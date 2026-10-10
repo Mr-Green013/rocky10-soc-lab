@@ -16,6 +16,8 @@
 | `proxmox/pve-clone-lab.sh` | pve-01 · root | 10 |
 | `windows/Initialize-SocLab.ps1` (เรียก `guest/post-clone.sh`) | Windows · PowerShell | 11 |
 | `proxmox/pve-snapshot.sh` | pve-01 · root | 12 |
+| `proxmox/pve-lab-power.sh` | pve-01 · root | ใช้งานประจำวัน |
+| `proxmox/pve-add-backup-storage.sh`, `proxmox/pve-backup.sh` | pve-01 · root | ขั้นเสริม B |
 | `proxmox/pve-check.sh`, `windows/Test-SocLab.ps1`, `guest/soclab-check.sh` | ตามชื่อ | วิธีตรวจสอบ |
 
 ขนาดเครื่องและ IP ทั้งหมดอยู่ใน `../lab-hosts.csv` แก้ที่ไฟล์นี้ไฟล์เดียว
@@ -64,4 +66,35 @@ bash pve-clone-lab.sh
 # [pve-01 · root]
 bash pve-check.sh
 bash pve-snapshot.sh ch01-base
+```
+
+## ใช้งานประจำวัน
+
+```powershell
+# [Windows · PowerShell (Admin)]
+Start-VM pve-01        # VM ทุกเครื่องที่ตั้ง onboot จะเปิดตามลำดับ ipa-01 ก่อน
+Stop-VM pve-01         # Proxmox ปิด VM ทุกเครื่องอย่างนุ่มนวลก่อนปิดตัวเอง
+```
+
+```bash
+# [pve-01 · root]
+bash pve-lab-power.sh status
+bash pve-lab-power.sh start ipa-01 graylog-01   # เปิดเฉพาะเครื่องที่บทนั้นใช้
+bash pve-lab-power.sh stop
+```
+
+## ขั้นเสริม B: backup ไป NVMe ลูกที่สอง
+
+```powershell
+# [Windows · PowerShell (Admin)]  E: = NVMe ลูกที่สอง
+New-VHD -Path E:\Hyper-V\pve-01-backup.vhdx -SizeBytes 500GB -Dynamic
+Add-VMHardDiskDrive -VMName pve-01 -ControllerType SCSI -Path E:\Hyper-V\pve-01-backup.vhdx
+Add-MpPreference -ExclusionPath E:\Hyper-V
+```
+
+```bash
+# [pve-01 · root]
+lsblk                                   # หา disk ใหม่ เช่น /dev/sdb
+bash pve-add-backup-storage.sh /dev/sdb
+bash pve-backup.sh
 ```
