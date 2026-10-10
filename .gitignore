@@ -1,0 +1,25 @@
+# ความลับและไฟล์เฉพาะเครื่อง
+*.env
+!example.env
+*.pem
+*.key
+id_*
+!*.pub.example
+
+# ISO และ disk image
+*.iso
+*.qcow2
+*.vhdx
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfvars
+crash.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

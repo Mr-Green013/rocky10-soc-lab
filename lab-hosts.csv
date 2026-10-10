@@ -1,0 +1,7 @@
+vmid,name,ip,cores,memory_mb,disk_gb,startup_order,role
+110,ipa-01,192.168.10.10,2,4096,40,1,FreeIPA (IdM / DNS / CA)
+120,graylog-01,192.168.10.20,4,10240,100,2,Graylog SIEM
+130,wazuh-01,192.168.10.30,4,8192,100,2,Wazuh manager / indexer / dashboard
+141,lab-linux-01,192.168.10.41,2,2048,32,3,Linux server / git server
+142,lab-linux-02,192.168.10.42,2,2048,32,3,attacker simulation / Samba
+150,node-01,192.168.10.50,4,6144,64,3,Docker / Tetragon / WordPress

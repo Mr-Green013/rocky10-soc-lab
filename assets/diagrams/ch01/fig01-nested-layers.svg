@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" font-family="Sarabun, 'Leelawadee UI', Tahoma, sans-serif">
+  <title>ภาพที่ 1-1 ชั้นของ nested virtualization ในห้องแลป</title>
+  <defs>
+    <marker id="up" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#E76F51"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="720" fill="#FFFFFF"/>
+
+  <!-- L2: guest VMs -->
+  <rect x="60" y="40" width="860" height="170" rx="14" fill="#E8F5F3" stroke="#2A9D8F" stroke-width="2.5"/>
+  <text x="80" y="74" font-size="22" font-weight="700" fill="#1F3A5F">L2  Rocky Linux 10 × 6  (VM ใน Proxmox)</text>
+  <g font-size="17" fill="#1F3A5F" text-anchor="middle">
+    <rect x="80"  y="96" width="130" height="92" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="1.5"/>
+    <text x="145" y="135" font-weight="700">ipa-01</text><text x="145" y="162">.10</text>
+    <rect x="220" y="96" width="130" height="92" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="1.5"/>
+    <text x="285" y="135" font-weight="700">graylog-01</text><text x="285" y="162">.20</text>
+    <rect x="360" y="96" width="130" height="92" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="1.5"/>
+    <text x="425" y="135" font-weight="700">wazuh-01</text><text x="425" y="162">.30</text>
+    <rect x="500" y="96" width="130" height="92" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="1.5"/>
+    <text x="565" y="135" font-weight="700">lab-linux-01</text><text x="565" y="162">.41</text>
+    <rect x="640" y="96" width="130" height="92" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="1.5"/>
+    <text x="705" y="135" font-weight="700">lab-linux-02</text><text x="705" y="162">.42</text>
+    <rect x="780" y="96" width="120" height="92" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="1.5"/>
+    <text x="840" y="135" font-weight="700">node-01</text><text x="840" y="162">.50</text>
+  </g>
+
+  <!-- L1: Proxmox -->
+  <rect x="60" y="232" width="860" height="140" rx="14" fill="#EAF0F8" stroke="#1F3A5F" stroke-width="2.5"/>
+  <text x="80" y="268" font-size="22" font-weight="700" fill="#1F3A5F">L1  pve-01: Proxmox VE 9  (Debian 13 + KVM/QEMU)</text>
+  <text x="80" y="302" font-size="18" fill="#33475B">VM ของ Hyper-V ที่ทำหน้าที่เป็น hypervisor ให้ชั้น L2 อีกต่อหนึ่ง</text>
+  <text x="80" y="334" font-size="18" fill="#33475B">vmbr0 = ทางออก internet · vmbr1 = network ของ lab 192.168.10.0/24</text>
+
+  <!-- L0: Windows + Hyper-V -->
+  <rect x="60" y="394" width="860" height="140" rx="14" fill="#F1F1F4" stroke="#5B6770" stroke-width="2.5"/>
+  <text x="80" y="430" font-size="22" font-weight="700" fill="#1F3A5F">L0  Windows 11 Pro + Hyper-V  (Type 1 hypervisor)</text>
+  <text x="80" y="464" font-size="18" fill="#33475B">Windows เองก็รันเป็น partition หนึ่งบน Hyper-V และเป็น admin workstation</text>
+  <text x="80" y="496" font-size="18" fill="#33475B">ของ lab ที่ 192.168.10.100 (SSH, Web UI ของ Proxmox / Graylog / Wazuh)</text>
+
+  <!-- Hardware -->
+  <rect x="60" y="556" width="860" height="120" rx="14" fill="#1F3A5F"/>
+  <text x="80" y="594" font-size="22" font-weight="700" fill="#FFFFFF">Hardware</text>
+  <text x="80" y="628" font-size="18" fill="#DCE6F2">Intel Core i9-13900K (VT-x, AVX2) · RAM 96 GB · NVMe 2 × 2 TB</text>
+  <text x="80" y="656" font-size="18" fill="#DCE6F2">BIOS: Intel Virtualization Technology (VT-x) และ VT-d = Enabled</text>
+
+  <!-- Right annotations -->
+  <line x1="1000" y1="650" x2="1000" y2="80" stroke="#E76F51" stroke-width="4" marker-end="url(#up)"/>
+  <g font-size="17" fill="#33475B">
+    <text x="1020" y="600" font-weight="700" fill="#E76F51">VT-x</text>
+    <text x="1020" y="624">มาจาก CPU จริง</text>
+    <text x="1020" y="446" font-weight="700" fill="#E76F51">Expose</text>
+    <text x="1020" y="470">Virtualization</text>
+    <text x="1020" y="494">Extensions = On</text>
+    <text x="1020" y="290" font-weight="700" fill="#E76F51">CPU type</text>
+    <text x="1020" y="314">= host</text>
+    <text x="1020" y="338">(ส่ง AVX2 ต่อ)</text>
+    <text x="1020" y="128" font-weight="700" fill="#E76F51">x86-64-v3</text>
+    <text x="1020" y="152">ที่ Rocky 10</text>
+    <text x="1020" y="176">ต้องการ</text>
+  </g>
+</svg>
