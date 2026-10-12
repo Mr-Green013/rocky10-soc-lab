@@ -1,0 +1,6 @@
+<!-- บทที่ 21: เพิ่มใน local_decoder.xml -->
+<decoder name="git-guard">
+  <program_name>^git-guard$</program_name>
+  <regex>^(\S+) user=(\S+) repo=(\S+) remote=(\S+) reason=(\S+)</regex>
+  <order>action, srcuser, git.repo, git.remote, git.reason</order>
+</decoder>

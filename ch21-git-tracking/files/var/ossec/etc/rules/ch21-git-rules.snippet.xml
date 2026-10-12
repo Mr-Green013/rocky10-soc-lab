@@ -1,0 +1,52 @@
+<!-- บทที่ 21: วาง rule 100370–100372 ใน 130-audit_rules.xml, 100375–100377 ต่อท้าย และ 100378 ใน group tetragon ของ 160-container_rules.xml -->
+<rule id="100370" level="3">
+  <if_sid>80700</if_sid>
+  <field name="audit.key">git_cmd</field>
+  <description>git executed (auid=$(audit.auid), cwd=$(audit.cwd))</description>
+  <group>git_activity,</group>
+</rule>
+
+<rule id="100371" level="10">
+  <if_sid>100370</if_sid>
+  <regex type="pcre2">a\d+="push"(?=.*a\d+="(--force|-f|--force-with-lease|--mirror|--delete)")|credential\.helper|filter-branch|filter-repo</regex>
+  <description>git: risky operation (force push, history rewrite or stored credentials) by auid=$(audit.auid)</description>
+  <mitre><id>T1565.001</id></mitre>
+  <group>git_activity,</group>
+</rule>
+
+<rule id="100372" level="12">
+  <if_sid>100370, 100371</if_sid>
+  <regex type="pcre2">--no-verify|core\.hooksPath</regex>
+  <description>git: attempt to bypass the git-guard hook by auid=$(audit.auid)</description>
+  <mitre><id>T1562.001</id></mitre>
+  <group>git_activity,</group>
+</rule>
+
+<rule id="100375" level="3">
+  <decoded_as>git-guard</decoded_as>
+  <description>git-guard: push $(action) for $(srcuser) to $(git.remote)</description>
+  <group>git_activity,</group>
+</rule>
+
+<rule id="100376" level="10">
+  <if_sid>100375</if_sid>
+  <action>DENY</action>
+  <description>git-guard: push DENIED for $(srcuser): $(git.reason) (remote $(git.remote))</description>
+  <mitre><id>T1567</id></mitre>
+  <group>git_activity,git_denied,</group>
+</rule>
+
+<rule id="100377" level="12" frequency="3" timeframe="600">
+  <if_matched_sid>100376</if_matched_sid>
+  <same_srcuser />
+  <description>git-guard: 3 denied pushes by the same user within 10 minutes</description>
+  <group>git_activity,</group>
+</rule>
+
+  <rule id="100378" level="13">
+    <if_sid>100800, 100801, 100802</if_sid>
+    <field name="process_kprobe.policy_name">^git-egress$</field>
+    <description>git blocked in kernel: connection to unapproved host by $(process_kprobe.process.binary) $(process_kprobe.process.arguments) (auid=$(process_kprobe.process.auid))</description>
+    <mitre><id>T1567.001</id></mitre>
+    <group>git_activity,</group>
+  </rule>

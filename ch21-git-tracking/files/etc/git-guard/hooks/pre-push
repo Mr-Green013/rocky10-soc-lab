@@ -1,0 +1,22 @@
+#!/bin/bash
+# git-guard pre-push hook: บังคับ remote ที่อนุมัติ และกัน force push / ลบ protected branch
+remote="$1"; url="$2"
+ALLOWED_RE='^(ssh://)?([A-Za-z0-9._-]+@)?git\.lab\.internal[:/]|^https://git\.lab\.internal/'
+PROTECTED_RE='^refs/heads/(main|master|release/.+)$'
+[ -r "${GIT_GUARD_CONF:-/etc/git-guard/config}" ] && . "${GIT_GUARD_CONF:-/etc/git-guard/config}"
+
+repo=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+say() { logger -p authpriv.notice -t git-guard "$1 user=$(id -un) repo=$repo remote=$url reason=$2"; }
+deny() { say DENY "$1"; echo "git-guard: push blocked ($1)" >&2; exit 1; }
+
+[[ "$url" =~ $ALLOWED_RE ]] || deny "remote-not-approved"
+
+while read -r lref lsha rref rsha; do
+  [[ "$rref" =~ $PROTECTED_RE ]] || continue
+  [[ "$lsha" =~ ^0+$ ]] && deny "delete-protected-branch"
+  if [[ ! "$rsha" =~ ^0+$ ]] && ! git merge-base --is-ancestor "$rsha" "$lsha" 2>/dev/null; then
+    deny "force-push-protected-branch"
+  fi
+done
+say ALLOW ok
+exit 0
