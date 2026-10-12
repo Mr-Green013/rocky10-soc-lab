@@ -1,0 +1,81 @@
+# /opt/graylog/docker-compose.yml สถานะหลังจบบทที่ 10
+# cloudflared อยู่ใน profile "tunnel": เริ่มเฉพาะเมื่อสั่ง  sudo docker compose --profile tunnel up -d
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    networks: [graylog]
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+
+  datanode:
+    image: graylog/graylog-datanode:${GRAYLOG_VERSION}
+    hostname: datanode
+    restart: unless-stopped
+    networks: [graylog]
+    environment:
+      GRAYLOG_DATANODE_NODE_ID_FILE: /var/lib/graylog-datanode/node-id
+      GRAYLOG_DATANODE_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET}
+      GRAYLOG_DATANODE_MONGODB_URI: mongodb://mongodb:27017/graylog
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    volumes:
+      - datanode_data:/var/lib/graylog-datanode
+
+  graylog:
+    image: graylog/graylog:${GRAYLOG_VERSION}
+    hostname: server
+    restart: unless-stopped
+    depends_on: [mongodb, datanode]
+    entrypoint: /usr/bin/tini -- /docker-entrypoint.sh
+    networks: [graylog]
+    environment:
+      GRAYLOG_NODE_ID_FILE: /usr/share/graylog/data/data/node-id
+      GRAYLOG_PASSWORD_SECRET: ${GRAYLOG_PASSWORD_SECRET}
+      GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2}
+      GRAYLOG_ROOT_TIMEZONE: Asia/Bangkok
+      GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
+      GRAYLOG_HTTP_EXTERNAL_URI: ${GRAYLOG_EXTERNAL_URI}
+      GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
+    ports:
+      - "127.0.0.1:9000:9000/tcp"   # Web UI และ API: เข้าผ่าน nginx เท่านั้น (16.10)
+      - "1514:1514/tcp"             # Syslog TCP
+      - "1514:1514/udp"             # Syslog UDP
+      - "12201:12201/tcp"           # GELF HTTP/TCP
+      - "12201:12201/udp"           # GELF UDP
+    volumes:
+      - graylog_data:/usr/share/graylog/data/data
+      - graylog_journal:/usr/share/graylog/data/journal
+
+  nginx:
+    image: nginx:stable
+    restart: unless-stopped
+    networks: [graylog]
+    depends_on: [graylog]
+    ports:
+      - "443:443/tcp"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro,Z
+      - ./nginx/tls:/etc/nginx/tls:ro,Z
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest   # เปลี่ยนเป็นเวอร์ชันที่ทดสอบแล้ว
+    profiles: [tunnel]
+    restart: unless-stopped
+    networks: [graylog]
+    depends_on: [nginx]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+
+networks:
+  graylog:
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+  datanode_data:
+  graylog_data:
+  graylog_journal:

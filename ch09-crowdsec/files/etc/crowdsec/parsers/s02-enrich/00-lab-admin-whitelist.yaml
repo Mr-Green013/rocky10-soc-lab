@@ -1,0 +1,6 @@
+name: lab/admin-whitelist
+description: "Admin workstation - never ban"
+whitelist:
+  reason: "lab admin workstation"
+  ip:
+    - "192.168.10.100"

@@ -1,0 +1,8 @@
+[Unit]
+Description=Import Tor exit nodes into CrowdSec
+After=crowdsec.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/crowdsec-tor-import.sh
