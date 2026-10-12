@@ -1,0 +1,134 @@
+# Pipeline SOC-SSH ของบทที่ 11 (Lab 16.25)
+# วางทีละ rule ที่ System → Pipelines → Manage rules → Create Rule แล้วจัดเข้า stage ตามตาราง
+# Stage 0: Rule1, Rule2A, Rule2B, Rule3, Rule4 | Stage 1: Rule5–7 | Stage 2: Rule8 | Stage 3: Rule9–10 | Stage 4: Rule11
+
+rule "Rule1-SOC SSH classify USER_AUTH failed"
+when
+  contains(to_string($message.message), "type=USER_AUTH") &&
+  contains(to_string($message.message), "/sshd") &&
+  contains(to_string($message.message), "op=PAM:authentication") &&
+  contains(to_string($message.message), "res=failed")
+then
+  set_field("event_source", "auditd");
+  set_field("ssh_event", "auth_failed");
+  set_field("auth_method", "password");
+  set_field("event_outcome", "failure");
+end
+
+rule "Rule2A-SOC SSH classify USER_AUTH success password"
+when
+  contains(to_string($message.message), "type=USER_AUTH") &&
+  contains(to_string($message.message), "/sshd") &&
+  contains(to_string($message.message), "op=PAM:authentication") &&
+  contains(to_string($message.message), "res=success")
+then
+  set_field("event_source", "auditd");
+  set_field("ssh_event", "auth_success");
+  set_field("auth_method", "password");
+  set_field("event_outcome", "success");
+end
+
+rule "Rule2B-SOC SSH classify USER_AUTH success key"
+when
+  contains(to_string($message.message), "type=USER_AUTH") &&
+  contains(to_string($message.message), "/sshd") &&
+  contains(to_string($message.message), "op=pubkey") &&
+  contains(to_string($message.message), "res=success")
+then
+  set_field("event_source", "auditd");
+  set_field("ssh_event", "auth_success");
+  set_field("auth_method", "publickey");
+  set_field("event_outcome", "success");
+end
+
+rule "Rule3-SOC SSH classify USER_START success"
+when
+  contains(to_string($message.message), "type=USER_START") &&
+  contains(to_string($message.message), "/sshd") &&
+  contains(to_string($message.message), "res=success")
+then
+  set_field("event_source", "auditd");
+  set_field("ssh_event", "session_start");
+  set_field("event_outcome", "success");
+end
+
+rule "Rule4-SOC SSH classify invalid user"
+when
+  starts_with(to_string($message.application_name), "sshd") &&
+  contains(to_string($message.message), "Invalid user ")
+then
+  set_field("event_source", "sshd");
+  set_field("ssh_event", "invalid_user");
+  set_field("event_outcome", "failure");
+end
+
+rule "Rule5-SOC SSH extract USER_START fields"
+when
+  to_string($message.ssh_event) == "session_start"
+then
+  let msg = to_string($message.message);
+  let ids = regex("auid=(\\d+) ses=(\\d+)", msg);
+  let who = regex("acct=\"([^\"]+)\"", msg);
+  let src = regex("addr=([0-9a-fA-F:.]+)", msg);
+  set_field("audit_auid", ids["0"]);
+  set_field("audit_session", ids["1"]);
+  set_field("ssh_user", who["0"]);
+  set_field("src_ip", src["0"]);
+end
+
+rule "Rule6-SOC SSH extract USER_AUTH fields"
+when
+  to_string($message.ssh_event) == "auth_failed" ||
+  to_string($message.ssh_event) == "auth_success"
+then
+  let msg = to_string($message.message);
+  let who = regex("acct=\"([^\"]+)\"", msg);
+  let src = regex("addr=([0-9a-fA-F:.]+)", msg);
+  set_field("ssh_user", who["0"]);
+  set_field("src_ip", src["0"]);
+end
+
+rule "Rule7-SOC SSH extract invalid user fields"
+when
+  to_string($message.ssh_event) == "invalid_user"
+then
+  let m = regex("Invalid user (\\S*) from ([0-9a-fA-F:.]+) port (\\d+)", to_string($message.message));
+  set_field("ssh_user", m["0"]);
+  set_field("src_ip", m["1"]);
+  set_field("src_port", m["2"]);
+end
+
+rule "Rule8-SOC SSH severity default"
+when
+  has_field("ssh_event")
+then
+  set_field("severity", "info");
+  set_field("severity_level", 1);
+end
+
+rule "Rule9-SOC SSH severity failed user"
+when
+  to_string($message.ssh_event) == "auth_failed"
+then
+  set_field("severity", "medium");
+  set_field("severity_level", 2);
+end
+
+rule "Rule10-SOC SSH severity invalid user"
+when
+  to_string($message.ssh_event) == "invalid_user"
+then
+  set_field("severity", "high");
+  set_field("severity_level", 3);
+  route_to_stream(name: "suspicious-ip");
+end
+
+rule "Rule11-SOC SSH severity root"
+when
+  to_string($message.ssh_user) == "root" &&
+  to_string($message.event_outcome) == "failure"
+then
+  set_field("severity", "critical");
+  set_field("severity_level", 4);
+  route_to_stream(name: "suspicious-ip");
+end

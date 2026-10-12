@@ -1,0 +1,17 @@
+type: http
+name: http_graylog
+log_level: info
+format: |
+  {{- range $i, $alert := . -}}
+  {{- if eq $i 0 -}}
+  {{- range $j, $d := $alert.Decisions -}}
+  {{- if eq $j 0 -}}
+  {"version":"1.1","host":"lab-linux-01","short_message":"CrowdSec {{$d.Type}} {{$d.Value}} by {{$d.Scenario}}","level":4,"_event_source":"crowdsec","_cs_ip":"{{$d.Value}}","_cs_scenario":"{{$d.Scenario}}","_cs_type":"{{$d.Type}}","_cs_duration":"{{$d.Duration}}","_cs_origin":"{{$d.Origin}}","_cs_country":"{{$alert.Source.Cn}}","_cs_as_name":"{{$alert.Source.AsName}}","_cs_events_count":{{$alert.EventsCount}}}
+  {{- end -}}
+  {{- end -}}
+  {{- end -}}
+  {{- end -}}
+url: http://192.168.10.20:12201/gelf
+method: POST
+headers:
+  Content-Type: application/json

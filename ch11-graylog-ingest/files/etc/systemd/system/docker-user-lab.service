@@ -1,0 +1,15 @@
+[Unit]
+Description=Restrict Graylog log ports to the lab subnet (DOCKER-USER)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/iptables -I DOCKER-USER -p tcp --dport 1514 ! -s 192.168.10.0/24 -j DROP
+ExecStart=/usr/sbin/iptables -I DOCKER-USER -p udp --dport 1514 ! -s 192.168.10.0/24 -j DROP
+ExecStart=/usr/sbin/iptables -I DOCKER-USER -p tcp --dport 12201 ! -s 192.168.10.0/24 -j DROP
+ExecStart=/usr/sbin/iptables -I DOCKER-USER -p udp --dport 12201 ! -s 192.168.10.0/24 -j DROP
+
+[Install]
+WantedBy=multi-user.target
