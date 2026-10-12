@@ -29,7 +29,7 @@ Windows 11 Pro (192.168.10.100)
 | Path | เนื้อหา |
 | --- | --- |
 | `lab-hosts.csv` | IP, VM ID, ขนาดของทุกเครื่อง (script ทุกตัวอ่านจากไฟล์นี้) |
-| `docs/` | โครงเล่ม, template ของบท และข้อตกลงในเล่ม |
+| `docs/` | โครงเล่ม, แผนเรียน 60 วัน ([study-plan.md](docs/study-plan.md)), ผลตรวจหัวข้อ ([topic-verification.md](docs/topic-verification.md)) และข้อตกลงในเล่ม |
 | `chNN-*/` | ไฟล์ Lab ของแต่ละบท แยกตามเครื่องที่รัน: `windows/`, `proxmox/`, `guest/` |
 | `assets/diagrams/chNN/` | ต้นฉบับ SVG ของ diagram ในหนังสือ |
 | `infra/azure-terraform/` | Terraform สร้าง lab บน Azure |
