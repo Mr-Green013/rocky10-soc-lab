@@ -1,0 +1,59 @@
+# 70-account-tracker.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "account-tracker"
+spec:
+  kprobes:
+  - call: "security_bprm_check"          # ใครรันเครื่องมือจัดการบัญชี
+    syscall: false
+    args:
+    - index: 0
+      type: "linux_binprm"
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Equal"
+        values:
+        - "/usr/sbin/useradd"
+        - "/usr/sbin/userdel"
+        - "/usr/sbin/usermod"
+        - "/usr/sbin/groupadd"
+        - "/usr/sbin/groupdel"
+        - "/usr/sbin/groupmod"
+        - "/usr/sbin/chpasswd"
+        - "/usr/sbin/visudo"
+        - "/usr/bin/passwd"
+        - "/usr/bin/chage"
+        - "/usr/bin/gpasswd"
+        - "/usr/bin/su"
+      matchActions:
+      - action: Post
+  - call: "security_file_permission"     # ใคร write ไฟล์บัญชีตรง ๆ
+    syscall: false
+    args:
+    - index: 0
+      type: "file"
+    - index: 1
+      type: "int"
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Equal"
+        values:
+        - "/etc/passwd"
+        - "/etc/shadow"
+        - "/etc/group"
+        - "/etc/gshadow"
+        - "/etc/sudoers"
+      - index: 1
+        operator: "Equal"
+        values:
+        - "2"                            # MAY_WRITE
+      matchNamespaces:
+      - namespace: Pid
+        operator: In
+        values:
+        - "host_ns"
+      matchActions:
+      - action: Post

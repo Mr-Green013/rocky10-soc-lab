@@ -1,0 +1,63 @@
+# 50-suid-guard.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "suid-guard"
+spec:
+  kprobes:
+  - call: "sys_chmod"
+    syscall: true
+    args:
+    - index: 0
+      type: "string"
+    - index: 1
+      type: "int"
+    selectors:
+    - matchArgs:                 # container: ฆ่า
+      - index: 1
+        operator: "Mask"
+        values:
+        - "3072"                 # 06000 = S_ISUID | S_ISGID
+      matchNamespaces:
+      - namespace: Pid
+        operator: NotIn
+        values:
+        - "host_ns"
+      matchActions:
+      - action: Sigkill
+    - matchArgs:                 # host: บันทึกอย่างเดียว
+      - index: 1
+        operator: "Mask"
+        values:
+        - "3072"
+      matchActions:
+      - action: Post
+  - call: "sys_fchmodat"
+    syscall: true
+    args:
+    - index: 0
+      type: "int"
+    - index: 1
+      type: "string"
+    - index: 2
+      type: "int"
+    selectors:
+    - matchArgs:
+      - index: 2
+        operator: "Mask"
+        values:
+        - "3072"
+      matchNamespaces:
+      - namespace: Pid
+        operator: NotIn
+        values:
+        - "host_ns"
+      matchActions:
+      - action: Sigkill
+    - matchArgs:
+      - index: 2
+        operator: "Mask"
+        values:
+        - "3072"
+      matchActions:
+      - action: Post

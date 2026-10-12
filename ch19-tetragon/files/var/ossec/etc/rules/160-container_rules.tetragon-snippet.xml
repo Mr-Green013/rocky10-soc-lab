@@ -1,0 +1,82 @@
+<!-- ส่วน Tetragon ของ 160-container_rules.xml (บทที่ 19) ต่อท้ายไฟล์เดิมจากบทที่ 18 -->
+<group name="tetragon,container_security,">
+
+  <rule id="100800" level="3">
+    <decoded_as>json</decoded_as>
+    <field name="integration">^tetragon$</field>
+    <description>Tetragon: $(process_kprobe.policy_name) / $(process_kprobe.function_name) by $(process_kprobe.process.binary)</description>
+  </rule>
+
+  <rule id="100801" level="7">
+    <if_sid>100800</if_sid>
+    <field name="process_kprobe.action">^KPROBE_ACTION_POST$</field>
+    <description>Tetragon observed: $(process_kprobe.policy_name) by $(process_kprobe.process.binary) $(process_kprobe.process.arguments)</description>
+  </rule>
+
+  <rule id="100802" level="12">
+    <if_sid>100800</if_sid>
+    <field name="process_kprobe.action">^KPROBE_ACTION_SIGKILL$|^KPROBE_ACTION_OVERRIDE$</field>
+    <description>Tetragon BLOCKED: $(process_kprobe.policy_name) by $(process_kprobe.process.binary) $(process_kprobe.process.arguments)</description>
+    <mitre><id>T1059</id></mitre>
+    <group>tetragon_kill,</group>
+  </rule>
+
+  <rule id="100805" level="14" frequency="3" timeframe="120">
+    <if_matched_group>tetragon_kill</if_matched_group>
+    <same_field>process_kprobe.process.docker</same_field>
+    <description>Tetragon killed 3 or more processes within 120s in the same container</description>
+    <mitre><id>T1611</id></mitre>
+  </rule>
+
+  <rule id="100810" level="12">
+    <if_sid>100800, 100801, 100802</if_sid>
+    <field name="process_kprobe.policy_name">^keyguard$</field>
+    <description>KeyGuard: SSH host key touched by $(process_kprobe.process.binary) (auid=$(process_kprobe.process.auid))</description>
+    <mitre><id>T1552.004</id></mitre>
+  </rule>
+
+  <rule id="100811" level="12">
+    <if_sid>100802</if_sid>
+    <field name="process_kprobe.policy_name">^suid-guard$</field>
+    <description>SUID/SGID bit set attempt killed in container: $(process_kprobe.process.binary) $(process_kprobe.process.arguments)</description>
+    <mitre><id>T1548.001</id></mitre>
+    <group>tetragon_kill,</group>
+  </rule>
+
+  <rule id="100813" level="8">
+    <if_sid>100801</if_sid>
+    <field name="process_kprobe.policy_name">^suid-guard$</field>
+    <description>SUID/SGID bit set on host by $(process_kprobe.process.binary) $(process_kprobe.process.arguments) (auid=$(process_kprobe.process.auid))</description>
+    <mitre><id>T1548.001</id></mitre>
+  </rule>
+
+  <rule id="100812" level="10">
+    <if_sid>100800, 100801, 100802</if_sid>
+    <field name="process_kprobe.policy_name">^sensitive-files$</field>
+    <description>Sensitive file read by $(process_kprobe.process.binary) (auid=$(process_kprobe.process.auid))</description>
+    <mitre><id>T1003.008</id></mitre>
+  </rule>
+
+  <rule id="100820" level="8">
+    <if_sid>100800, 100801, 100802</if_sid>
+    <field name="process_kprobe.policy_name">^account-tracker$</field>
+    <field name="process_kprobe.function_name">security_bprm_check</field>
+    <description>Account tool executed: $(process_kprobe.process.arguments) (auid=$(process_kprobe.process.auid))</description>
+    <mitre><id>T1136.001</id><id>T1098</id></mitre>
+  </rule>
+
+  <rule id="100821" level="12">
+    <if_sid>100800, 100801, 100802</if_sid>
+    <field name="process_kprobe.policy_name">^account-tracker$</field>
+    <field name="process_kprobe.function_name">security_file_permission</field>
+    <description>Direct write to account database by $(process_kprobe.process.binary) (auid=$(process_kprobe.process.auid))</description>
+    <mitre><id>T1136.001</id></mitre>
+  </rule>
+
+  <rule id="100830" level="5">
+    <if_sid>100800, 100801, 100802</if_sid>
+    <field name="process_kprobe.policy_name">^connect-audit$</field>
+    <description>Container outbound connect by $(process_kprobe.process.binary)</description>
+  </rule>
+
+</group>

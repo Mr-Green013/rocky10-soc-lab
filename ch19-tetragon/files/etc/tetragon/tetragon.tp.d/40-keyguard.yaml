@@ -1,0 +1,33 @@
+# 40-keyguard.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
+# ระยะที่ 1 (สังเกต) ระยะบังคับ: เปลี่ยน action เป็น Sigkill และลบ rateLimit ตามขั้นตอนที่ 5 ของ 24-E
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "keyguard"
+spec:
+  kprobes:
+  - call: "security_file_permission"
+    syscall: false
+    args:
+    - index: 0
+      type: "file"
+    - index: 1
+      type: "int"
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Equal"
+        values:
+        - "/etc/ssh/ssh_host_rsa_key"
+        - "/etc/ssh/ssh_host_ecdsa_key"
+        - "/etc/ssh/ssh_host_ed25519_key"
+      matchBinaries:
+      - operator: "NotIn"
+        values:
+        - "/usr/sbin/sshd"
+        - "/usr/libexec/openssh/sshd-session"
+        - "/usr/bin/ssh-keygen"
+        - "/var/ossec/bin/wazuh-syscheckd"
+      matchActions:
+      - action: Post
+        rateLimit: "1m"

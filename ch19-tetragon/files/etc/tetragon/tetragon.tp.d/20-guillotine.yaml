@@ -1,0 +1,27 @@
+# 20-guillotine.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "guillotine"
+spec:
+  kprobes:
+  - call: "security_bprm_check"
+    syscall: false
+    args:
+    - index: 0
+      type: "linux_binprm"
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Equal"
+        values:
+        - "/usr/bin/ncat"
+        - "/usr/bin/nmap"
+        - "/usr/bin/socat"
+      matchNamespaces:
+      - namespace: Pid
+        operator: NotIn
+        values:
+        - "host_ns"
+      matchActions:
+      - action: Sigkill

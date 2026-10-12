@@ -1,0 +1,40 @@
+# 60-sensitive-files.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "sensitive-files"
+spec:
+  kprobes:
+  - call: "security_file_permission"
+    syscall: false
+    args:
+    - index: 0
+      type: "file"
+    - index: 1
+      type: "int"
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Prefix"
+        values:
+        - "/etc/shadow"
+        - "/etc/gshadow"
+        - "/etc/sudoers"
+        - "/etc/krb5.keytab"
+        - "/root/.ssh/"
+      matchNamespaces:
+      - namespace: Pid
+        operator: In
+        values:
+        - "host_ns"
+      matchBinaries:
+      - operator: "NotIn"
+        values:
+        - "/usr/sbin/sshd"
+        - "/usr/libexec/openssh/sshd-session"
+        - "/usr/bin/sudo"
+        - "/usr/sbin/unix_chkpwd"
+        - "/var/ossec/bin/wazuh-syscheckd"
+      matchActions:
+      - action: Post
+        rateLimit: "1m"
