@@ -102,7 +102,7 @@ locals {
           content     = local.etc_hosts
         },
         {
-          # เรียงก่อน 10-auth.conf (Lab 12) และ 50-redhat.conf; ไม่แตะ PasswordAuthentication
+          # เรียงหลัง 01-soclab-auth.conf (บทที่ 8) แต่ก่อน 50-redhat.conf; ไม่แตะ PasswordAuthentication
           # เพื่อให้ Lab 14 เปิด password ชั่วคราวได้ตามเอกสาร
           path        = "/etc/ssh/sshd_config.d/05-soclab-baseline.conf"
           permissions = "0600"
