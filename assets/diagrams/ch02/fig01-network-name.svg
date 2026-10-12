@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700" font-family="Sarabun, 'Leelawadee UI', Tahoma, sans-serif">
+  <title>ภาพที่ 2-1 ชั้นของ NetworkManager และลำดับการแปลงชื่อเป็น IP</title>
+  <defs><marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#1F3A5F"/></marker></defs>
+  <rect width="1400" height="700" fill="#fff"/>
+  <!-- left: NetworkManager -->
+  <text x="40" y="50" font-size="24" font-weight="700" fill="#1F3A5F">NetworkManager: device กับ connection</text>
+  <g font-size="17" fill="#33475B">
+    <rect x="40" y="80" width="600" height="110" rx="12" fill="#EAF0F8" stroke="#1F3A5F" stroke-width="2"/>
+    <text x="60" y="115" font-size="20" font-weight="700" fill="#1F3A5F">คำสั่งที่ผู้ดูแลใช้</text>
+    <text x="60" y="148">nmcli (ใช้ใน script และหนังสือเล่มนี้) · nmtui (เมนู)</text>
+    <text x="60" y="174">nmcli connection modify lab …  →  nmcli device reapply eth0</text>
+    <rect x="40" y="230" width="600" height="150" rx="12" fill="#FDF0EC" stroke="#E76F51" stroke-width="2"/>
+    <text x="60" y="265" font-size="20" font-weight="700" fill="#1F3A5F">connection (profile) ชื่อ "lab"</text>
+    <text x="60" y="298">ค่าที่ตั้ง: ipv4.method manual, address 192.168.10.41/24,</text>
+    <text x="60" y="322">gateway 192.168.10.1, dns 1.1.1.1, dns-search lab.internal</text>
+    <text x="60" y="354" font-family="monospace" font-size="15">/etc/NetworkManager/system-connections/*.nmconnection</text>
+    <rect x="40" y="420" width="600" height="110" rx="12" fill="#E8F5F3" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="60" y="455" font-size="20" font-weight="700" fill="#1F3A5F">device: eth0 (NIC virtio ใน Proxmox)</text>
+    <text x="60" y="488">ของจริงที่ kernel เห็น ดูด้วย ip -br link / nmcli device</text>
+    <text x="60" y="514">profile หนึ่งผูกกับ device ได้ทีละตัว</text>
+  </g>
+  <g stroke="#1F3A5F" stroke-width="3" fill="none" marker-end="url(#a)">
+    <line x1="340" y1="192" x2="340" y2="226"/><line x1="340" y1="382" x2="340" y2="416"/>
+  </g>
+  <text x="40" y="580" font-size="16" fill="#5B6770">บทที่ 1: cloud-init สร้าง profile ให้ (ชื่อตั้งต้นเช่น "cloud-init eth0")</text>
+  <text x="40" y="606" font-size="16" fill="#5B6770">บทนี้เปลี่ยนชื่อเป็น "lab" แล้วจัดการด้วย nmcli เอง (ปิด cloud-init แล้ว จึงไม่ถูกเขียนทับ)</text>
+
+  <!-- right: name resolution -->
+  <text x="740" y="50" font-size="24" font-weight="700" fill="#1F3A5F">ชื่อเครื่อง → IP</text>
+  <g font-size="17" fill="#33475B">
+    <rect x="740" y="80" width="620" height="80" rx="12" fill="#F1F1F4" stroke="#5B6770" stroke-width="2"/>
+    <text x="760" y="113" font-size="19" font-weight="700" fill="#1F3A5F">โปรแกรมถาม: ssh ipa-01.lab.internal</text>
+    <text x="760" y="142">ผ่าน glibc (getaddrinfo) ซึ่งอ่านลำดับจาก /etc/nsswitch.conf</text>
+    <rect x="740" y="200" width="620" height="120" rx="12" fill="#E8F5F3" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="760" y="233" font-size="19" font-weight="700" fill="#1F3A5F">1) files → /etc/hosts</text>
+    <text x="760" y="264" font-family="monospace" font-size="15">192.168.10.10  ipa-01.lab.internal ipa-01</text>
+    <text x="760" y="292">พบแล้วหยุดทันที ใช้ได้แม้ไม่มี DNS (บทที่ 2–6)</text>
+    <rect x="740" y="360" width="620" height="120" rx="12" fill="#EAF0F8" stroke="#1F3A5F" stroke-width="2"/>
+    <text x="760" y="393" font-size="19" font-weight="700" fill="#1F3A5F">2) dns → /etc/resolv.conf</text>
+    <text x="760" y="424" font-family="monospace" font-size="15">nameserver 1.1.1.1   search lab.internal</text>
+    <text x="760" y="452">ตั้งโดย NetworkManager จาก profile "lab"</text>
+    <rect x="740" y="520" width="620" height="90" rx="12" fill="#1F3A5F"/>
+    <text x="760" y="555" font-size="19" font-weight="700" fill="#fff">บทที่ 7: เปลี่ยน DNS เป็น FreeIPA (192.168.10.10)</text>
+    <text x="760" y="585" fill="#DCE6F2">ชื่อ *.lab.internal จะมาจาก DNS ของ IPA แทน /etc/hosts</text>
+  </g>
+  <g stroke="#1F3A5F" stroke-width="3" fill="none" marker-end="url(#a)">
+    <line x1="1050" y1="162" x2="1050" y2="196"/><line x1="1050" y1="322" x2="1050" y2="356"/><line x1="1050" y1="482" x2="1050" y2="516"/>
+  </g>
+  <text x="1110" y="342" font-size="15" fill="#5B6770">ไม่พบใน hosts</text>
+  <text x="740" y="660" font-size="16" fill="#5B6770">ลำดับจริงของเครื่องดูได้ด้วย: grep ^hosts /etc/nsswitch.conf · ทดสอบด้วย getent hosts &lt;ชื่อ&gt;</text>
+</svg>

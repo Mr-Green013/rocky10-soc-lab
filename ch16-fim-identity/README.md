@@ -2,7 +2,7 @@
 
 Lab ในหลักสูตร: 22
 
-syscheck แบบ realtime และ whodata ติดตามไฟล์สำคัญ ตรวจการแก้กลุ่ม การสวมรอยด้วย usermod เฝ้าดู SMB share และแจ้งเตือนการลบไฟล์จำนวนมากแบบ ransomware
+syscheck แบบ scheduled, realtime และ whodata ติดตามไฟล์สำคัญ เก็บ diff ของ config โดยไม่ให้ความลับรั่ว เฝ้า sudoers, authorized_keys, cron, /boot และ baseline ของไฟล์ SUID ตรวจการแก้กลุ่มและการสวมรอยด้วย usermod เฝ้า SMB share และแจ้งเตือนการลบไฟล์จำนวนมาก
 
 สิ่งที่ได้เมื่อจบบท:
 
@@ -11,4 +11,4 @@ syscheck แบบ realtime และ whodata ติดตามไฟล์ส�
 
 สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

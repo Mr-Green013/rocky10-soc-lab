@@ -9,6 +9,21 @@ Lab ในหลักสูตร: 4, 6, 7
 - ทุกเครื่อง sync เวลาจากแหล่งเดียวกัน
 - อ่าน chronyc sources และ tracking ได้
 
-สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
+สถานะ: ต้นฉบับเขียนแล้ว รอทดสอบบนเครื่องจริง
 
 เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+
+## ไฟล์
+
+| ไฟล์ | รันที่ | หน้าที่ |
+| --- | --- | --- |
+| `proxmox/pve-ntp-server.sh` | pve-01 | chrony ของ pve-01 แจกเวลาให้ lab |
+| `guest/set-time.sh` | ทุก VM | timezone และ chrony ชี้ pve-01 |
+| `guest/ch03-check.sh` | ทุก VM | ตรวจ kernel, BTF, OS, เวลา |
+
+รัน script ฝั่ง guest กับทุกเครื่องจาก Windows:
+
+```powershell
+cd tools\windows
+.\Invoke-SocLabScript.ps1 -Script ..\..\ch03-kernel-time-ntp\guest\ch03-check.sh
+```

@@ -47,7 +47,7 @@ Domain `lab.internal`, ผู้ใช้ admin `aod`, template `rocky10-tpl` (V
 | | 19 | Tetragon: มองเห็นและหยุดภัยระดับ Kernel | 33, 35, 36, 37 | node-01 | `ch19-tetragon` |
 | 7 SOC Operations ขั้นสูง | 20 | SOC Analyst Access และ Sudo Violation Dashboard | 25, 26 | ipa-01, graylog-01 | – |
 | | 21 | ติดตามและบล็อกคำสั่ง Git แบบ Real-time | 27 | lab-linux-01 | – |
-| | 22 | Application และ Web Logging: Nginx, WordPress, Redis | 28, 29, 30, 31 | node-01, graylog-01 | `ch22-web` |
+| | 22 | Application และ Web Logging: Nginx, WordPress, Redis และ WAF | 28, 29, 30, 31, 32 | node-01, graylog-01 | `ch22-web` |
 | 8 แจ้งเตือนและปรับแต่ง | 23 | Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh | 38, 39, 40 | wazuh-01 | `ch23-final` |
 | ภาคผนวก | ก | สร้างห้องแลปบน Azure ด้วย Terraform | – | – | – |
 | | ข | ตาราง Port, Service และ Firewall ของทุกเครื่อง | – | – | – |
@@ -55,7 +55,7 @@ Domain `lab.internal`, ผู้ใช้ admin `aod`, template `rocky10-tpl` (V
 | | ง | ดัชนีปัญหาและวิธีแก้ (รวมจากทุกบท) | – | – | – |
 | | จ | อภิธานศัพท์ ไทย–อังกฤษ | – | – | – |
 
-หมายเหตุ: หลักสูตรต้นฉบับข้ามเลข Lab 32 (จาก 31 ไป 33) เล่มนี้คงเลข Lab เดิมไว้เพื่อให้อ้างอิงกับหลักสูตรได้ การแบ่ง Lab 16 และ 21 ออกเป็น 2 บทจะยืนยันเลขหัวข้อย่อยอีกครั้งตอนเขียนบทนั้น
+หมายเหตุ: สารบัญต้นฉบับข้ามเลข Lab 32 เล่มนี้เพิ่ม Lab 32 Web Application Firewall (ModSecurity + OWASP CRS) ไว้ในบทที่ 22 และเติมหัวข้อย่อยที่ขาด (10.10, 16.16, 22.10–22.26, 23.10–23.29) ตาม `docs/proposed-subtopics.md` ที่อนุมัติแล้ว
 
 ## เนื้อหาแต่ละบทโดยย่อ
 
@@ -80,7 +80,7 @@ Domain `lab.internal`, ผู้ใช้ admin `aod`, template `rocky10-tpl` (V
 ได้: ค้นและกรอง log ด้วย journalctl, grep, awk; คัดลอกข้อมูลหลักฐานด้วย rsync โดยรักษา metadata
 
 **บทที่ 6 ผู้ใช้ กลุ่ม และนโยบายรหัสผ่าน** (Lab 10.1–10.13)  
-โครงสร้าง /etc/passwd และ /etc/shadow, script สร้างผู้ใช้หลายคน, password history และ aging, สิทธิ์ super user และการจัดการกลุ่ม รวมถึงตรวจสิทธิ์ NOPASSWD ที่ cloud-init ให้ไว้ในบทที่ 1  
+โครงสร้าง /etc/passwd และ /etc/shadow, script สร้างผู้ใช้หลายคน, password history และ aging, สิทธิ์ super user, การล็อกและปิดบัญชี (offboarding) และการจัดการกลุ่ม รวมถึงตรวจสิทธิ์ NOPASSWD ที่ cloud-init ให้ไว้ในบทที่ 1  
 ได้: นโยบายรหัสผ่านที่บังคับใช้จริงด้วย PAM; รู้จุดที่ผู้โจมตีใช้ยกระดับสิทธิ์ผ่านบัญชีและกลุ่ม
 
 **บทที่ 7 Centralized Identity ด้วย FreeIPA** (Lab 11)  
@@ -120,11 +120,11 @@ decoder และ rule แบบ custom (ช่วง ID 100000–100999), ล�
 ได้: rule ที่ tune แล้วพร้อม test ด้วย wazuh-logtest; ตอบสนองอัตโนมัติที่ย้อนกลับได้
 
 **บทที่ 16 File Integrity และ Identity Monitoring** (Lab 22)  
-syscheck แบบ realtime และ whodata ติดตามไฟล์สำคัญ ตรวจการแก้กลุ่ม การสวมรอยด้วย usermod เฝ้าดู SMB share และแจ้งเตือนการลบไฟล์จำนวนมากแบบ ransomware  
+syscheck แบบ scheduled, realtime และ whodata ติดตามไฟล์สำคัญ เก็บ diff ของ config โดยไม่ให้ความลับรั่ว เฝ้า sudoers, authorized_keys, cron, /boot และ baseline ของไฟล์ SUID ตรวจการแก้กลุ่มและการสวมรอยด้วย usermod เฝ้า SMB share และแจ้งเตือนการลบไฟล์จำนวนมาก  
 ได้: รู้ว่าใครแก้ไฟล์ไหนเมื่อไร; alert การลบไฟล์จำนวนมาก
 
 **บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน** (Lab 23)  
-เขียน audit rule, ใช้ ausearch และ aureport, จำลอง web shell, ดักจับ privilege dropping, การโหลด kernel module แบบ rootkit และการเรียกใช้ eBPF API  
+เขียน audit rule ตามหมวดหมู่มาตรฐาน (time-change, identity, logins, privileged, mounts, delete, sudoers, software, export และอื่น ๆ) ใช้ ausearch และ aureport วัดและปรับภาระของ auditd และเขียน rule ตรวจจับเทคนิคระดับ syscall  
 ได้: audit rule ที่ใช้ตรวจเทคนิคการโจมตีระดับ syscall
 
 **บทที่ 18 Docker Runtime Security** (Lab 24)  
@@ -143,9 +143,9 @@ syscheck แบบ realtime และ whodata ติดตามไฟล์ส�
 ติดตามคำสั่ง git ด้วย audit และ log ส่ง event เข้า SIEM และบล็อกการ push ที่ผิดนโยบายด้วย hook  
 ได้: มองเห็นและควบคุมการเปลี่ยนแปลง source code
 
-**บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis** (Lab 28, 29, 30, 31)  
-ส่ง log ของ application เข้า Graylog, เขียน rule ดักจับและบล็อก shell execution ใน WordPress, แยก log ของ Nginx กับ WordPress และเร่งความเร็ว WordPress ด้วย Redis  
-ได้: log ของ web stack แยกและค้นได้; ตรวจจับ web shell ได้
+**บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF** (Lab 28, 29, 30, 31, 32)  
+ส่ง log ของ application เข้า Graylog, แยก log ของ Nginx กับ WordPress, เขียน rule ดักจับและบล็อก shell execution ใน WordPress, เร่งความเร็วด้วย Redis และวาง Web Application Firewall (ModSecurity + OWASP CRS) แบบตรวจจับก่อนแล้วจึงบล็อก  
+ได้: log ของ web stack แยกและค้นได้; ตรวจจับ web shell ได้; WAF ที่ tune แล้วส่ง log เข้า Graylog
 
 **บทที่ 23 Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh** (Lab 38, 39, 40)  
 integration ของ Wazuh ส่ง alert ไป LINE Messaging API (แทน LINE Notify ที่ปิดบริการ), Telegram bot และ Gmail ผ่าน SMTP relay และย้าย port ของ Wazuh dashboard พร้อม firewall rule  

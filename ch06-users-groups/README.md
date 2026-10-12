@@ -2,7 +2,7 @@
 
 Lab ในหลักสูตร: 10.1–10.13
 
-โครงสร้าง /etc/passwd และ /etc/shadow, script สร้างผู้ใช้หลายคน, password history และ aging, สิทธิ์ super user และการจัดการกลุ่ม รวมถึงตรวจสิทธิ์ NOPASSWD ที่ cloud-init ให้ไว้ในบทที่ 1
+โครงสร้าง /etc/passwd และ /etc/shadow, script สร้างผู้ใช้หลายคน, password history และ aging, สิทธิ์ super user, การล็อกและปิดบัญชี (offboarding) และการจัดการกลุ่ม รวมถึงตรวจสิทธิ์ NOPASSWD ที่ cloud-init ให้ไว้ในบทที่ 1
 
 สิ่งที่ได้เมื่อจบบท:
 
@@ -11,4 +11,4 @@ Lab ในหลักสูตร: 10.1–10.13
 
 สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

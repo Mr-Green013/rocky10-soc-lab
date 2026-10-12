@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560" font-family="Sarabun, 'Leelawadee UI', Tahoma, sans-serif">
+  <title>ภาพที่ 2-2 ลำดับที่ sshd อ่าน config และค่าที่มีผลจริง</title>
+  <defs><marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#1F3A5F"/></marker></defs>
+  <rect width="1400" height="560" fill="#fff"/>
+  <g font-size="17" fill="#33475B">
+    <rect x="40" y="40" width="380" height="220" rx="12" fill="#F1F1F4" stroke="#5B6770" stroke-width="2"/>
+    <text x="60" y="76" font-size="20" font-weight="700" fill="#1F3A5F">/etc/ssh/sshd_config</text>
+    <text x="60" y="110" font-family="monospace" font-size="15">Include /etc/ssh/sshd_config.d/*.conf</text>
+    <text x="60" y="140">บรรทัดนี้อยู่ต้นไฟล์ ไฟล์ใน .d จึงถูก</text>
+    <text x="60" y="166">อ่านก่อนค่าในไฟล์หลัก</text>
+    <text x="60" y="206">แก้ไฟล์นี้ตรง ๆ ไม่ได้: dnf update</text>
+    <text x="60" y="232">อาจแทนที่ด้วยไฟล์ .rpmnew</text>
+    <rect x="490" y="40" width="460" height="330" rx="12" fill="#FDF0EC" stroke="#E76F51" stroke-width="2"/>
+    <text x="510" y="76" font-size="20" font-weight="700" fill="#1F3A5F">sshd_config.d/*.conf เรียงตามชื่อ</text>
+    <g font-family="monospace" font-size="15">
+      <text x="510" y="116">05-soclab-baseline.conf  (Azure เท่านั้น)</text>
+      <text x="510" y="146">10-auth.conf             (บทที่ 8)</text>
+      <text x="510" y="176">10-port.conf             (mini-lab บทที่ 4)</text>
+      <text x="510" y="206">50-cloud-init.conf       (บทที่ 1)</text>
+      <text x="510" y="236">50-redhat.conf           (มากับ Rocky)</text>
+    </g>
+    <text x="510" y="280">เลขน้อยถูกอ่านก่อน และ keyword ส่วนใหญ่</text>
+    <text x="510" y="306"><tspan font-weight="700" fill="#C0392B">ค่าแรกที่พบคือค่าที่ใช้</tspan> ค่าที่ซ้ำภายหลังถูกเมิน</text>
+    <text x="510" y="340">ไฟล์ของเราจึงตั้งชื่อขึ้นต้นด้วยเลขต่ำกว่า 50</text>
+    <rect x="1020" y="40" width="340" height="220" rx="12" fill="#1F3A5F"/>
+    <text x="1040" y="76" font-size="20" font-weight="700" fill="#fff">sudo sshd -T</text>
+    <text x="1040" y="110" fill="#DCE6F2">พิมพ์ค่าที่มีผลจริงหลังรวม</text>
+    <text x="1040" y="136" fill="#DCE6F2">ทุกไฟล์แล้ว ใช้ตรวจทุกครั้ง</text>
+    <text x="1040" y="176" font-family="monospace" font-size="15" fill="#F2CC60">passwordauthentication no</text>
+    <text x="1040" y="204" font-family="monospace" font-size="15" fill="#F2CC60">permitrootlogin without-password</text>
+    <text x="1040" y="232" font-family="monospace" font-size="15" fill="#F2CC60">port 22</text>
+  </g>
+  <g stroke="#1F3A5F" stroke-width="3" fill="none" marker-end="url(#a)">
+    <line x1="422" y1="110" x2="486" y2="110"/><line x1="952" y1="150" x2="1016" y2="150"/>
+  </g>
+  <rect x="40" y="410" width="1320" height="110" rx="12" fill="#E8F5F3" stroke="#2A9D8F" stroke-width="2"/>
+  <text x="60" y="446" font-size="20" font-weight="700" fill="#1F3A5F">กฎ 3 ข้อทุกครั้งที่แก้ SSH</text>
+  <text x="60" y="480" font-size="17" fill="#33475B">1) เปิด session ที่สองค้างไว้   2) sudo sshd -t ต้องไม่มี output   3) sudo systemctl reload sshd (ไม่ตัด session ที่เปิดอยู่)</text>
+  <text x="60" y="508" font-size="16" fill="#5B6770">ถ้าพลาดจนเข้าไม่ได้: ใช้ Console ของ VM ใน Proxmox ซึ่งไม่ผ่าน SSH</text>
+</svg>

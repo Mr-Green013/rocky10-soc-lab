@@ -9,6 +9,21 @@ Lab ในหลักสูตร: 2, 3, 5
 - ทุกเครื่องมี FQDN ที่ resolve เป็น IP จริง
 - เข้าใจว่า sshd อ่านค่าจากไฟล์ใดก่อนหลัง (sshd -T)
 
-สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
+สถานะ: ต้นฉบับเขียนแล้ว รอทดสอบบนเครื่องจริง
 
 เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+
+## ไฟล์
+
+| ไฟล์ | รันที่ | หน้าที่ |
+| --- | --- | --- |
+| `guest/set-identity.sh` | ทุก VM | ตั้ง FQDN, /etc/hosts ของ lab, profile ชื่อ lab |
+| `guest/ch02-check.sh` | ทุก VM | ตรวจ network, hostname, SSH |
+| `../tools/windows/Set-SocLabHosts.ps1` | Windows (Admin) | hosts file และ ~/.ssh/config ของ Windows |
+
+รัน script ฝั่ง guest กับทุกเครื่องจาก Windows:
+
+```powershell
+cd tools\windows
+.\Invoke-SocLabScript.ps1 -Script ..\..\ch02-network-ssh-hostname\..\tools\windows\Set-SocLabHosts.ps1
+```

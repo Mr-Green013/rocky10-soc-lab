@@ -9,6 +9,19 @@ Lab ในหลักสูตร: 8
 - แก้ปัญหา SELinux โดยไม่ปิด SELinux
 - เขียน unit drop-in เพื่อปรับ service อย่างปลอดภัย
 
-สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
+สถานะ: ต้นฉบับเขียนแล้ว รอทดสอบบนเครื่องจริง
 
 เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+
+## ไฟล์
+
+| ไฟล์ | รันที่ | หน้าที่ |
+| --- | --- | --- |
+| `guest/ch04-check.sh` | ทุก VM | ตรวจ SELinux, systemd และ cleanup ของ mini-lab |
+
+รัน script ฝั่ง guest กับทุกเครื่องจาก Windows:
+
+```powershell
+cd tools\windows
+.\Invoke-SocLabScript.ps1 -Script ..\..\ch04-selinux-systemd\guest\ch04-check.sh
+```
