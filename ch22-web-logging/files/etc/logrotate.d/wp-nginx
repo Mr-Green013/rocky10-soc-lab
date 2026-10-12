@@ -1,0 +1,11 @@
+/var/log/wp-nginx/*.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /usr/bin/docker kill -s USR1 wordpress-nginx-1 >/dev/null 2>&1 || true
+    endscript
+}

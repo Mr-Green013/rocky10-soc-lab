@@ -1,0 +1,16 @@
+[Unit]
+Description=orders-api demo (GELF logging)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+DynamicUser=yes
+Environment=GELF_HOST=192.168.10.20 GELF_PORT=12201 APP_ENV=lab PORT=8090
+ExecStart=/usr/bin/python3 /opt/orders-api/orders_api.py
+Restart=on-failure
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target
