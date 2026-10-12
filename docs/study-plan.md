@@ -1189,14 +1189,15 @@ ssh_event:auth_failed AND _exists_:src_ip_geolocation
 
 **ทฤษฎี**
 - ส่วนประกอบ: indexer (เก็บ alert), server/manager (วิเคราะห์), dashboard (UI), Filebeat (ส่ง alert ไป indexer)
-- Wazuh รองรับ RHEL 10 สำหรับ central components อย่างเป็นทางการ
+- เอกสาร Wazuh 4.14 ระบุ RHEL 10 เป็นระบบที่รองรับ Rocky 10 เข้ากันได้ แต่ถ้า assistant ปฏิเสธต้องใช้ -i
 - รหัสผ่านเริ่มต้นอยู่ใน wazuh-install-files.tar ต้องเก็บรักษาและเปลี่ยน
 
 **ขั้นตอนปฏิบัติ**
 1. ดาวน์โหลด installer ของรุ่น 4.14
-2. ติดตั้งแบบ -a
+2. ติดตั้งแบบ -a และเปิด firewall 1514, 1515, 55000, https
 3. เก็บไฟล์รหัสผ่านไว้นอกเครื่องอย่างปลอดภัย
-4. login dashboard
+4. ตั้ง heap ของ indexer 2 GB (14.3.1)
+5. login dashboard
 
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
@@ -1217,9 +1218,9 @@ sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard filebeat --no-
 
 อ่านเพิ่ม: บทที่ 14 ติดตั้ง Wazuh, Agent และ Agent Group
 
-### วันที่ 36 · บทที่ 14 — Agent ทุกเครื่องและ Agent Group (Lab 34)
+### วันที่ 36 · บทที่ 14 — Agent ทุกเครื่อง, alert เข้า Graylog และ Agent Group (Lab 34)
 
-**เป้าหมาย:** ทุกเครื่องรายงานเข้า Wazuh และแยก config ตามบทบาท
+**เป้าหมาย:** ทุกเครื่องรายงานเข้า Wazuh, alert ระดับ 5 ขึ้นไปเข้า Graylog และแยก config ตามบทบาท
 
 **ทฤษฎี**
 - agent ลงทะเบียนกับ manager ผ่าน port 1515 และส่งข้อมูลที่ 1514
@@ -1228,27 +1229,28 @@ sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard filebeat --no-
 
 **ขั้นตอนปฏิบัติ**
 1. เพิ่ม repo ของ Wazuh (import GPG key + wazuh.repo) แล้วติดตั้ง agent ทุกเครื่องพร้อมตัวแปร WAZUH_MANAGER
-2. สร้าง group linux, webservers, identity
-3. ใส่ agent เข้า group
-4. ตรวจว่า config ถูกแจก
+2. เปิด syslog_output ไป Graylog และสร้าง stream wazuh-alerts กับ pipeline Wazuh
+3. สร้าง group linux-base, container-hosts, file-servers และใส่ agent
+4. ตรวจว่า config ถูกแจก (agent_groups -S) และรัน ch14-check.sh
 5. snapshot ch14-wazuh
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-sudo WAZUH_MANAGER="wazuh-01.lab.internal" WAZUH_AGENT_GROUP="linux" dnf install -y wazuh-agent
-sudo systemctl enable --now wazuh-agent
-# บน wazuh-01:
-sudo /var/ossec/bin/agent_groups -a -g webservers -q && sudo /var/ossec/bin/agent_control -l
+sudo WAZUH_MANAGER='192.168.10.30' WAZUH_AGENT_NAME="$(hostname -s)" WAZUH_AGENT_GROUP='default' dnf install -y wazuh-agent
+sudo sed -i 's/^enabled=1/enabled=0/' /etc/yum.repos.d/wazuh.repo
+sudo /var/ossec/bin/agent_groups -a -g linux-base -q   # บน wazuh-01
+sudo /var/ossec/bin/verify-agent-conf -f /var/ossec/etc/shared/linux-base/agent.conf
 ```
 
 **แบบฝึกหัด**
-- ใส่ setting ต่างกันใน group linux และ webservers แล้วพิสูจน์ว่า node-01 ได้ทั้งสองชุด
+- พิสูจน์ว่า node-01 ได้ค่าจากทั้ง linux-base และ container-hosts และบอกว่า label role ค่าใดชนะเพราะอะไร
 
 **เกณฑ์ผ่าน**
-- [ ] agent_control -l แสดงทุกเครื่องเป็น Active
-- [ ] agent_groups -l แสดง group ตามบทบาท
+- [ ] agent_control -l แสดงทั้ง 5 เครื่องเป็น Active
+- [ ] Graylog ค้น event_source:wazuh แล้วมี field wazuh_rule_id
+- [ ] ch14-check.sh ผ่านทุกข้อ
 
-**หลักฐาน:** ผล agent_control -l
+**หลักฐาน:** ผล agent_control -l + ch14-check.sh
 
 อ่านเพิ่ม: บทที่ 14 ติดตั้ง Wazuh, Agent และ Agent Group
 
@@ -1270,7 +1272,7 @@ sudo /var/ossec/bin/agent_groups -a -g webservers -q && sudo /var/ossec/bin/agen
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
 sudo /var/ossec/bin/wazuh-logtest
-sudo nano /var/ossec/etc/rules/local_rules.xml
+ls -l /var/ossec/etc/rules/   # 100-tuning … 170-web
 sudo /var/ossec/bin/wazuh-analysisd -t && sudo systemctl restart wazuh-manager
 ```
 
@@ -1302,9 +1304,9 @@ sudo /var/ossec/bin/wazuh-analysisd -t && sudo systemctl restart wazuh-manager
 
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
-sudo grep -c "Rule: 5503\|Rule: 5716" /var/ossec/logs/alerts/alerts.log
-sudo /var/ossec/bin/wazuh-logtest
-sudo tail -f /var/ossec/logs/alerts/alerts.json | jq -r "select(.rule.id==\"5763\") | .data.srcip"
+sudo /var/ossec/bin/wazuh-logtest   # วาง Failed password 5 ครั้ง → 100100
+sudo grep -c '"id":"100100"' /var/ossec/logs/alerts/alerts.json
+sudo systemctl stop crowdsec-firewall-bouncer   # บน lab-linux-01 ระหว่างทดสอบ แล้ว start คืน
 ```
 
 **แบบฝึกหัด**
@@ -1336,9 +1338,9 @@ sudo tail -f /var/ossec/logs/alerts/alerts.json | jq -r "select(.rule.id==\"5763
 
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
-<active-response><command>firewall-drop</command><location>local</location><rules_id>5763</rules_id><timeout>600</timeout></active-response>
-sudo tail -f /var/ossec/logs/active-responses.log   # บน agent
-sudo /var/ossec/bin/agent_control -L
+<active-response><command>firewall-drop</command><location>local</location><rules_id>100100,100101,5763,5712</rules_id><timeout>600</timeout></active-response>
+sudo tail -n 5 /var/ossec/logs/active-responses.log   # บน agent
+wazuh_rule_id:100651   # ค้นใน Graylog
 ```
 
 **แบบฝึกหัด**
@@ -1434,9 +1436,10 @@ sudo usermod -aG wheel somchai && sudo gpasswd -d somchai wheel
 
 **คำสั่งหลัก** (lab-linux-02 · aod)
 ```bash
-sudo install -d -o aod /srv/share/test && for i in $(seq 1 50); do echo dummy > /srv/share/test/f$i.txt; done
-sleep 10; rm -f /srv/share/test/f*.txt
-<rule id="100220" level="12" frequency="20" timeframe="60"><if_matched_sid>553</if_matched_sid><description>Mass file deletion</description></rule>
+sudo useradd -M -s /sbin/nologin smbuser1 && sudo smbpasswd -a smbuser1   # lab-linux-02
+for i in $(seq 1 30); do echo "test $i" > "doc$i.txt"; done   # lab-linux-01 ใน ~/smbtest
+smbclient //192.168.10.42/share -U smbuser1 -c 'prompt OFF; mput doc*.txt' && smbclient //192.168.10.42/share -U smbuser1 -c 'del doc*.txt'
+sudo tail -n 5 /var/log/smbd_audit.log   # lab-linux-02: rule 100423
 ```
 
 **แบบฝึกหัด**
@@ -1686,70 +1689,73 @@ docker run --rm --network backend alpine wget -T3 -qO- http://example.com || ech
 
 อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
 
-### วันที่ 50 · บทที่ 19 — ติดตั้ง Tetragon และ kill การสร้าง SUID/SGID (Lab 33, 35)
+### วันที่ 50 · บทที่ 19 — ติดตั้ง Tetragon และ eBPF Shield ของ container (Lab 33, 24-E, 35)
 
-**เป้าหมาย:** หยุด process ที่พยายามตั้ง bit SUID/SGID ทันทีในระดับ kernel
+**เป้าหมาย:** หยุด process ใน container ที่ละเมิด policy ทันทีในระดับ kernel และส่ง event เข้า Wazuh
 
 **ทฤษฎี**
 - Tetragon = eBPF ที่ทั้งสังเกตและบังคับ (Sigkill) ใน kernel
-- TracingPolicy: kprobe + selector + action
-- บังคับใน kernel ไม่มีช่องว่างระหว่างตรวจเจอกับหยุด ต่างจาก Wazuh AR ที่ทำหลังเกิดเหตุ
+- TracingPolicy: kprobe + selector + action; host_ns NotIn = เฉพาะ container
+- Sigkill ไม่ยับยั้ง operation ที่กำลังทำ ต้องใช้ Override หรือ no-new-privileges เป็นชั้นสำรอง
 
 **ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Tetragon 1.7.1 จาก tarball
-2. ดู event ด้วย tetra getevents
-3. วาง TracingPolicy ที่ kill chmod ที่ตั้ง mode 04000/02000
-4. ทดสอบกับไฟล์ทดสอบใน /tmp
+1. ติดตั้ง Tetragon 1.7.1 จาก tarball และจำกัด export เฉพาะ PROCESS_KPROBE
+2. smoke-test แล้วต่อ tetragon.log เข้า Wazuh (rule 100800–100802)
+3. โหลด block-tmp-exec, guillotine, protect-shadow ด้วย tetra tracingpolicy add แล้วทดสอบใน ebpf-01
+4. โหลด 50-suid-guard.yaml: chmod u+s ใน container ถูก kill ส่วนบน host แค่บันทึก
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-tar -xzf tetragon-v1.7.1-amd64.tar.gz && cd tetragon-v1.7.1-amd64 && sudo ./install.sh
-sudo tetra getevents -o compact
-sudo cp block-suid.yaml /etc/tetragon/tetragon.tp.d/ && sudo systemctl restart tetragon
-cp /bin/true /tmp/t && chmod u+s /tmp/t; echo "exit=$?"
+tar -xf tetragon-v1.7.1-amd64.tar.gz && cd tetragon-v1.7.1-amd64 && sudo ./install.sh
+sudo tetra tracingpolicy add ~/tp/50-suid-guard.yaml
+sudo docker exec ebpf-01 chmod u+s /root/suid-test; echo "exit=$?"
+sudo docker exec ebpf-01 ls -l /root/suid-test
 ```
 
 **แบบฝึกหัด**
-- เปลี่ยน action จาก Sigkill เป็น Post (ดูอย่างเดียว) แล้วอธิบายว่าเหมาะกับช่วงไหนของการ rollout
+- ตรวจ kernel ด้วย grep BPF_KPROBE_OVERRIDE /boot/config-$(uname -r) แล้วอธิบายว่า suid-guard ของ lab ป้องกันได้ระดับใด
 
 **เกณฑ์ผ่าน**
-- [ ] chmod u+s ถูก kill (exit 137) และมี event ใน tetra
-- [ ] chmod ปกติ (644) ยังทำได้
+- [ ] chmod u+s ใน container ได้ exit 137 และ bit ไม่ค้าง (หรือแก้คืนแล้ว)
+- [ ] chmod g+s บน host ได้ exit 0 และ alert 100813
 
-**หลักฐาน:** ผล tetra getevents + exit code
+**หลักฐาน:** exit code + alert 100802/100811/100813
 
 อ่านเพิ่ม: บทที่ 19 Tetragon: มองเห็นและหยุดภัยระดับ Kernel
 
-### วันที่ 51 · บทที่ 19 — Sensitive file access และ Account Activity Tracker (Lab 36–37)
+### วันที่ 51 · บทที่ 19 — keyguard, sensitive file และ Account Activity Tracker (Lab 36–37)
 
-**เป้าหมาย:** เห็นว่า process ใดอ่านไฟล์ลับ และติดตามกิจกรรมของบัญชี
+**เป้าหมาย:** ปกป้อง SSH host key แบบสังเกตก่อนบังคับ และรู้ว่าใครอ่านไฟล์ลับหรือแก้บัญชี
 
 **ทฤษฎี**
-- kprobe ที่ security_file_permission หรือ fd_install จับการเปิดไฟล์
-- filter ตาม path (/etc/shadow, ~/.ssh) ลด event
-- process ancestry บอกว่าใครเป็นต้นทาง (sshd → bash → cat)
+- policy ฝั่ง host: Post + rateLimit ก่อน แล้วจึง Sigkill
+- matchBinaries NotIn ยกเว้น binary ที่อ่านตามหน้าที่ (sshd, sshd-session, sudo)
+- auid ระบุคนที่ login จริงแม้ใช้ sudo
 
 **ขั้นตอนปฏิบัติ**
-1. วาง policy เฝ้า /etc/shadow และ authorized_keys
-2. cat /etc/shadow ด้วย sudo แล้วดู event พร้อม parent
-3. ส่ง event JSON เข้า Graylog
-4. snapshot ch19-tetragon
+1. เปิด SSH session สำรองและ Console ของ Proxmox
+2. keyguard ระยะสังเกต → นับ binary ด้วย jq → ระยะบังคับ แล้วทดสอบ SSH ใหม่
+3. โหลด sensitive-files และ account-tracker ทดสอบด้วย tester1 แล้วรัน acct-activity.sh
+4. เพิ่ม rule ราย policy และ 100805 → quarantine แล้วติดตั้งถาวรใน tetragon.tp.d
+5. รัน ch19-check.sh แล้ว snapshot ch19-ebpf
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-sudo cat /etc/shadow > /dev/null
-sudo tetra getevents -o compact --processes cat
-sudo tail -f /var/log/tetragon/tetragon.log | jq -r ".process_kprobe.process.binary"
+sudo jq -r 'select(.process_kprobe.policy_name=="keyguard") | .process_kprobe.process.binary' /var/log/tetragon/tetragon.log | sort | uniq -c
+sudo /usr/local/sbin/acct-activity.sh | tail -5
+sudo install -m 600 -o root -g root ~/tp/*.yaml /etc/tetragon/tetragon.tp.d/
+sudo systemctl restart tetragon && sudo tetra tracingpolicy list
 ```
 
 **แบบฝึกหัด**
-- เปรียบเทียบสิ่งที่ auditd (บทที่ 17) กับ Tetragon เห็นจากเหตุการณ์เดียวกัน เป็นตาราง 5 แถว
+- เปรียบเทียบสิ่งที่ auditd (บทที่ 17) กับ Tetragon เห็นจากเหตุการณ์ cat /etc/shadow เดียวกัน เป็นตาราง 5 แถว
 
 **เกณฑ์ผ่าน**
-- [ ] event แสดง binary, user และ parent ของการอ่าน shadow
-- [ ] มีตารางเปรียบเทียบ
+- [ ] หลังบังคับ keyguard SSH ใหม่ยังเข้าได้
+- [ ] policy 9 ตัวโหลดหลัง restart
+- [ ] ch19-check.sh ผ่านทุกข้อ
 
-**หลักฐาน:** event JSON + ตาราง
+**หลักฐาน:** ผล ch19-check.sh + ตารางเปรียบเทียบ
 
 อ่านเพิ่ม: บทที่ 19 Tetragon: มองเห็นและหยุดภัยระดับ Kernel
 

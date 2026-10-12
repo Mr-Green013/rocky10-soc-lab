@@ -10,6 +10,6 @@ Lab ในหลักสูตร: 28, 29, 30, 31, 32
 - ตรวจจับ web shell ได้
 - WAF ที่ tune แล้วส่ง log เข้า Graylog
 
-สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
+สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch22-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
 
 หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

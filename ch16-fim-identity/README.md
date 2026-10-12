@@ -9,6 +9,6 @@ syscheck แบบ scheduled, realtime และ whodata ติดตามไ�
 - รู้ว่าใครแก้ไฟล์ไหนเมื่อไร
 - alert การลบไฟล์จำนวนมาก
 
-สถานะ: กำลังเขียน ไฟล์ Lab ของบทนี้จะเพิ่มเมื่อทดสอบบนเครื่องจริงแล้ว
+สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch16-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
 
 หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)
