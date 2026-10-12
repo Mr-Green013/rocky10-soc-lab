@@ -1,0 +1,5 @@
+-w /etc/audit -p wa -k audit-config
+-w /etc/libaudit.conf -p wa -k audit-config
+-w /usr/sbin/auditctl -p x -k audit-tools
+-w /usr/sbin/auditd -p x -k audit-tools
+-w /usr/sbin/augenrules -p x -k audit-tools

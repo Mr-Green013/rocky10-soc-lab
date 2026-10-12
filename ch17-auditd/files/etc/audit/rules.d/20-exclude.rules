@@ -1,0 +1,8 @@
+## ระดับ record type: ไม่สร้าง record ชนิดที่ไม่ใช้
+-a always,exclude -F msgtype=CRYPTO_KEY_USER
+-a always,exclude -F msgtype=CRYPTO_SESSION
+-a always,exclude -F msgtype=BPF
+
+## ระดับ executable: โปรแกรมที่รันถี่และยืนยันแล้วว่าไม่มีค่าต่อการสืบสวน
+-a never,exit -F arch=b64 -S execve -F exe=/usr/bin/sleep
+-a never,exit -F arch=b64 -S execve -F exe=/usr/bin/date

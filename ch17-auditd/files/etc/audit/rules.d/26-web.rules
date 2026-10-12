@@ -1,0 +1,2 @@
+-a always,exit -F arch=b64 -S execve -F euid=$WEBUID -k webshell_exec
+-a always,exit -F arch=b64 -S execve -F euid=$NGXUID -k webshell_exec
