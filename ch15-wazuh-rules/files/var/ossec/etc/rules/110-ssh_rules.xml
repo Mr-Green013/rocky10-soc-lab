@@ -1,0 +1,68 @@
+<!-- บทที่ 15: rule ใน 110-ssh_rules.xml (คัดจากขั้นตอนของบท) -->
+<group name="local,sshd,">
+
+  <rule id="100100" level="10" frequency="5" timeframe="120" ignore="60">
+ <if_matched_sid>5716</if_matched_sid>
+ <same_source_ip />
+ <description>SSH brute force: 5 failed logins from $(srcip) within 2 minutes</description>
+ <mitre><id>T1110.001</id></mitre>
+ <group>authentication_failures,brute_force,</group>
+  </rule>
+
+  <rule id="100101" level="10" frequency="4" timeframe="120" ignore="60">
+ <if_matched_sid>5710</if_matched_sid>
+ <same_source_ip />
+ <description>SSH user enumeration: invalid users tried from $(srcip)</description>
+ <mitre><id>T1110.003</id></mitre>
+ <group>authentication_failures,brute_force,</group>
+  </rule>
+
+  <rule id="100102" level="13" timeframe="300">
+ <if_sid>5715</if_sid>
+ <if_matched_sid>100100</if_matched_sid>
+ <same_source_ip />
+ <description>SSH login SUCCEEDED after brute force from $(srcip) as $(dstuser)</description>
+ <mitre><id>T1110</id><id>T1078</id></mitre>
+ <group>authentication_success,brute_force_success,</group>
+  </rule>
+
+</group>
+
+<group name="local,">
+<rule id="100120" level="6">
+  <if_sid>5700</if_sid>
+  <match>maximum authentication attempts exceeded</match>
+  <description>sshd: MaxAuthTries exceeded from $(srcip)</description>
+  <group>authentication_failures,ssh_hardening,</group>
+</rule>
+
+<rule id="100121" level="5">
+  <if_sid>5700</if_sid>
+  <match>Timeout before authentication</match>
+  <description>sshd: LoginGraceTime expired before authentication</description>
+  <group>ssh_hardening,</group>
+</rule>
+
+<rule id="100122" level="8">
+  <if_sid>5700</if_sid>
+  <match>not allowed because none of user's groups are listed in AllowGroups</match>
+  <description>sshd: login denied by AllowGroups policy</description>
+  <mitre><id>T1078</id></mitre>
+  <group>authentication_failed,ssh_hardening,</group>
+</rule>
+
+<rule id="100123" level="4">
+  <if_sid>5700</if_sid>
+  <regex>timeout, no activity|channel \d+: timed out|Timeout, client not responding</regex>
+  <description>sshd: session closed by idle or keepalive timeout</description>
+  <group>ssh_hardening,</group>
+</rule>
+</group>
+
+<group name="local,">
+<rule id="100130" level="3">
+  <decoded_as>active-users</decoded_as>
+  <description>Active session: $(dstuser) on $(tty) from $(srcip)</description>
+  <group>active_sessions,</group>
+</rule>
+</group>

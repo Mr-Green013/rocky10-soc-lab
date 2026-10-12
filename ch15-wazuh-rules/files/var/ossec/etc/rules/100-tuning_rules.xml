@@ -1,0 +1,26 @@
+<!-- บทที่ 15: rule ใน 100-tuning_rules.xml (คัดจากขั้นตอนของบท) -->
+<group name="local,">
+
+<!-- ยกระดับ: login สำเร็จของ root ผ่าน SSH ต้องไม่เกิดขึ้นใน lab นี้ -->
+<rule id="100001" level="12">
+  <if_sid>5715</if_sid>
+  <user>^root$</user>
+  <description>sshd: successful root login from $(srcip)</description>
+  <mitre><id>T1078.003</id></mitre>
+  <group>authentication_success,</group>
+</rule>
+
+<!-- ลดระดับ: session ของ service account ที่เกิดตลอดเวลา -->
+<rule id="100002" level="0">
+  <if_sid>5501,5502</if_sid>
+  <match>for user backup-svc</match>
+  <description>Ignore PAM session noise from backup service account</description>
+</rule>
+
+<rule id="100010" level="0">
+  <if_sid>5710,5716</if_sid>
+  <srcip>192.168.10.100</srcip>
+  <description>Ignore SSH auth failures from authorized admin/scanner host</description>
+</rule>
+
+</group>

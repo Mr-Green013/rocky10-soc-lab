@@ -1,0 +1,7 @@
+"host","criticality"
+"lab-linux-01","high"
+"lab-linux-02","medium"
+"ipa-01","critical"
+"wazuh-01","critical"
+"graylog-01","critical"
+"node-01","high"

@@ -1,0 +1,25 @@
+<!-- บทที่ 15: rule ใน 120-identity_rules.xml (คัดจากขั้นตอนของบท) -->
+<group name="local,identity,">
+
+  <rule id="100200" level="10">
+ <if_sid>5303</if_sid>
+ <description>Privilege escalation: su to root by $(srcuser)</description>
+ <mitre><id>T1548</id></mitre>
+ <group>privilege_escalation,</group>
+  </rule>
+
+  <rule id="100201" level="8">
+ <if_sid>5304</if_sid>
+ <description>Identity switch: su from $(srcuser) to $(dstuser)</description>
+ <mitre><id>T1078</id></mitre>
+ <group>identity_switch,</group>
+  </rule>
+
+  <rule id="100202" level="10" frequency="3" timeframe="120">
+ <if_matched_sid>5301</if_matched_sid>
+ <description>su brute force: repeated failed su attempts</description>
+ <mitre><id>T1110</id></mitre>
+ <group>authentication_failures,privilege_escalation,</group>
+  </rule>
+
+</group>
