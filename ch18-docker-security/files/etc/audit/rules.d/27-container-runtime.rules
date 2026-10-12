@@ -1,0 +1,9 @@
+## ใครรันคำสั่ง docker / runtime
+-w /usr/bin/docker      -p x  -k docker_cmd
+-w /usr/bin/dockerd     -p x  -k docker_daemon
+-w /usr/bin/containerd  -p x  -k container_runtime
+-w /usr/bin/runc        -p x  -k container_runtime
+## ใครแก้ config ของ daemon
+-w /etc/docker                              -p wa -k docker_config
+-w /usr/lib/systemd/system/docker.service   -p wa -k docker_config
+-w /usr/lib/systemd/system/docker.socket    -p wa -k docker_config

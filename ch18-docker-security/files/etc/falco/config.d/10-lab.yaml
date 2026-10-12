@@ -1,0 +1,14 @@
+json_output: true
+json_include_output_property: true
+json_include_tags_property: true
+file_output:
+  enabled: true
+  keep_alive: false
+  filename: /var/log/falco/falco.json
+append_output:
+  - match:
+      source: syscall
+    extra_fields:
+      - container.id
+      - container.name
+      - container.image.repository

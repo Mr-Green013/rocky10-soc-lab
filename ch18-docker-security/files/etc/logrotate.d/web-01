@@ -1,0 +1,11 @@
+/var/log/web-01/*.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /usr/bin/docker kill -s USR1 web-01 >/dev/null 2>&1 || true
+    endscript
+}

@@ -1,0 +1,22 @@
+- rule: Lab - Network tool in container
+  desc: A network scanning or relay tool was executed inside a container
+  condition: >
+    spawned_process and container
+    and proc.name in (nc, ncat, nmap, socat)
+  output: >
+    Network tool in container | user=%user.name process=%proc.name
+    command=%proc.cmdline parent=%proc.pname
+  priority: WARNING
+  tags: [lab, container, mitre_discovery, T1046]
+
+- rule: Lab - Write to system file in container
+  desc: An account, sudo, hosts or cron file was opened for writing inside a container
+  condition: >
+    open_write and container
+    and (fd.name in (/etc/passwd, /etc/shadow, /etc/group, /etc/sudoers, /etc/hosts)
+         or fd.directory = /etc/cron.d)
+  output: >
+    System file opened for writing in container | user=%user.name
+    process=%proc.name command=%proc.cmdline file=%fd.name
+  priority: ERROR
+  tags: [lab, container, mitre_persistence, T1543]
