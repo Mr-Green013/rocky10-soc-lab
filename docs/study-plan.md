@@ -482,18 +482,18 @@ sudo shutdown -r +30 && sudo shutdown -c
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
 getent passwd aod; grep ^ENCRYPT_METHOD /etc/login.defs
-sudo useradd -m -c "Analyst 01" -s /bin/bash analyst01
-sudo passwd analyst01 && sudo chage -d 0 analyst01
-sudo getent shadow analyst01 | cut -d: -f2 | cut -c1-4   # แสดงเฉพาะต้น hash
+sudo useradd -m -c "Analyst 01" -s /bin/bash somchai
+sudo passwd somchai && sudo chage -d 0 somchai
+sudo getent shadow somchai | cut -d: -f2 | cut -c1-4   # แสดงเฉพาะต้น hash
 sudo awk -F: '$3>=1000 && $3<60000 {print $1}' /etc/passwd
 ```
 
 **แบบฝึกหัด**
 - ปรับ script ให้ข้ามผู้ใช้ที่มีอยู่แล้ว และรันซ้ำได้โดยไม่ error
-- เทียบต้น hash ของ aod (ตั้งผ่าน cloud-init ของ Proxmox) กับ analyst01 แล้วอธิบายว่าทำไมอาจต่างกัน
+- เทียบต้น hash ของ aod (ตั้งผ่าน cloud-init ของ Proxmox) กับ somchai แล้วอธิบายว่าทำไมอาจต่างกัน
 
 **เกณฑ์ผ่าน**
-- [ ] hash ของ analyst01 ขึ้นต้นด้วย $y$ (yescrypt)
+- [ ] hash ของ somchai ขึ้นต้นด้วย $y$ (yescrypt)
 - [ ] script รันซ้ำแล้วไม่สร้างซ้ำ
 
 **หลักฐาน:** script และผลการรัน 2 ครั้ง
@@ -517,10 +517,10 @@ sudo awk -F: '$3>=1000 && $3<60000 {print $1}' /etc/passwd
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-sudo chage -M 90 -m 1 -W 7 analyst01 && sudo chage -l analyst01
+sudo chage -M 90 -m 1 -W 7 somchai && sudo chage -l somchai
 sudo authselect enable-feature with-pwhistory
 sudo authselect enable-feature with-faillock
-sudo faillock --user analyst01
+sudo faillock --user somchai
 ```
 
 **แบบฝึกหัด**
@@ -553,17 +553,17 @@ sudo faillock --user analyst01
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
 sudo grep -r NOPASSWD /etc/sudoers /etc/sudoers.d/
-sudo usermod -L -e 1 -s /sbin/nologin analyst02
-sudo passwd -S analyst02; sudo chage -l analyst02
-sudo groupadd soc && sudo usermod -aG soc analyst01 && id analyst01
+sudo usermod -L -e 1 -s /sbin/nologin exstaff
+sudo passwd -S exstaff; sudo chage -l exstaff
+sudo groupadd soc && sudo usermod -aG soc somchai && id somchai
 ```
 
 **แบบฝึกหัด**
-- เขียน checklist offboarding 6 ข้อ (รวมถอด authorized_keys และ cron ของผู้ใช้) แล้วทำกับ analyst02
+- เขียน checklist offboarding 6 ข้อ (รวมถอด authorized_keys และ cron ของผู้ใช้) แล้วทำกับ exstaff
 
 **เกณฑ์ผ่าน**
-- [ ] ssh ด้วย analyst02 ถูกปฏิเสธทั้ง password และ key
-- [ ] id analyst01 แสดงกลุ่ม soc
+- [ ] ssh ด้วย exstaff ถูกปฏิเสธทั้ง password และ key
+- [ ] id somchai แสดงกลุ่ม soc
 
 **หลักฐาน:** checklist + ผลการทดสอบ login; snapshot ch06-users
 
@@ -623,7 +623,7 @@ kinit admin && ipa user-find --sizelimit=5
 sudo nmcli connection modify lab ipv4.dns 192.168.10.10 && sudo nmcli connection up lab
 sudo ipa-client-install --mkhomedir --no-ntp --domain lab.internal --server ipa-01.lab.internal
 kinit admin && ipa pwpolicy-mod --minlength=12 --history=5 --maxfail=5 --lockouttime=600
-id soc.analyst@lab.internal
+id somsak@lab.internal
 ```
 
 **แบบฝึกหัด**
@@ -655,11 +655,11 @@ id soc.analyst@lab.internal
 
 **คำสั่งหลัก** (ipa-01 · aod)
 ```bash
-ipa hbacrule-add soc_servers --servicecat=all
-ipa hbactest --user=soc.analyst --host=graylog-01.lab.internal --service=sshd
+ipa hbacrule-add allow_sysadmins_web && ipa hbacrule-add-user allow_sysadmins_web --groups=sysadmins
+ipa hbactest --user=somsak --host=lab-linux-01.lab.internal --service=sshd --rules=allow_sysadmins_web
 ipa hbacrule-disable allow_all
 ipa sudocmd-add /usr/bin/journalctl && ipa sudorule-add soc_journal && ipa sudorule-add-allow-command soc_journal --sudocmds="/usr/bin/journalctl"
-ldapsearch -Y GSSAPI -b "cn=users,cn=accounts,dc=lab,dc=internal" uid=soc.analyst ipaSshPubKey
+ldapsearch -Y GSSAPI -b "cn=users,cn=accounts,dc=lab,dc=internal" uid=somsak ipaSshPubKey
 ```
 
 **แบบฝึกหัด**
@@ -675,33 +675,34 @@ ldapsearch -Y GSSAPI -b "cn=users,cn=accounts,dc=lab,dc=internal" uid=soc.analys
 
 ### วันที่ 20 · บทที่ 8 — SSH key authentication และปิด password (Lab 12)
 
-**เป้าหมาย:** SSH ใช้ key อย่างเดียว โดยไม่ lock ตัวเองออก
+**เป้าหมาย:** SSH ใช้ key อย่างเดียว ปิดทั้ง password และ keyboard-interactive โดยไม่ lock ตัวเองออก
 
 **ทฤษฎี**
 - กลไก public key: server ท้าให้ client พิสูจน์ด้วย private key
 - ed25519 สั้น เร็ว และปลอดภัยกว่า RSA ขนาดเดิม
-- ไฟล์ drop-in ต้องชื่อขึ้นต้นด้วยเลขต่ำกว่า 50-cloud-init.conf ค่าจึงมีผล
+- 04-ipa.conf เปิด keyboard-interactive ไฟล์ของเราจึงต้องชื่อ 01- เพื่อให้ถูกอ่านก่อน
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง key และติดตั้งด้วย ssh-copy-id
-2. เปิด session สำรองค้างไว้ก่อนแก้
-3. เขียน 40-hardening.conf ปิด password
-4. ตรวจด้วย sshd -t และ sshd -T แล้ว reload
+1. สร้าง key ใหม่ id_ed25519_lab บน Windows และวางบน lab-linux-01
+2. ทดสอบด้วย IdentitiesOnly และเทียบ fingerprint ใน /var/log/secure
+3. เพิ่ม Host lab01 ใน ~/.ssh/config
+4. เขียน 01-soclab-auth.conf แล้ว sshd -t และ reload
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-ssh-keygen -t ed25519 -C "aod@lab"
-printf "PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin no\n" | sudo tee /etc/ssh/sshd_config.d/40-hardening.conf
-sudo sshd -t && sudo sshd -T | grep -E "^(passwordauthentication|permitrootlogin)"
-sudo systemctl reload sshd
+sudo sshd -T | grep -E "^(passwordauthentication|kbdinteractiveauthentication)"
+sudo grep -H -i -E "challengeresponse|kbdinteractive" /etc/ssh/sshd_config.d/*.conf
+printf "PubkeyAuthentication yes\nPasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin no\n" | sudo tee /etc/ssh/sshd_config.d/01-soclab-auth.conf
+sudo sshd -t && sudo systemctl reload sshd
+sudo grep "Accepted publickey for aod" /var/log/secure | tail -2
 ```
 
 **แบบฝึกหัด**
-- จาก lab-linux-02 ลอง ssh -o PubkeyAuthentication=no ไปที่ lab-linux-01 ต้องได้ Permission denied (publickey)
+- จาก Windows รัน ssh -o PubkeyAuthentication=no -o GSSAPIAuthentication=no lab-linux-01 รายการวิธีใน Permission denied ต้องไม่มี password หรือ keyboard-interactive
 
 **เกณฑ์ผ่าน**
-- [ ] sshd -T แสดง passwordauthentication no
-- [ ] login ด้วย key ยังได้
+- [ ] sshd -T แสดง passwordauthentication no และ kbdinteractiveauthentication no
+- [ ] ssh lab01 เข้าได้ด้วย key ใหม่
 
 **หลักฐาน:** ผล sshd -T และข้อความ Permission denied
 
@@ -709,36 +710,36 @@ sudo systemctl reload sshd
 
 ### วันที่ 21 · บทที่ 8 — จำกัด session และ connection (Lab 13)
 
-**เป้าหมาย:** จำกัด session, เวลาว่าง และ connection ที่ยังไม่ยืนยันตัวตน
+**เป้าหมาย:** จำกัดการลองยืนยันตัวตน, connection ที่รอ, login พร้อมกัน, กลุ่มที่ใช้ SSH และ session ที่ว่าง
 
 **ทฤษฎี**
-- MaxSessions = จำนวน session ต่อ connection, MaxStartups = connection ที่รอยืนยันตัวตน
-- ClientAliveInterval × ClientAliveCountMax = เวลาตัด session ที่ค้าง
+- MaxSessions = channel ต่อ connection, MaxStartups = connection ที่รอยืนยันตัวตน
+- ClientAlive ตัดเฉพาะ client ที่หลุด ส่วน idle ต้องใช้ ChannelTimeout session:*= หรือ TMOUT
 - pam_limits maxlogins จำกัดจำนวน login ต่อผู้ใช้
 
 **ขั้นตอนปฏิบัติ**
-1. เพิ่มค่า MaxAuthTries, LoginGraceTime, MaxStartups, ClientAlive
-2. ตั้ง maxlogins ใน limits.d
-3. ทดสอบเปิด session เกินกำหนด
-4. อ่าน log ของ sshd
+1. ยืนยันว่า aod อยู่ใน wheel ก่อนใส่ AllowGroups
+2. เขียน 20-session-limit.conf และ limits.d/90-maxlogins.conf
+3. ตั้ง TMOUT ใน /etc/profile.d
+4. ทดสอบ MaxAuthTries, LoginGraceTime, AllowGroups และ maxlogins แล้วอ่าน log
 5. snapshot ch08-ssh
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-printf "MaxAuthTries 3\nLoginGraceTime 30\nMaxSessions 2\nMaxStartups 10:30:60\nClientAliveInterval 300\nClientAliveCountMax 2\n" | sudo tee -a /etc/ssh/sshd_config.d/40-hardening.conf
-echo "@soc hard maxlogins 2" | sudo tee /etc/security/limits.d/40-soc.conf
-sudo sshd -t && sudo systemctl reload sshd
-journalctl -u sshd --since "15 min ago" | grep -iE "maximum|too many"
+id aod | grep -o wheel
+sudo sshd -T | grep -Ei "^(maxauthtries|logingracetime|maxstartups|channeltimeout|allowgroups|persourcepenalties)"
+sudo journalctl -u sshd --since "15 min ago" | grep -E "maximum authentication|Timeout before|AllowGroups"
+sudo journalctl --since "15 min ago" | grep "Too many logins"
 ```
 
 **แบบฝึกหัด**
-- คำนวณว่า session ที่ค้างจะถูกตัดภายในกี่นาที แล้วพิสูจน์ด้วยการรอ (ลดค่าชั่วคราวให้รอสั้นลง)
+- คำนวณว่า client ที่หลุดเงียบจะถูกตัดภายในกี่นาทีจาก ClientAliveInterval × ClientAliveCountMax แล้วพิสูจน์ด้วยการลดค่าชั่วคราว
 
 **เกณฑ์ผ่าน**
-- [ ] login ครั้งที่ 3 ของสมาชิก soc ถูกปฏิเสธ
+- [ ] ch08-check.sh ผ่านทุกข้อ
 - [ ] อธิบายตัวเลข 3 ตัวของ MaxStartups ได้
 
-**หลักฐาน:** บรรทัด log ที่พิสูจน์ + ไฟล์ 40-hardening.conf
+**หลักฐาน:** บรรทัด log ของแต่ละ limit + ผล ch08-check.sh
 
 อ่านเพิ่ม: บทที่ 8 SSH Hardening: Key Authentication และ Session Limit
 
@@ -746,25 +747,27 @@ journalctl -u sshd --since "15 min ago" | grep -iE "maximum|too many"
 
 ### วันที่ 22 · บทที่ 9 — CrowdSec: ติดตั้ง, scenario sshd และ bouncer (Lab 14)
 
-**เป้าหมาย:** IP ที่ login ผิดซ้ำถูก ban อัตโนมัติด้วย nftables
+**เป้าหมาย:** IP ที่เดารหัสผ่าน SSH ซ้ำถูก ban อัตโนมัติที่ nftables โดยเครื่อง admin ไม่ถูก ban
 
 **ทฤษฎี**
-- CrowdSec แยกส่วนตรวจจับ (agent + scenario) กับส่วนบังคับ (bouncer)
-- acquisition บอกว่าอ่าน log จากไหน
-- decision มีอายุ (default 4 ชั่วโมง) และ allowlist กัน IP ของ admin
+- CrowdSec แยก Security Engine (ตรวจจับ), LAPI (เก็บ decision) และ bouncer (บังคับใช้)
+- scenario ssh-bf เป็น leaky bucket: จุ 5 รั่ว 1 ทุก 10 วินาที
+- parser crowdsecurity/whitelists ยกเว้น IP ภายในทั้งหมด จึงต้อง whitelist admin แล้วถอดออกใน lab
 
 **ขั้นตอนปฏิบัติ**
-1. ติดตั้ง crowdsec และ firewall bouncer แบบ nftables
-2. ตรวจ collection sshd
-3. จาก lab-linux-02 login ผิดหลายครั้งด้วยมือ (ผู้ใช้ไม่มีจริง)
-4. ดู alert และ decision แล้วลบ decision
+1. เปิด password ชั่วคราวด้วย 00-lab-password.conf (ยกเว้น lab-linux-02 จาก PerSourcePenalties)
+2. ติดตั้ง crowdsec และ firewall bouncer แบบ nftables (อ่าน script ของ repository ก่อนรัน)
+3. whitelist 192.168.10.100 แล้วถอด crowdsecurity/whitelists
+4. จาก lab-linux-02 ทดสอบ login ผิดด้วยผู้ใช้ที่ไม่มีจริง
+5. ดู alert, decision และ nftables แล้วลบ decision
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-curl -s https://install.crowdsec.net | sudo sh
-sudo dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
-sudo cscli collections list | grep sshd
+curl -fsSL https://install.crowdsec.net -o crowdsec-repo.sh && less crowdsec-repo.sh
+sudo sh crowdsec-repo.sh && sudo dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
+sudo cscli metrics show acquisition
 sudo cscli alerts list; sudo cscli decisions list
+sudo cscli explain --file /var/log/secure --type syslog | tail -30
 sudo cscli decisions delete --ip 192.168.10.42
 ```
 
@@ -775,42 +778,43 @@ sudo cscli decisions delete --ip 192.168.10.42
 - [ ] หลัง login ผิดตามเกณฑ์ lab-linux-02 ต่อ port 22 ไม่ได้
 - [ ] ลบ decision แล้วกลับมาต่อได้
 
-**หลักฐาน:** ผล cscli decisions list และ nft list ruleset (ส่วน crowdsec)
+**หลักฐาน:** ผล cscli alerts list และ decisions list
 
 อ่านเพิ่ม: บทที่ 9 CrowdSec: Ban Brute-force และบล็อก Tor/Proxy
 
 ### วันที่ 23 · บทที่ 9 — บล็อก Tor exit node และ anonymous proxy (Lab 15)
 
-**เป้าหมาย:** บล็อก IP กลุ่ม anonymizer แบบค่อยเป็นค่อยไป
+**เป้าหมาย:** IP ของ Tor exit node ถูกบล็อกล่วงหน้าและอัปเดตเองทุก 12 ชั่วโมง
 
 **ทฤษฎี**
-- Blocklist คือรายการ IP จากภายนอก ต่างจาก decision ที่เกิดจากพฤติกรรมในเครื่อง
-- เริ่มจากโหมดดู (log) ก่อนบล็อกจริงเพื่อลด false positive
-- ผลกระทบ: ผู้ใช้จริงที่ใช้ VPN หรือ Tor จะเข้าไม่ได้
+- reactive (ssh-bf) ต่างจาก proactive (blocklist ตามชื่อเสียงของ IP)
+- decision มีอายุ 13 ชม. แต่นำเข้าใหม่ทุก 12 ชม. IP ที่ยังอยู่ใน list จึงถูกต่ออายุ
+- list รวม VPN อาจบล็อกผู้ใช้จริง ต้องเริ่มด้วยการเก็บ log
 
 **ขั้นตอนปฏิบัติ**
-1. enroll เครื่องเข้า CrowdSec Console (ใช้ key จาก console อ่านด้วย read -s)
-2. subscribe blocklist ของ Tor/Proxy ที่ plan ฟรีให้
-3. ตรวจ decision ที่มาจาก blocklist
-4. ตั้ง allowlist ให้ IP ของ admin
+1. นำเข้า Tor exit list ด้วย cscli decisions import
+2. ติดตั้ง script, service และ timer
+3. ทดสอบด้วยการนำเข้า IP ของ lab-linux-02 อายุ 5 นาที
+4. ลบ 00-lab-password.conf และปลด ban lab-linux-02
 5. snapshot ch09-crowdsec
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-read -rs CS_KEY && sudo cscli console enroll "$CS_KEY"; unset CS_KEY
-sudo cscli decisions list --origin lists | head
+sudo systemctl start crowdsec-tor-import.service
+systemctl list-timers crowdsec-tor-import.timer
+sudo cscli decisions list --origin cscli-import --limit 3
 sudo cscli metrics show decisions
-sudo cscli allowlists create admins --description "admin workstation" && sudo cscli allowlists add admins 192.168.10.100
+sudo rm /etc/ssh/sshd_config.d/00-lab-password.conf && sudo systemctl reload sshd
 ```
 
 **แบบฝึกหัด**
 - เขียน 1 ย่อหน้า: องค์กรประเภทใดไม่ควรบล็อก Tor ทั้งหมด และควรใช้มาตรการอะไรแทน
 
 **เกณฑ์ผ่าน**
-- [ ] มี decision จาก origin lists
-- [ ] IP 192.168.10.100 ไม่ถูก ban แม้ทดสอบ login ผิด
+- [ ] มี decision จาก origin cscli-import และ timer มีเวลารันครั้งถัดไป
+- [ ] ch09-check.sh ผ่านทุกข้อ
 
-**หลักฐาน:** ผล cscli metrics และ allowlists inspect
+**หลักฐาน:** ผล list-timers และ metrics show decisions
 
 อ่านเพิ่ม: บทที่ 9 CrowdSec: Ban Brute-force และบล็อก Tor/Proxy
 
@@ -822,14 +826,14 @@ sudo cscli allowlists create admins --description "admin workstation" && sudo cs
 - ทบทวนคำถามท้ายบทที่ 5–9
 
 **ขั้นตอนปฏิบัติ**
-1. Scenario: พนักงาน soc.temp ลาออกวันนี้ ให้ offboard ทั้งใน IPA และเครื่อง local
+1. Scenario: พนักงาน intern ลาออกวันนี้ ให้ offboard ทั้งใน IPA และเครื่อง local
 2. จาก lab-linux-02 ทดสอบ login ด้วยบัญชีนั้น ต้องถูกปฏิเสธ และถ้าผิดซ้ำต้องถูก ban
 3. เขียนรายงาน 1 หน้า: ทำอะไร หลักฐานคืออะไร ย้อนกลับอย่างไร
 
 **คำสั่งหลัก** (ipa-01 · aod)
 ```bash
-ipa user-disable soc.temp
-ipa user-show soc.temp --all | grep -i "account disabled"
+ipa user-disable intern
+ipa user-show intern --all | grep -i "account disabled"
 sudo cscli decisions list
 ```
 
@@ -916,106 +920,104 @@ sudo ss -tlnp | grep -E ":(80|443|9000)\b"
 
 อ่านเพิ่ม: บทที่ 10 ติดตั้ง Graylog และเปิดใช้อย่างปลอดภัย
 
-### วันที่ 27 · บทที่ 11 — Inputs และ rsyslog จากทุกเครื่อง
+### วันที่ 27 · บทที่ 11 — Inputs, DOCKER-USER และ rsyslog จากทุกเครื่อง (16.18–16.20)
 
-**เป้าหมาย:** log ของทุกเครื่องเข้า Graylog แบบ real-time
+**เป้าหมาย:** ทุกเครื่องส่ง log เข้า Graylog แบบ TCP พร้อม disk queue และ port รับ log เปิดเฉพาะ lab
 
 **ทฤษฎี**
-- Syslog (RFC 5424) กับ GELF ต่างกันที่โครงสร้าง field
-- TCP + queue ใน rsyslog กัน log หายตอน Graylog ล่ม
-- ใช้ port ไม่ใช่ privileged (1514) เพราะ container ไม่รันเป็น root
+- TCP + disk queue ทำให้ log ไม่หายเมื่อ Graylog ล่ม UDP ทิ้งเงียบ ๆ
+- port ที่ Docker publish ไม่ผ่าน firewalld ต้องจำกัดด้วย DOCKER-USER
+- SELinux อนุญาต rsyslog เฉพาะ syslogd_port_t จึงต้องเพิ่ม 1514
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง Syslog TCP input port 1514
-2. เขียน /etc/rsyslog.d/90-graylog.conf พร้อม disk queue
-3. แจกไฟล์ไปทุกเครื่องด้วย Invoke-SocLabScript.ps1
-4. ทดสอบด้วย logger
+1. สร้าง input syslog-tcp-1514 และ gelf-http-12201
+2. ติดตั้ง docker-user-lab.service บน graylog-01
+3. semanage port 1514 และเขียน 90-graylog.conf บน client
+4. ทดสอบด้วย logger และทดสอบ queue ด้วยการหยุด Graylog
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-echo '*.* action(type="omfwd" target="graylog-01.lab.internal" port="1514" protocol="tcp" template="RSYSLOG_SyslogProtocol23Format" queue.type="LinkedList" queue.filename="graylog" queue.saveOnShutdown="on" action.resumeRetryCount="-1")' | sudo tee /etc/rsyslog.d/90-graylog.conf
+sudo semanage port -a -t syslogd_port_t -p tcp 1514
 sudo rsyslogd -N1 && sudo systemctl restart rsyslog
-logger -t soclab "test from $(hostname -s)"
+logger -p authpriv.notice -t lab-test "hello graylog from $(hostname -s)"
+sudo ss -tnp | grep ':1514'
 ```
 
 **แบบฝึกหัด**
 - หยุด Graylog 2 นาที ส่ง logger 10 ข้อความ แล้วเปิดคืน ตรวจว่าครบ 10
 
 **เกณฑ์ผ่าน**
-- [ ] เห็นข้อความทดสอบจากทุกเครื่องใน Search
+- [ ] เห็นข้อความทดสอบจากทุกเครื่องใน Search โดย source เป็น FQDN
 - [ ] ไม่มีข้อความหายในแบบฝึกหัด
 
-**หลักฐาน:** ภาพผลค้น source ทุกเครื่อง
+**หลักฐาน:** ภาพ Search + ผล ch11-check.sh บน client
 
 อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
 
-### วันที่ 28 · บทที่ 11 — Streams และ Index Set
+### วันที่ 28 · บทที่ 11 — auditd เข้า syslog และ Streams (16.21–16.24)
 
-**เป้าหมาย:** แยก log ตามประเภทเพื่อค้นเร็วและกำหนดอายุต่างกัน
+**เป้าหมาย:** audit event เข้า Graylog และ log ถูกแยกเป็น 3 stream
 
 **ทฤษฎี**
-- Stream = ชุดเงื่อนไขที่ route ข้อความ
-- Index set กำหนด retention ต่อประเภทข้อมูล
-- ลบออกจาก Default Stream เพื่อไม่เก็บซ้ำ
+- auditd บันทึกจาก kernel ผ่าน PAM และมี auid ที่ติดตัวผู้ใช้แม้ sudo
+- stream rule ทำงานใน Filter Chain ก่อน pipeline
+- OpenSSH 9.8+ เขียน log ในชื่อ sshd-session จึงต้องใช้ regex ^sshd(-session)?$
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง index set auth (เก็บ 90 วัน)
-2. สร้าง stream SSH-Auth จาก application_name = sshd
-3. สร้าง stream Sudo และ Audit
-4. ตรวจจำนวนข้อความในแต่ละ stream
+1. เปิด syslog plugin ของ auditd และ 10-audit-local.conf
+2. สร้าง stream sudo-activity, auth-logs, suspicious-ip
+3. ทดสอบ rule ด้วย Load a message to test rules
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-# ทำใน Web UI: Streams → Create stream → Add rule
-logger -p authpriv.notice -t sshd "test stream rule"
-curl -sk -u "$GL_USER" https://graylog-01.lab.internal/api/streams | jq ".streams[].title"
+sudo sed -i 's/^active = no/active = yes/' /etc/audit/plugins.d/syslog.conf
+sudo auditctl --signal reload 2>/dev/null || sudo service auditd restart
+sudo grep -c "sshd-session\[" /var/log/secure
+sudo id   # สร้าง event ของ stream sudo-activity
 ```
 
 **แบบฝึกหัด**
 - ออกแบบ stream 5 ตัวของ lab พร้อมเหตุผลเรื่อง retention ของแต่ละตัว
 
 **เกณฑ์ผ่าน**
-- [ ] ข้อความ sshd ไปที่ SSH-Auth เท่านั้น
+- [ ] ข้อความ sshd-session เข้า auth-logs และ sudo เข้า sudo-activity
 - [ ] อธิบายผลของ "Remove matches from Default Stream" ได้
 
-**หลักฐาน:** ตาราง stream ที่ออกแบบ + ภาพ Streams
+**หลักฐาน:** ภาพหน้า Streams 3 ตัวที่ Running
 
 อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
 
-### วันที่ 29 · บทที่ 11 — Pipeline rule แยก field ของ SSH
+### วันที่ 29 · บทที่ 11 — Pipeline SOC-SSH และ Test Login (16.25)
 
-**เป้าหมาย:** event ของ sshd มี field user, src_ip, auth_result พร้อมค้น
+**เป้าหมาย:** log SSH ทุกบรรทัดมี ssh_event, ssh_user, src_ip และ severity
 
 **ทฤษฎี**
-- Pipeline → stage → rule ทำงานตามลำดับ stage
-- grok pattern แยกข้อความเป็น field
-- ทดสอบ rule กับข้อความตัวอย่างก่อนผูกกับ stream จริง
+- rule ใน stage เดียวกันไม่รับประกันลำดับ งานที่พึ่งกันต้องคนละ stage
+- stage ต้องตั้ง None or more rules match
+- route_to_stream() ส่งข้อความเข้า stream หลังมี field แล้ว
 
 **ขั้นตอนปฏิบัติ**
-1. เขียน rule ssh_failed และ ssh_accepted
-2. ผูก pipeline กับ stream SSH-Auth
-3. ทดสอบด้วย Simulator
-4. ค้นด้วย field ใหม่
+1. วาง rule 12 ตัวจาก SOC-SSH-pipeline.rules
+2. สร้าง pipeline 5 stage และผูกกับ auth-logs
+3. ตรวจลำดับ Message Processors
+4. Test Login 5 เหตุการณ์ (เปิด password ชั่วคราวแล้วลบ)
 5. snapshot ch11-ingest
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-rule "ssh failed"
-when has_field("message") && contains(to_string($message.message), "Failed password")
-then
-  let m = grok(pattern: "Failed password for (invalid user )?%{USERNAME:user} from %{IP:src_ip} port %{INT:src_port}", value: to_string($message.message), only_named_captures: true);
-  set_fields(m); set_field("auth_result", "failure");
-end
+ssh -o BatchMode=yes nosuchuser@192.168.10.41 true   # จาก lab-linux-02
+sudo journalctl -u sshd --since '-5min' -o cat | grep -E 'Invalid user|Accepted'
+sudo rm -f /etc/ssh/sshd_config.d/00-lab-password.conf && sudo systemctl reload sshd
 ```
 
 **แบบฝึกหัด**
-- เพิ่ม rule สำหรับ "Accepted publickey" ให้ได้ field key_type และ fingerprint
+- เพิ่ม rule ที่ดึง fingerprint จาก Accepted publickey ลง field ssh_key_fp
 
 **เกณฑ์ผ่าน**
-- [ ] ค้น auth_result:failure แล้วได้ผลพร้อม src_ip
-- [ ] Simulator แสดง field ครบ
+- [ ] ค้น ssh_event:invalid_user แล้วได้ ssh_user, src_ip และอยู่ใน suspicious-ip
+- [ ] Rule Simulation แสดง field ครบ
 
-**หลักฐาน:** source ของ rule + ภาพ Simulator
+**หลักฐาน:** ตาราง Test Login 5 เหตุการณ์พร้อม query
 
 อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
 
@@ -1037,7 +1039,7 @@ end
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
-auth_result:failure AND NOT src_ip:192.168.10.100
+ssh_event:auth_failed AND NOT src_ip:192.168.10.100
 message:"type=USER_START" AND message:"acct=\"aod\""
 _exists_:src_ip AND source:lab-linux-0*
 ```
@@ -1070,7 +1072,7 @@ _exists_:src_ip AND source:lab-linux-0*
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
-(user:aod OR user:admin) AND auth_result:success AND NOT src_ip:192.168.10.100
+ssh_user:(aod OR admin) AND ssh_event:auth_success AND NOT src_ip:192.168.10.100
 timestamp:["2026-10-12 18:00:00.000" TO "2026-10-13 08:00:00.000"]
 ```
 
@@ -1136,7 +1138,7 @@ sudo journalctl -u crowdsec --since "10 min ago" | tail
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
 # Dashboards → Create → Add widget: Aggregation (group by src_ip_country_code)
-auth_result:failure AND _exists_:src_ip_geolocation
+ssh_event:auth_failed AND _exists_:src_ip_geolocation
 ```
 
 **แบบฝึกหัด**
@@ -1400,7 +1402,7 @@ echo "# fim test" | sudo tee -a /etc/ssh/ssh_config   # บน agent แล้�
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
 sudo find / -xdev -perm /6000 -type f 2>/dev/null | sort > ~/suid-baseline.txt
-sudo usermod -aG wheel analyst01 && sudo gpasswd -d analyst01 wheel
+sudo usermod -aG wheel somchai && sudo gpasswd -d somchai wheel
 <directories realtime="yes" tags="identity">/etc/sudoers,/etc/sudoers.d</directories>
 ```
 
@@ -1472,7 +1474,7 @@ sudo aureport -au --summary
 ```
 
 **แบบฝึกหัด**
-- ใช้ ausearch หาว่าใครเปลี่ยนรหัสผ่านของ analyst01 ครั้งล่าสุด
+- ใช้ ausearch หาว่าใครเปลี่ยนรหัสผ่านของ somchai ครั้งล่าสุด
 
 **เกณฑ์ผ่าน**
 - [ ] auditctl -l แสดง rule ที่เขียน
@@ -1765,21 +1767,21 @@ sudo tail -f /var/log/tetragon/tetragon.log | jq -r ".process_kprobe.process.bin
 **ขั้นตอนปฏิบัติ**
 1. สร้าง system account สำหรับ bind ใน IPA
 2. ตั้ง Authentication Service แบบ LDAP ใน Graylog
-3. ทดสอบ login ด้วย soc.analyst
+3. ทดสอบ login ด้วย analyst
 4. สร้าง dashboard sudo violation
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
 # System → Authentication → Create service → LDAP: ldaps://ipa-01.lab.internal:636
 message:"NOT in sudoers" OR message:"command not allowed"
-# ssh soc.analyst@lab-linux-01 แล้วสั่ง sudo systemctl restart sshd เพื่อ trigger
+# ssh analyst@lab-linux-01 แล้วสั่ง sudo systemctl restart sshd เพื่อ trigger
 ```
 
 **แบบฝึกหัด**
 - ตั้ง alert ของ Graylog เมื่อ sudo violation เกิน 3 ครั้งใน 10 นาที
 
 **เกณฑ์ผ่าน**
-- [ ] soc.analyst login Graylog ได้ด้วยรหัสผ่าน IPA
+- [ ] analyst login Graylog ได้ด้วยรหัสผ่าน IPA
 - [ ] dashboard แสดง violation ที่ trigger
 
 **หลักฐาน:** ภาพ dashboard + การตั้งค่า LDAP (ปิด password)
