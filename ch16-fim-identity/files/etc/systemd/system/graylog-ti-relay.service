@@ -1,0 +1,16 @@
+[Unit]
+Description=Graylog threat-intel relay for Wazuh Active Response
+After=network-online.target
+
+[Service]
+EnvironmentFile=/etc/graylog-ti-relay.env
+ExecStart=/usr/bin/python3 /usr/local/sbin/graylog-ti-relay.py
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

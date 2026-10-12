@@ -1,0 +1,9 @@
+-a always,exit -F path=/usr/sbin/useradd  -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/sbin/usermod  -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/sbin/userdel  -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/sbin/groupadd -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/sbin/groupmod -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/sbin/groupdel -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/bin/gpasswd   -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/bin/passwd    -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd
+-a always,exit -F path=/usr/bin/chage     -F perm=x -F auid>=1000 -F auid!=unset -k identity_cmd

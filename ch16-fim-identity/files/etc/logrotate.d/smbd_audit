@@ -1,0 +1,10 @@
+/var/log/smbd_audit.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    postrotate
+        /usr/bin/systemctl kill -s HUP rsyslog.service >/dev/null 2>&1 || true
+    endscript
+}
