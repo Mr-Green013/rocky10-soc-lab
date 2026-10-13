@@ -12,6 +12,21 @@
 | CVE-2021-4034  | pkexec execve + SUID ใหม่         |                               |                   |                  |         |                     |
 | CVE-2024-3094  | แก้ไฟล์ของระบบที่เฝ้าไว้           |                               |                   |                  |         |                     |
 
+## OWASP Top 10 (2021)
+
+| หมวด | สัญญาณ/วิธีทดสอบ (benign)          | ตัวตรวจจับ | ตรวจเจอ | หมายเหตุ |
+| ---- | --------------------------------- | ---------- | ------- | -------- |
+| A01 Broken Access Control | curl /wp-admin จาก lab-linux-02 |            |         |          |
+| A02 Cryptographic Failures | FIM บน TLS config               |            |         |          |
+| A03 Injection | สตริงทดสอบ CRS ของ Lab 32          |            |         |          |
+| A04 Insecure Design | (threat modeling ไม่ใช่ detection) | —          | —       | ปิดด้วยการออกแบบ |
+| A05 Security Misconfiguration | FIM test + ตรวจ port           |            |         |          |
+| A06 Vulnerable Components | Wazuh vuln / dnf check-update     |            |         |          |
+| A07 Auth Failures | brute-force (24.3.5)                |            |         |          |
+| A08 Integrity Failures | FIM test บนไฟล์ WordPress         |            |         |          |
+| A09 Logging/Monitoring | logger → ยืนยันถึง Graylog         |            |         |          |
+| A10 SSRF | egress test (24.3.2)                      |            |         |          |
+
 ## สรุป
 - ช่องว่างที่ใหญ่ที่สุด (สัญญาณที่ไม่มีชั้นใดเห็น หรือเห็นช้าเกินไป):
 - แผนปิดช่องว่าง (rule/policy ที่จะเพิ่ม):

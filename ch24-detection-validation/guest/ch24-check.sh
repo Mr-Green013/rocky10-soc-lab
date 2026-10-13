@@ -28,6 +28,7 @@ elif [ "$H" = node-01 ]; then
   if [ -z "$miss" ]; then ok "Tetragon policy พร้อม: egress-private-only guillotine suid-guard wp-no-shell"; else bad "Tetragon policy ที่ยังไม่โหลด:$miss"; fi
   if systemctl is-active --quiet auditd && auditctl -l 2>/dev/null | grep -q 'webshell_exec'; then ok "auditd active และมี key webshell_exec"; else bad "auditd ไม่ active หรือไม่มี key webshell_exec"; fi
   if docker inspect ebpf-01 >/dev/null 2>&1; then ok "container ทดสอบ ebpf-01 พร้อม"; else warn "ไม่มี container ebpf-01 (สร้างตามบทที่ 19 ก่อนจำลอง egress/guillotine)"; fi
+  if docker ps --format '{{.Names}} {{.Image}}' 2>/dev/null | grep -qiE 'waf|modsecurity'; then ok "WAF (ModSecurity) ทำงาน (OWASP A03/A10)"; else warn "ไม่พบ container WAF (ทำ Lab 32 ก่อนทดสอบ OWASP ระดับเว็บ)"; fi
 
 elif [ "$H" = lab-linux-01 ]; then
   echo "== lab-linux-01: ชั้นเครือข่าย/log และ host"
