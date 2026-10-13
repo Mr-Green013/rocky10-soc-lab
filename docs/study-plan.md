@@ -413,8 +413,8 @@ tail -n 20 /var/log/messages | less
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-sudo visudo -cf /etc/sudoers.d/40-helpdesk
-sudo -l -U helpdesk
+sudo visudo -cf /etc/sudoers.d/20-containerops
+sudo -l -U anan
 journalctl _COMM=sudo --since today
 journalctl -u sshd -p warning -o short-iso
 ```
@@ -547,15 +547,15 @@ sudo faillock --user somchai
 **ขั้นตอนปฏิบัติ**
 1. ตรวจไฟล์ sudoers ที่มี NOPASSWD
 2. ล็อกบัญชีด้วย 3 วิธีแล้วเทียบผล (10.10)
-3. สร้างกลุ่ม soc แล้วเพิ่มสมาชิก
+3. สร้างกลุ่ม soc-analyst (GID 5000) แล้วเพิ่มสมาชิก
 4. ทดสอบ login ของบัญชีที่ปิดต้องถูกปฏิเสธ
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
 sudo grep -r NOPASSWD /etc/sudoers /etc/sudoers.d/
-sudo usermod -L -e 1 -s /sbin/nologin exstaff
+sudo useradd -m exstaff && sudo usermod -L -e 1 -s /sbin/nologin exstaff   # บัญชีทดสอบ ลบด้วย userdel -r หลังจบ
 sudo passwd -S exstaff; sudo chage -l exstaff
-sudo groupadd soc && sudo usermod -aG soc somchai && id somchai
+sudo groupadd -g 5000 soc-analyst && sudo usermod -aG soc-analyst somchai && id somchai
 ```
 
 **แบบฝึกหัด**
@@ -649,7 +649,7 @@ id somsak@lab.internal
 **ขั้นตอนปฏิบัติ**
 1. สร้าง host group และ HBAC rule สำหรับทีม SOC
 2. ทดสอบด้วย ipa hbactest แล้วจึงปิด allow_all
-3. สร้าง sudo rule ให้กลุ่ม soc
+3. สร้าง sudo rule web_nginx_ops ให้กลุ่ม sysadmins
 4. เพิ่ม SSH key ให้ผู้ใช้ และค้นด้วย ldapsearch
 5. snapshot ch07-ipa
 
@@ -658,7 +658,7 @@ id somsak@lab.internal
 ipa hbacrule-add allow_sysadmins_web && ipa hbacrule-add-user allow_sysadmins_web --groups=sysadmins
 ipa hbactest --user=somsak --host=lab-linux-01.lab.internal --service=sshd --rules=allow_sysadmins_web
 ipa hbacrule-disable allow_all
-ipa sudocmd-add /usr/bin/journalctl && ipa sudorule-add soc_journal && ipa sudorule-add-allow-command soc_journal --sudocmds="/usr/bin/journalctl"
+ipa sudorule-add web_nginx_ops && ipa sudorule-add-user web_nginx_ops --groups=sysadmins && ipa sudorule-add-allow-command web_nginx_ops --sudocmdgroups=nginx-ops
 ldapsearch -Y GSSAPI -b "cn=users,cn=accounts,dc=lab,dc=internal" uid=somsak ipaSshPubKey
 ```
 
@@ -832,7 +832,7 @@ sudo rm /etc/ssh/sshd_config.d/00-lab-password.conf && sudo systemctl reload ssh
 
 **คำสั่งหลัก** (ipa-01 · aod)
 ```bash
-ipa user-disable intern
+ipa user-disable intern   # บัญชีที่ผู้สอนสร้างไว้สำหรับ scenario
 ipa user-show intern --all | grep -i "account disabled"
 sudo cscli decisions list
 ```
@@ -863,7 +863,7 @@ sudo cscli decisions list
 **ขั้นตอนปฏิบัติ**
 1. ติดตั้ง Docker CE และ compose plugin
 2. สร้าง .env ด้วย secret ที่สุ่มขึ้น
-3. docker compose up -d แล้วดู health
+3. sudo docker compose up -d แล้วดู health
 4. login Web UI ผ่าน port ภายใน
 
 **คำสั่งหลัก** (graylog-01 · aod)
@@ -871,7 +871,7 @@ sudo cscli decisions list
 sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
 sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && sudo systemctl enable --now docker
 umask 077; printf "GRAYLOG_PASSWORD_SECRET=%s\n" "$(openssl rand -hex 48)" > .env
-docker compose up -d && docker compose ps
+sudo docker compose up -d && sudo docker compose ps
 ```
 
 **แบบฝึกหัด**
@@ -903,8 +903,8 @@ docker compose up -d && docker compose ps
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
-docker compose exec nginx nginx -t && docker compose exec nginx nginx -s reload
-docker compose logs cloudflared | grep -i "registered tunnel connection"
+sudo docker compose exec nginx nginx -t && sudo docker compose exec nginx nginx -s reload
+sudo docker compose logs cloudflared | grep -i "registered tunnel connection"
 curl -skI https://graylog-01.lab.internal/ | head -3
 sudo ss -tlnp | grep -E ":(80|443|9000)\b"
 ```
@@ -1265,7 +1265,7 @@ sudo /var/ossec/bin/verify-agent-conf -f /var/ossec/etc/shared/linux-base/agent.
 
 **ขั้นตอนปฏิบัติ**
 1. เปิด wazuh-logtest วางบรรทัด sshd ตัวอย่าง
-2. เขียน rule ใน local_rules.xml
+2. เขียน rule ใน 110-ssh_rules.xml (ไม่ใช้ local_rules.xml เพื่อให้แบ่งไฟล์ตามช่วง ID)
 3. ทดสอบซ้ำจน level และ description ตรง
 4. restart manager
 
@@ -1277,10 +1277,10 @@ sudo /var/ossec/bin/wazuh-analysisd -t && sudo systemctl restart wazuh-manager
 ```
 
 **แบบฝึกหัด**
-- เขียน rule 100010: login สำเร็จของ aod จาก IP ที่ไม่ใช่ 192.168.10.100 ให้ level 10
+- เขียน rule 100150: login สำเร็จของ aod จาก IP ที่ไม่ใช่ 192.168.10.100 ให้ level 10
 
 **เกณฑ์ผ่าน**
-- [ ] wazuh-logtest แสดง rule id 100010 สำหรับบรรทัดทดสอบ
+- [ ] wazuh-logtest แสดง rule id 100150 สำหรับบรรทัดทดสอบ
 - [ ] wazuh-analysisd -t ไม่มี error
 
 **หลักฐาน:** XML ของ rule + ผล logtest
@@ -1354,206 +1354,207 @@ wazuh_rule_id:100651   # ค้นใน Graylog
 
 อ่านเพิ่ม: บทที่ 15 Rule, Tuning และ Active Response
 
-### วันที่ 40 · บทที่ 16 — FIM: โหมด scan, report_changes และ nodiff (22.1–22.13)
+### วันที่ 40 · บทที่ 16 — FIM: โหมด scan, whodata, report_changes และ nodiff (22.1–22.5, 22.10–22.13)
 
-**เป้าหมาย:** รู้ว่าไฟล์สำคัญเปลี่ยนเมื่อไร และเห็น diff โดยไม่ทำให้ secret รั่ว
+**เป้าหมาย:** เลือกโหมด FIM ให้เหมาะกับไฟล์แต่ละกลุ่ม และรู้ว่าใครแก้ไฟล์ด้วยโปรแกรมใดโดยไม่ทำให้ความลับรั่ว
 
 **ทฤษฎี**
-- scheduled vs realtime vs whodata และภาระต่อระบบ
-- report_changes เก็บ diff ของไฟล์ข้อความ
-- nodiff กับไฟล์ที่มี secret (/etc/shadow, key)
+- scheduled, realtime และ whodata ต่างกันที่ความเร็วและข้อมูล "ใคร/โปรแกรมใด"
+- whodata ใช้ auditd จึงต้องมี rule wazuh_fim
+- report_changes ส่ง diff ของไฟล์ ห้ามใช้กับ /etc/shadow ให้ใช้ nodiff
 
 **ขั้นตอนปฏิบัติ**
-1. ตั้ง directories ใน agent.conf ของ group linux
-2. เปิด report_changes กับ /etc/ssh
-3. ใส่ nodiff ให้ /etc/shadow
-4. แก้ไฟล์ทดสอบแล้วดู alert
+1. ต่อยอด agent.conf ของกลุ่ม linux-base จากบทที่ 14 ด้วย directories ของ /etc/ssh และไฟล์บัญชี
+2. ใส่ nodiff ให้ /etc/shadow และ /etc/gshadow
+3. แก้ sshd_config ด้วย comment ทดสอบแล้วดู alert พร้อม audit.login_user
+4. ลบบรรทัดทดสอบและตรวจ alert ของการแก้กลับ
 
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
-<syscheck><frequency>43200</frequency><directories realtime="yes" report_changes="yes">/etc/ssh</directories><directories whodata="yes">/etc/passwd,/etc/shadow,/etc/group</directories><nodiff>/etc/shadow</nodiff></syscheck>
-echo "# fim test" | sudo tee -a /etc/ssh/ssh_config   # บน agent แล้วลบออก
+sudo /var/ossec/bin/verify-agent-conf -f /var/ossec/etc/shared/linux-base/agent.conf
+echo "# fim test" | sudo tee -a /etc/ssh/sshd_config >/dev/null   # บน lab-linux-01
+sudo sed -i '/# fim test/d' /etc/ssh/sshd_config   # บน lab-linux-01
+sudo jq -r 'select(.syscheck) | [.syscheck.path, .syscheck.audit.login_user.name] | @tsv' /var/ossec/logs/alerts/alerts.json | tail -3
 ```
 
 **แบบฝึกหัด**
-- พิสูจน์ว่า alert ของ /etc/shadow ไม่มีเนื้อหา hash ปรากฏ
+- ทำตาราง 3 แถว: ไฟล์กลุ่มใดใช้ scheduled, realtime หรือ whodata พร้อมเหตุผลด้านภาระและข้อมูลที่ได้
 
 **เกณฑ์ผ่าน**
-- [ ] alert 550 (modified) พร้อม diff ของ ssh_config
-- [ ] alert ของ shadow ไม่มี diff
+- [ ] alert ของ sshd_config ระบุผู้ใช้ที่ login จริงและโปรแกรมที่แก้
+- [ ] alert ของ /etc/shadow ไม่มีเนื้อหาหรือ hash ของรหัสผ่าน
 
-**หลักฐาน:** alert JSON 2 รายการ
+**หลักฐาน:** alert JSON 2 รายการ (sshd_config และ shadow)
 
 อ่านเพิ่ม: บทที่ 16 File Integrity และ Identity Monitoring
 
-### วันที่ 41 · บทที่ 16 — Persistence paths, SUID baseline และ identity (22.14–22.22)
+### วันที่ 41 · บทที่ 16 — Persistence path, SUID baseline และ identity (22.14–22.26, 22.3–22.8)
 
-**เป้าหมาย:** เฝ้าจุดที่ผู้บุกรุกใช้ฝังตัวและยกระดับสิทธิ์
+**เป้าหมาย:** เห็นการฝังตัวผ่าน sudoers, authorized_keys, cron, systemd และไฟล์ SUID ใหม่ และการแก้บัญชีผู้ใช้
 
 **ทฤษฎี**
-- MITRE T1098.004 SSH authorized_keys, T1053 cron, T1543 systemd service
-- SUID baseline ตอนระบบสะอาด แล้วเทียบเมื่อมีไฟล์ใหม่
-- usermod -aG wheel = การยกระดับสิทธิ์ที่เห็นได้ใน /etc/group
+- ผู้บุกรุกที่ได้ root มักทิ้งทางกลับไว้ที่ sudoers.d, authorized_keys, cron และ systemd unit
+- SUID baseline ทำให้ไฟล์ SUID ใหม่ทุกไฟล์เป็น alert
+- การแก้บัญชีจับได้ทั้ง FIM และ auditd (rule 100220–100222, 100300–100301)
 
 **ขั้นตอนปฏิบัติ**
-1. เฝ้า sudoers.d, authorized_keys, cron, systemd unit dir, /boot
-2. ทำ SUID baseline ด้วย find
-3. ใส่ tag ให้กลุ่มไฟล์ identity
-4. ทดสอบ: เพิ่ม key ทดสอบแล้วลบ, เพิ่มผู้ใช้ทดสอบเข้ากลุ่มแล้วถอน
+1. เฝ้า sudoers.d, authorized_keys, cron.d, systemd unit dir และ /boot ผ่าน linux-base
+2. ทำ SUID baseline ด้วย find แล้วเปิด rule ไฟล์ SUID ใหม่
+3. ทดสอบด้วยไฟล์ใน sudoers.d ที่มีแต่ comment และการเพิ่ม/ถอนสมาชิกกลุ่ม แล้วลบทันที
+4. ดู alert ระดับความเสี่ยงสูงใน Graylog
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
 sudo find / -xdev -perm /6000 -type f 2>/dev/null | sort > ~/suid-baseline.txt
+sudo visudo -f /etc/sudoers.d/99-ch16-test   # ใส่ comment บรรทัดเดียว แล้วลบไฟล์
 sudo usermod -aG wheel somchai && sudo gpasswd -d somchai wheel
-<directories realtime="yes" tags="identity">/etc/sudoers,/etc/sudoers.d</directories>
+sudo rm -f /etc/sudoers.d/99-ch16-test
 ```
 
 **แบบฝึกหัด**
-- เขียน rule 100210 ให้ alert level 12 เมื่อ /etc/group เปลี่ยนและมีคำว่า wheel
+- เลือก persistence path มา 2 จุดที่ไม่ได้อยู่ในบท แล้วเสนอ directories ของ syscheck พร้อมระดับ alert
 
 **เกณฑ์ผ่าน**
-- [ ] ทุกการทดสอบเกิด alert พร้อม whodata (user, process)
-- [ ] มีไฟล์ SUID baseline
+- [ ] การเพิ่ม somchai เข้า wheel ได้ alert ระดับสูงพร้อมผู้สั่ง
+- [ ] ไม่มีไฟล์ทดสอบค้างใน sudoers.d (ch16-check.sh)
 
-**หลักฐาน:** alert ของการเพิ่มกลุ่ม wheel พร้อม audit.user
+**หลักฐาน:** alert ของ identity + diff ของ SUID baseline
 
 อ่านเพิ่ม: บทที่ 16 File Integrity และ Identity Monitoring
 
-### วันที่ 42 · บทที่ 16 — SMB share และการลบไฟล์จำนวนมาก (Ransomware)
+### วันที่ 42 · บทที่ 16 — SMB share, การลบไฟล์จำนวนมาก และบล็อกต้นทาง (22.9, 22.30–22.34)
 
-**เป้าหมาย:** แจ้งเตือนเมื่อมีการลบหรือเปลี่ยนไฟล์จำนวนมากใน share
+**เป้าหมาย:** ตรวจจับการลบหรือเปลี่ยนชื่อไฟล์จำนวนมากบน share และบล็อก IP ต้นทางอัตโนมัติ
 
 **ทฤษฎี**
-- ransomware มักเปลี่ยนนามสกุลหรือลบไฟล์จำนวนมากในเวลาสั้น
-- rule แบบ frequency บน rule 553 (deleted)
-- ทดสอบด้วยไฟล์ dummy ที่สร้างเองเท่านั้น
+- vfs full_audit ของ Samba บันทึกทุก operation พร้อม user และ IP
+- rule 100423/100424 นับการลบและ rename ซ้ำในเวลาสั้น
+- Active Response บล็อกต้นทางแบบมีเวลาหมดอายุ และต้องยกเว้น IP ของ admin
 
 **ขั้นตอนปฏิบัติ**
-1. ตั้ง Samba share /srv/share บน lab-linux-02
-2. เฝ้า /srv/share แบบ realtime
-3. เขียน rule 100220: ลบไฟล์ 20 ไฟล์ใน 60 วินาที
-4. สร้างไฟล์ dummy 50 ไฟล์แล้วลบ
+1. ตั้ง share บน lab-linux-02 ด้วยบัญชี smbuser1 (ไม่มี shell)
+2. ส่ง log ของ full_audit เข้า Wazuh
+3. จาก lab-linux-01 คัดลอกไฟล์ทดสอบ 30 ไฟล์แล้วลบทั้งหมด
+4. ดู alert 100423/100424 และกฎ DROP ชั่วคราว แล้วรอให้หมดเวลา
 
 **คำสั่งหลัก** (lab-linux-02 · aod)
 ```bash
-sudo useradd -M -s /sbin/nologin smbuser1 && sudo smbpasswd -a smbuser1   # lab-linux-02
+sudo useradd -M -s /sbin/nologin smbuser1 && sudo smbpasswd -a smbuser1
 for i in $(seq 1 30); do echo "test $i" > "doc$i.txt"; done   # lab-linux-01 ใน ~/smbtest
-smbclient //192.168.10.42/share -U smbuser1 -c 'prompt OFF; mput doc*.txt' && smbclient //192.168.10.42/share -U smbuser1 -c 'del doc*.txt'
-sudo tail -n 5 /var/log/smbd_audit.log   # lab-linux-02: rule 100423
+smbclient //192.168.10.42/share -U smbuser1 -c 'prompt OFF; mput doc*.txt; mdel doc*.txt'
+sudo iptables -S INPUT | grep 192.168.10.41   # ระหว่างถูกบล็อก
 ```
 
 **แบบฝึกหัด**
-- ปรับ threshold ให้ไม่ alert เมื่อผู้ใช้ลบ 5 ไฟล์ตามปกติ และอธิบายค่าที่เลือก
+- อธิบายว่าเกณฑ์ "ลบ 20 ไฟล์ใน 60 วินาที" จะพลาดหรือเตือนผิดในงานใดของผู้ใช้จริง และจะปรับอย่างไร
 
 **เกณฑ์ผ่าน**
-- [ ] alert 100220 เกิดครั้งเดียวต่อการลบชุดใหญ่
-- [ ] การลบ 5 ไฟล์ไม่เกิด alert
+- [ ] เกิด alert 100423 หรือ 100424 พร้อม IP ของ lab-linux-01
+- [ ] หลังหมดเวลาไม่มีกฎ DROP ค้าง (ch16-check.sh)
 
-**หลักฐาน:** alert 100220 + ค่าที่เลือก
+**หลักฐาน:** alert + log ของ active-responses.log
 
 อ่านเพิ่ม: บทที่ 16 File Integrity และ Identity Monitoring
 
-### วันที่ 43 · บทที่ 17 — auditd พื้นฐาน, ausearch และ aureport (23.1–23.9)
+### วันที่ 43 · บทที่ 17 — auditd พื้นฐาน, การต่อเข้า Wazuh และลด log ขยะ (23.1–23.4, 23.6)
 
-**เป้าหมาย:** เขียน audit rule แบบมี key และค้นด้วย ausearch
+**เป้าหมาย:** เขียน audit rule แบบ watch และ syscall ที่มี key และค้นย้อนหลังได้ด้วย ausearch/aureport
 
 **ทฤษฎี**
-- watch (-w) กับ syscall rule (-a always,exit)
-- key (-k) ทำให้ค้นและส่งต่อ Wazuh ได้
-- rules.d + augenrules --load คือวิธีถาวร
+- rule แบบ watch (-w) กับ syscall (-a) และ key ที่ใช้ค้น
+- auid ไม่เปลี่ยนเมื่อ sudo/su จึงระบุคนจริงได้
+- ลด log ขยะด้วย exclude ตาม record type และ executable ก่อนส่งออก
 
 **ขั้นตอนปฏิบัติ**
 1. ดู rule ปัจจุบันด้วย auditctl -l
-2. สร้าง /etc/audit/rules.d/50-soclab.rules
-3. โหลดด้วย augenrules
-4. ค้นด้วย ausearch -k และสรุปด้วย aureport
+2. วางไฟล์ 10-base, 20-exclude, 25-identity และ 30-soc ใน /etc/audit/rules.d/
+3. โหลดด้วย augenrules แล้วทดสอบ chmod ไฟล์ทดสอบ (key perm_mod)
+4. ส่ง audit log เข้า Wazuh และดู alert 1003xx
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
-echo "-w /etc/passwd -p wa -k identity" | sudo tee /etc/audit/rules.d/50-soclab.rules
-sudo augenrules --load && sudo auditctl -l
-sudo ausearch -k identity -i --start today | tail -20
-sudo aureport -au --summary
+sudo auditctl -l | head
+sudo augenrules --check && sudo augenrules --load
+touch /tmp/ch17 && chmod 600 /tmp/ch17 && sudo ausearch -k perm_mod -ts recent -i | tail -5
+sudo aureport -k --summary | head
 ```
 
 **แบบฝึกหัด**
-- ใช้ ausearch หาว่าใครเปลี่ยนรหัสผ่านของ somchai ครั้งล่าสุด
+- เขียน rule ที่บันทึกการแก้ /etc/hosts แล้วอธิบายว่าทำไม watch เหมาะกว่า syscall rule ในกรณีนี้
 
 **เกณฑ์ผ่าน**
-- [ ] auditctl -l แสดง rule ที่เขียน
-- [ ] ausearch -i อ่านได้ว่า user ใดรัน command ใด
+- [ ] ausearch -k perm_mod พบ event ที่มี auid ของ aod
+- [ ] auditctl -s แสดง lost 0
 
-**หลักฐาน:** ไฟล์ rules + ผล ausearch
+**หลักฐาน:** ผล ausearch + aureport
 
 อ่านเพิ่ม: บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
 
-### วันที่ 44 · บทที่ 17 — หมวด audit rule แนว CIS (23.10–23.29)
+### วันที่ 44 · บทที่ 17 — ไฟล์ rule ตามหมวดแนว CIS และการล็อก rule (23.10–23.29)
 
-**เป้าหมาย:** ชุด rule ครอบคลุม 18 หมวดพร้อม key
+**เป้าหมาย:** จัด audit rule เป็นไฟล์ตามหมวด และตั้ง -e 2 โดยไม่ทำให้ whodata ของ Wazuh เสีย
 
 **ทฤษฎี**
-- หมวด: time-change, identity, system-locale, MAC-policy, logins, session, perm_mod, access, privileged, mounts, delete, scope, actions, sysctl, cron, software_mgmt, export
-- -e 2 (immutable) ป้องกันผู้บุกรุกแก้ rule ต้อง reboot ถึงเปลี่ยนได้
-- วัดภาระด้วย auditctl -s (lost, backlog)
+- ลำดับไฟล์ใน rules.d มีผล: exclude ต้องมาก่อน rule ที่จะยกเว้น
+- -e 2 ทำให้แก้ rule ได้ด้วยการ reboot เท่านั้น
+- Wazuh ต้องเพิ่ม rule wazuh_fim ก่อนล็อก
 
 **ขั้นตอนปฏิบัติ**
-1. เขียน rule ทีละหมวดพร้อมทดสอบ trigger ที่ไม่เป็นอันตราย
+1. เขียน 40-cis.rules ทีละหมวดพร้อม trigger ที่ไม่เป็นอันตราย
 2. สร้าง rule privileged จาก SUID baseline วันที่ 41
-3. ใส่ -e 2 เป็นบรรทัดสุดท้าย (หลังทดสอบเสร็จ)
-4. ตรวจ lost events
+3. ใส่ -e 2 ใน 99-finalize.rules หลังทดสอบเสร็จ แล้ว reboot
+4. ตรวจ enabled 2, lost 0 และ rule wazuh_fim
 
 **คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
 -a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k time-change
 -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F auid>=1000 -F auid!=unset -k delete
 -w /etc/sudoers -p wa -k scope
-sudo auditctl -s | grep -E "lost|backlog"
+sudo auditctl -s | grep -E "enabled|lost|backlog"
 ```
 
 **แบบฝึกหัด**
-- ทำตาราง 18 หมวด: rule, คำสั่ง trigger ที่ปลอดภัย, ผล ausearch -k
+- อธิบายขั้นตอนแก้ rule หลังตั้ง -e 2 ไปแล้วแบบไม่ปิด auditd และไม่เสีย log ระหว่างนั้น
 
 **เกณฑ์ผ่าน**
-- [ ] ทุกหมวดค้นเจอด้วย ausearch -k
-- [ ] lost = 0 หลังทดสอบ
+- [ ] auditctl -s แสดง enabled 2 และ lost 0
+- [ ] ch17-check.sh ผ่านข้อ wazuh_fim
 
-**หลักฐาน:** ตาราง 18 หมวด
+**หลักฐาน:** ไฟล์ rules.d + ผล auditctl -s
 
 อ่านเพิ่ม: บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
 
-### วันที่ 45 · บทที่ 17 — ตรวจจับเทคนิคระดับ syscall และส่งเข้า Wazuh (23.30–23.35)
+### วันที่ 45 · บทที่ 17 — ตรวจจับระดับ syscall และ proctitle ใน Graylog (23.5, 23.7–23.9, 23.30–23.35)
 
-**เป้าหมาย:** ตรวจจับ web shell, การโหลด kernel module และ bpf() ที่ผิดปกติ
+**เป้าหมาย:** ตรวจจับ shell จาก web server, การโหลด kernel module, การใช้บัญชี nobody, process injection และ LD_PRELOAD ด้วยเหตุการณ์จำลองที่ไม่เป็นอันตราย
 
 **ทฤษฎี**
-- web shell = web server (uid ของ web) รัน /bin/sh
-- LKM rootkit ต้องใช้ init_module/finit_module
-- bpf() syscall คือทางเข้าของ eBPF ทั้งเครื่องมือดีและร้าย
+- key webshell_exec, modules, nobody_exec, process_injection, ld_preload
+- trigger ใช้คำสั่งปกติของระบบ เช่น modprobe โมดูล dummy ที่มากับ kernel
+- proctitle เป็น hex ต้องถอดรหัสก่อนอ่านใน Graylog
 
 **ขั้นตอนปฏิบัติ**
-1. rule execve ของ uid web server
-2. rule init_module/finit_module/delete_module
-3. rule bpf
-4. trigger แบบปลอดภัย: modprobe โมดูลระบบที่มีอยู่, รัน bpftool prog list
-5. ส่ง audit log เข้า Wazuh แล้วดู alert
-6. snapshot ch17-auditd
+1. ทดสอบทีละ key ตามส่วน B ของบทแล้วดู alert ใน Wazuh
+2. ถอดรหัส proctitle ผ่าน pipeline ของ Graylog
+3. สร้าง dashboard SOC Critical
+4. ลบบัญชีและ module ทดสอบ แล้ว snapshot ch17-auditd
 
-**คำสั่งหลัก** (node-01 · aod)
+**คำสั่งหลัก** (lab-linux-01 · aod)
 ```bash
--a always,exit -F arch=b64 -S init_module,finit_module,delete_module -k modules
--a always,exit -F arch=b64 -S bpf -k bpf
-sudo modprobe -r dummy 2>/dev/null; sudo modprobe dummy && sudo modprobe -r dummy
-sudo ausearch -k modules -i | tail
+sudo modprobe dummy && sudo modprobe -r dummy
+sudo ausearch -k modules -ts recent -i | grep -E "type=(SYSCALL|KERN_MODULE)" | tail -4
+sudo ausearch -k ld_preload -ts recent -i | tail -2
+bash pve-snapshot.sh ch17-auditd   # บน pve-01
 ```
 
 **แบบฝึกหัด**
-- เขียน rule Wazuh ที่ alert level 12 เมื่อ key modules ถูกเรียกโดยผู้ใช้ที่ไม่ใช่ root ผ่าน sudo
+- เปรียบเทียบ alert ของการโหลด module จาก auditd กับสิ่งที่ Tetragon (บทที่ 19) จะเห็น เขียนเป็นตาราง 3 แถว
 
 **เกณฑ์ผ่าน**
-- [ ] ausearch -k modules พบการโหลด dummy
-- [ ] Wazuh แสดง alert ของ audit key
+- [ ] ทุก key ในส่วน B มี alert อย่างน้อย 1 ครั้ง
+- [ ] Graylog แสดง proctitle เป็นข้อความอ่านได้
 
-**หลักฐาน:** ผล ausearch + alert ใน Wazuh
+**หลักฐาน:** ภาพ dashboard SOC Critical + ผล ch17-check.sh
 
 อ่านเพิ่ม: บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
 
@@ -1589,103 +1590,106 @@ sudo ausearch -k identity -k scope -k cron -i --start today
 
 ## ภาค 6 Container และ eBPF
 
-### วันที่ 47 · บทที่ 18 — Docker runtime security: hardening ของ container
+### วันที่ 47 · บทที่ 18 — Docker Engine ที่ปลอดภัยและการมองเห็นชั้น Docker API (24-A, 24-B)
 
-**เป้าหมาย:** รัน container ด้วยสิทธิ์ต่ำสุดที่ทำงานได้
+**เป้าหมาย:** ติดตั้ง Docker แบบใช้ SELinux และ seccomp ไม่มีสมาชิกในกลุ่ม docker และส่ง event ของ Docker API เข้า Wazuh
 
 **ทฤษฎี**
-- container ใช้ kernel ร่วมกับ host: namespace + cgroup v2 + capability + seccomp + SELinux
-- Rocky 10 ใช้ cgroup v2 เป็นค่าเริ่มต้น
-- docker group = root ทางอ้อม ห้ามให้ผู้ใช้ทั่วไป
+- container ใช้ kernel ร่วมกับ host: namespace, cgroup v2, capability, seccomp, SELinux
+- ใครสั่ง Docker ได้เทียบเท่า root จึงใช้ sudo docker แทนกลุ่ม docker
+- docker-listener เห็น exec, kill, commit, cp ผ่าน Docker API
 
 **ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Docker CE บน node-01 (แก้ addrtype ถ้าเจอ)
-2. รัน container แบบปกติแล้วดู capability
-3. รันซ้ำด้วย --read-only, --cap-drop ALL, no-new-privileges
-4. เทียบผลด้วย docker inspect
+1. ติดตั้ง Docker CE บน node-01 และตรวจ SecurityOptions
+2. สร้าง network lab-net และ container web-01, app-01, tools-01 (label soc.autoresponse=off)
+3. เพิ่ม audit rule ของ docker runtime
+4. เปิด docker-listener และทดสอบ docker exec
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-docker run --rm alpine sh -c "grep Cap /proc/self/status"
-docker run -d --name web --read-only --tmpfs /tmp --tmpfs /var/cache/nginx --tmpfs /run --cap-drop ALL --cap-add CHOWN --cap-add SETUID --cap-add SETGID --cap-add NET_BIND_SERVICE --security-opt no-new-privileges --pids-limit 100 --memory 256m nginx:alpine
-docker inspect web --format "{{.HostConfig.CapDrop}} {{.HostConfig.ReadonlyRootfs}}"
+sudo docker info --format '{{.CgroupVersion}} {{.SecurityOptions}}'
+getent group docker   # ต้องไม่มีสมาชิก
+sudo docker run -d --name app-01 --network lab-net alpine:3.20 sleep infinity
+sudo docker exec tools-01 id   # สร้าง alert ของ Docker API
 ```
 
 **แบบฝึกหัด**
-- หาค่าต่ำสุดของ capability ที่ nginx:alpine ต้องใช้จริง (ทดลองถอดทีละตัว)
+- รัน web-01 ใหม่แบบ --read-only, --cap-drop ALL และเพิ่มเฉพาะ capability ที่ nginx ต้องใช้ แล้วยืนยันว่ายังให้บริการได้
 
 **เกณฑ์ผ่าน**
-- [ ] container web ทำงานได้ด้วย cap-drop ALL + ตัวที่จำเป็น
-- [ ] เขียนลง / ใน container ไม่ได้
+- [ ] docker info แสดง selinux และ seccomp
+- [ ] alert ของ docker exec มีชื่อ container และผู้สั่งจาก auditd
 
-**หลักฐาน:** ผล docker inspect + การทดลอง
+**หลักฐาน:** ผล docker info + alert
 
 อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
 
-### วันที่ 48 · บทที่ 18 — ตรวจจับใน container ด้วย Falco: terminal hijacking
+### วันที่ 48 · บทที่ 18 — rule ของ container และ Active Response แบบไล่ระดับ (24-B, 24-C)
 
-**เป้าหมาย:** Falco แจ้งเตือนเมื่อมีคนเปิด shell ใน container
+**เป้าหมาย:** ตรวจจับ terminal hijacking, DoS และการนำข้อมูลออกใน container แล้วตอบสนองด้วย pause/stop/kill พร้อม whitelist
 
 **ทฤษฎี**
-- Falco อ่าน syscall ผ่าน modern eBPF probe
-- rule "Terminal shell in container" จับ shell แบบ interactive
-- output ของ Falco ส่งต่อ syslog → Graylog ได้
+- rule 1007xx ใน 160-container_rules.xml
+- pause แช่แข็งโดยไม่ทำลายหลักฐานในหน่วยความจำ
+- label soc.autoresponse=off ทำให้ยังเกิด alert แต่ไม่ถูกตอบโต้
 
 **ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Falco 0.45 จาก repo ทางการ (driver modern_ebpf)
-2. docker exec -it web sh เพื่อ trigger
-3. ดู alert ใน journal
-4. ส่ง output เข้า Graylog
+1. วาง rule และ decoder ของ container บน wazuh-01
+2. ติดตั้ง container-response.sh (root:wazuh 750) และทดสอบด้วยมือก่อนผูก rule
+3. ทดสอบทั้ง 3 โหมดและ whitelist ตามขั้นตอนที่ 5 ของ 24-C
+4. เก็บหลักฐานจาก container ที่ถูก pause แล้ว unpause
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-sudo systemctl status falco-modern-bpf --no-pager | head -3
-docker exec -it web sh -c "id; exit"
-sudo journalctl -u falco-modern-bpf --since "5 min ago" | grep -i "terminal shell"
+sudo tail -n 3 /var/ossec/logs/active-responses.log
+sudo docker ps -a --format 'table {{.Names}}\t{{.Status}}'
+sudo docker unpause app-01
+sudo docker inspect -f '{{.Name}} {{.HostConfig.Privileged}}' $(sudo docker ps -q)
 ```
 
 **แบบฝึกหัด**
-- เขียน Falco rule override ที่ยกเว้น container ชื่อ debug-toolbox เท่านั้น
+- กรอกแบบฟอร์มรายงานผลทดสอบ 4 ขั้น (24.13) ของ 1 สถานการณ์
 
 **เกณฑ์ผ่าน**
-- [ ] alert Terminal shell in container ปรากฏพร้อมชื่อ container
-- [ ] container debug-toolbox ไม่เกิด alert
+- [ ] เห็นผล pause, kill และ skip ตาม label ใน active-responses.log
+- [ ] ไม่มี container privileged หรือ mount docker.sock ค้าง
 
-**หลักฐาน:** บรรทัด alert + rule ที่เขียน
+**หลักฐาน:** log ของ Active Response + แบบฟอร์ม 4 ขั้น
 
 อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
 
-### วันที่ 49 · บทที่ 18 — DoS และ data exfiltration ใน container
+### วันที่ 49 · บทที่ 18 — Falco แบบ modern eBPF และ SOC Command Center (24-D, 24-F)
 
-**เป้าหมาย:** จำกัดทรัพยากร และตรวจจับการเชื่อมต่อขาออกที่ผิดปกติ
+**เป้าหมาย:** ตรวจจับพฤติกรรมใน container ระดับ syscall ด้วย Falco ลด false positive และรวมภาพใน dashboard
 
 **ทฤษฎี**
-- ไม่มี limit = container เดียวกิน RAM/CPU/PID ทั้ง host
-- exfiltration ตรวจได้จาก connection ขาออกไปปลายทางที่ไม่คาดคิด
-- network แบบ internal ของ Docker ตัด internet ได้
+- Falco ใช้ driver modern_ebpf บน Rocky 10
+- rule ของตัวเองอยู่ใน rules.d และ override ได้โดยไม่แก้ rule หลัก
+- access log ของ nginx ใน web-01 ใช้ตรวจ scan และบล็อก IP
 
 **ขั้นตอนปฏิบัติ**
-1. รัน container ที่ใช้ memory มากภายใต้ --memory 128m แล้วดู OOM
-2. ตรวจ pids-limit ด้วยการสร้าง process หลายตัวใน container (หยุดเองที่ limit)
-3. สร้าง network --internal สำหรับ backend
-4. ดู Falco alert เมื่อ container ต่อออกไปปลายทางภายนอก
+1. ติดตั้ง Falco และเปิด JSON output
+2. เขียน rule ของตัวเองและส่งเข้า Wazuh
+3. ลด false positive ของ tools-01
+4. ส่ง access log ของ web-01 เข้า Wazuh และสร้าง dashboard SOC Command Center
+5. รัน ch18-check.sh แล้ว snapshot ch18-docker
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-docker run --rm --memory 128m --memory-swap 128m alpine sh -c "head -c 300m /dev/zero | tail" ; echo "exit=$?"
-docker stats --no-stream
-docker network create --internal backend
-docker run --rm --network backend alpine wget -T3 -qO- http://example.com || echo blocked
+systemctl is-active falco-modern-bpf.service
+sudo docker exec -it app-01 sh -c exit
+sudo jq -r 'select(.rule=="Terminal shell in container") | .output' /var/log/falco/falco.json | tail -1
+bash pve-snapshot.sh ch18-docker   # บน pve-01
 ```
 
 **แบบฝึกหัด**
-- ตั้ง limit ให้ WordPress stack (บทที่ 22) แล้วบันทึกเหตุผลของแต่ละค่า
+- เขียน Falco rule ที่เตือนเมื่อ container เขียนไฟล์ใน /etc และยกเว้น container ที่ตั้งใจเขียน
 
 **เกณฑ์ผ่าน**
-- [ ] container ถูก OOM kill (exit 137) ไม่กระทบ host
-- [ ] container ใน backend ออก internet ไม่ได้
+- [ ] Falco alert ของ shell ใน app-01 ไปถึง Wazuh
+- [ ] ch18-check.sh ผ่านทุกข้อ
 
-**หลักฐาน:** ผล exit code + docker stats; snapshot ch18-docker
+**หลักฐาน:** alert ของ Falco + ภาพ SOC Command Center
 
 อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
 
@@ -1761,171 +1765,176 @@ sudo systemctl restart tetragon && sudo tetra tracingpolicy list
 
 ## ภาค 7 SOC Operations ขั้นสูง
 
-### วันที่ 52 · บทที่ 20 — Analyst login Graylog ด้วย FreeIPA และ Sudo Violation Dashboard (Lab 25–26)
+### วันที่ 52 · บทที่ 20 — SOC Analyst login Graylog ด้วย FreeIPA และ Sudo Violation Dashboard (Lab 25–26)
 
-**เป้าหมาย:** สิทธิ์ทีม SOC จัดการจาก FreeIPA และเห็นการใช้ sudo ผิดนโยบาย
+**เป้าหมาย:** analyst เข้า Graylog ด้วยบัญชี FreeIPA ตามกลุ่ม และเห็นการใช้ sudo ที่ละเมิดนโยบายใน dashboard
 
 **ทฤษฎี**
-- Graylog Open ทำ LDAP authentication ได้ แต่ group-to-role sync ต้องใช้ Enterprise จึงกำหนด default role
-- ใช้ LDAPS และบัญชี bind ที่มีสิทธิ์อ่านอย่างเดียว
-- sudo violation: "user NOT in sudoers" และ "command not allowed"
+- LDAPS 636 ต้องให้ JVM ของ Graylog เชื่อ CA ของ IPA
+- filter ตามกลุ่ม soc-analysts ทำให้ intern1 เข้าไม่ได้
+- rule 100213 นับการละเมิด sudo ซ้ำของผู้ใช้เดียวกัน
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง system account สำหรับ bind ใน IPA
-2. ตั้ง Authentication Service แบบ LDAP ใน Graylog
-3. ทดสอบ login ด้วย analyst
-4. สร้าง dashboard sudo violation
+1. สร้างกลุ่ม soc-analysts และผู้ใช้ analyst1, intern1 ใน IPA
+2. ทดสอบ LDAPS จาก graylog-01 ก่อนตั้ง Authentication Service
+3. ให้ role แบบ SOC Analyst แล้วทดสอบ login ทั้งสองบัญชี
+4. สร้างข้อมูลทดสอบด้วย su - anan / chai แล้วสร้าง dashboard และ event definition
+5. snapshot ch20-soc
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
-# System → Authentication → Create service → LDAP: ldaps://ipa-01.lab.internal:636
-message:"NOT in sudoers" OR message:"command not allowed"
-# ssh analyst@lab-linux-01 แล้วสั่ง sudo systemctl restart sshd เพื่อ trigger
+ipa group-add soc-analysts --desc="Graylog SOC analysts"   # บน ipa-01
+LDAPTLS_CACERT=/opt/graylog/ipa-ca.crt ldapsearch -LLL -H ldaps://ipa-01.lab.internal:636 -D "uid=graylog-bind,cn=sysaccounts,cn=etc,dc=lab,dc=internal" -W -b "cn=users,cn=accounts,dc=lab,dc=internal" "(&(uid=analyst1)(memberOf=cn=soc-analysts,cn=groups,cn=accounts,dc=lab,dc=internal))" uid
+su - anan   # บน lab-linux-01 แล้ว sudo cat /etc/shadow 3 ครั้ง
+wazuh_rule_id:100213   # ค้นใน Graylog
 ```
 
 **แบบฝึกหัด**
-- ตั้ง alert ของ Graylog เมื่อ sudo violation เกิน 3 ครั้งใน 10 นาที
+- เขียนขั้นตอนตอบสนองเมื่อ dashboard แสดง 100213 ของบัญชีหนึ่ง: ตรวจ auid, ถามเจ้าของ, ล็อกบัญชีใน IPA
 
 **เกณฑ์ผ่าน**
-- [ ] analyst login Graylog ได้ด้วยรหัสผ่าน IPA
-- [ ] dashboard แสดง violation ที่ trigger
+- [ ] analyst1 login ได้ และ intern1 ถูกปฏิเสธ
+- [ ] dashboard แสดง 100213 ของ anan
 
-**หลักฐาน:** ภาพ dashboard + การตั้งค่า LDAP (ปิด password)
+**หลักฐาน:** ภาพ dashboard + ผล ldapsearch
 
 อ่านเพิ่ม: บทที่ 20 SOC Analyst Access และ Sudo Violation Dashboard
 
 ### วันที่ 53 · บทที่ 21 — ติดตามและบล็อกคำสั่ง Git แบบ real-time (Lab 27)
 
-**เป้าหมาย:** เห็นทุกคำสั่ง git ใน SIEM และบล็อก push ที่ผิดนโยบาย
+**เป้าหมาย:** push ไป remote ที่ไม่อนุมัติหรือ force push ถูกหยุด และการพยายามข้าม hook กลายเป็น alert
 
 **ทฤษฎี**
-- audit execve ของ /usr/bin/git ให้เห็น argument
-- server-side hook (pre-receive) บังคับนโยบายได้ ผู้ใช้ข้ามไม่ได้ต่างจาก client hook
-- ตัวอย่างนโยบาย: ห้าม push ไฟล์ .env หรือ private key
+- 4 ชั้น: Track (audit), Guard (pre-push hook), Kernel block (Tetragon git-egress), Server (กฎของ repository)
+- hook ฝั่ง client ข้ามได้ด้วย --no-verify จึงเป็นราวกันตก ไม่ใช่กำแพง
+- rule 100370–100378 แยกตามชั้น
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง bare repo บน lab-linux-01
-2. audit rule สำหรับ git
-3. เขียน pre-receive hook ปฏิเสธไฟล์ .env
-4. ทดสอบ push จาก lab-linux-02 และดู event ใน Graylog
+1. สร้าง repository ที่อนุมัติบน lab-linux-01 (git.lab.internal) และ remote ทดสอบบน lab-linux-02
+2. audit rule และ Wazuh rule ของ git
+3. ติดตั้ง system-wide pre-push hook และ policy git-egress
+4. ทดสอบ 6 กรณีตามตารางในบท
+5. snapshot ch21-git
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**คำสั่งหลัก** (node-01 · aod)
 ```bash
-sudo git init --bare /srv/git/app.git
--a always,exit -F arch=b64 -S execve -F path=/usr/bin/git -k git
-git diff --name-only "$oldrev" "$newrev" | grep -qE "(^|/)\.env$" && { echo "push rejected: .env"; exit 1; }
+git init --bare -b main /srv/git/demo.git   # บน lab-linux-01
+git push --force origin main   # ต้องถูก git-guard หยุด
+git push --no-verify evil main   # ต้องถูก Tetragon ตัด
+wazuh_rule_id:[100370 TO 100378]   # ค้นใน Graylog
 ```
 
 **แบบฝึกหัด**
-- ขยาย hook ให้ปฏิเสธไฟล์ที่มีข้อความ "BEGIN OPENSSH PRIVATE KEY"
+- อธิบายว่าถ้าไม่มีชั้น Kernel block ผู้ใช้จะนำ code ออกได้ด้วยวิธีใดบ้าง (ระดับแนวคิด) และชั้นใดจะยังเห็น
 
 **เกณฑ์ผ่าน**
-- [ ] push ที่มี .env ถูกปฏิเสธพร้อมข้อความ
-- [ ] event git ค้นเจอใน Graylog ด้วย key=git
+- [ ] ผลทั้ง 6 กรณีตรงกับตารางในบท
+- [ ] ch21-check.sh ผ่านทุกข้อ
 
-**หลักฐาน:** output ของ push ที่ถูกปฏิเสธ + event
+**หลักฐาน:** ตารางผลทดสอบ 6 กรณี + alert
 
 อ่านเพิ่ม: บทที่ 21 ติดตามและบล็อกคำสั่ง Git แบบ Real-time
 
-### วันที่ 54 · บทที่ 22 — WordPress, Nginx log แยก และ Redis (Lab 28, 30, 31)
+### วันที่ 54 · บทที่ 22 — App log เข้า Graylog, WordPress stack และ Web logging (Lab 28, 30, 31)
 
-**เป้าหมาย:** web stack บน node-01 ส่ง log แยก Nginx กับ WordPress เข้า Graylog
+**เป้าหมาย:** ส่ง log ของ application 3 วิธี แยก log ของ Nginx กับ WordPress และเร่ง WordPress ด้วย Redis
 
 **ทฤษฎี**
-- Nginx access log แบบ JSON ทำให้ Graylog แยก field ได้ทันที
-- log ของ application (PHP/WordPress) กับ web server ต่างกัน ต้องแยก stream
-- Redis object cache ลดการ query database
+- GELF จาก application, Docker gelf driver และไฟล์ผ่าน rsyslog
+- log_format แบบ JSON ทำให้ Graylog ไม่ต้อง parse ด้วย regex
+- Redis object cache วัดผลด้วย keyspace_hits/misses
 
 **ขั้นตอนปฏิบัติ**
-1. รัน WordPress + MariaDB + Nginx + Redis ด้วย compose
-2. ตั้ง log_format json ใน Nginx
-3. ส่ง log ด้วย GELF driver หรือ rsyslog
-4. ติดตั้ง Redis Object Cache และวัด hit
+1. ทำ Lab 28 วิธี A และ B แล้วสร้าง stream และ pipeline
+2. start WordPress stack ใน /opt/wordpress และติดตั้ง WordPress
+3. สร้าง stream และ pipeline Web แยก nginx กับ WordPress แล้วทำ dashboard Web Overview
+4. วัด baseline ด้วย ab แล้วเปิด Redis และวัดซ้ำ
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-log_format json escape=json '{"time":"$time_iso8601","remote_addr":"$remote_addr","request":"$request","status":$status,"ua":"$http_user_agent"}';
-docker compose up -d && docker compose ps
-docker compose exec redis redis-cli info stats | grep -E "keyspace_(hits|misses)"
+cd /opt/wordpress && sudo docker compose up -d && sudo docker compose ps
+ab -n 300 -c 10 http://192.168.10.50:8081/ | grep -E "Requests per second|Time per request"
+rcli info stats | grep -E 'keyspace_(hits|misses)'   # rcli ตามขั้นตอนที่ 4 ของ Lab 31
+log_type:nginx_access AND http_status:>=400   # ค้นใน Graylog
 ```
 
 **แบบฝึกหัด**
-- ทำ widget ใน Graylog: status code 4xx/5xx ต่อชั่วโมงแยกตาม path
+- เทียบตัวเลขก่อนและหลังเปิด Redis และอธิบายว่าทำไมหน้าที่ login แล้วได้ประโยชน์จาก cache น้อยกว่า
 
 **เกณฑ์ผ่าน**
-- [ ] log Nginx มี field status, request ใน Graylog
-- [ ] keyspace_hits เพิ่มขึ้นหลังเปิดหน้าเว็บซ้ำ
+- [ ] Graylog แยก log_type ของ nginx และ WordPress
+- [ ] keyspace_hits มากกว่า misses หลังเรียกหน้าซ้ำ
 
-**หลักฐาน:** ภาพ field ใน Graylog + ผล redis-cli
+**หลักฐาน:** ผล ab ก่อน/หลัง + ภาพ Web Overview
 
 อ่านเพิ่ม: บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
 
-### วันที่ 55 · บทที่ 22 — ตรวจจับ shell execution ใน WordPress (Lab 29)
+### วันที่ 55 · บทที่ 22 — ตรวจจับและหยุด shell execution ใน WordPress (Lab 29)
 
-**เป้าหมาย:** alert และหยุดเมื่อ process ของ PHP รัน shell
+**เป้าหมาย:** ไฟล์ PHP ทดสอบที่เรียก shell ถูกตรวจจับ, IP ถูกบล็อก, shell ถูกฆ่าใน kernel และปิดทางที่ configuration
 
 **ทฤษฎี**
-- web shell ทำให้ php-fpm หรือ apache spawn /bin/sh
-- ตรวจได้ 3 ชั้น: auditd (execve uid web), Falco (spawned shell), Tetragon (kill)
-- ทดสอบด้วย PHP ไฟล์ทดสอบที่รันคำสั่ง id อย่างเดียว แล้วลบทันที
+- 3 รอบ: ตรวจจับและ block IP → ฆ่า shell ใน kernel (Tetragon wp-no-shell, rule 100903) → hardening
+- ไฟล์ทดสอบเรียกแค่ id และลบทันทีหลังทดสอบ
+- disable_functions และการห้ามรัน PHP ใน uploads ปิดทางตั้งแต่ต้นทาง
 
 **ขั้นตอนปฏิบัติ**
-1. เขียน audit/Falco rule สำหรับ shell จาก process ของ web
-2. วางไฟล์ทดสอบที่เรียก shell_exec("id") ใน container
-3. เรียกหน้าแล้วดู alert ทั้ง 2 ชั้น
-4. เปิด Tetragon policy kill แล้วทดสอบซ้ำ
-5. ลบไฟล์ทดสอบ
+1. ให้ Wazuh เห็นไฟล์และ log ของ WordPress แล้ววาง rule 1009xx
+2. วางไฟล์ทดสอบ lab-shelltest.php ตามขั้นตอนที่ 3 แล้วดู alert 100901
+3. โหลด policy wp-no-shell แล้วทดสอบซ้ำ
+4. เปิด LAB29-HARDENING ใน nginx และลบไฟล์ทดสอบ
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-docker compose exec wordpress sh -c 'echo "<?php echo shell_exec(\"id\");" > /var/www/html/t.php'
-curl -s http://node-01.lab.internal/t.php
-docker compose exec wordpress rm -f /var/www/html/t.php
+curl -s http://192.168.10.50:8081/wp-content/uploads/lab-shelltest.php
+sudo tetra tracingpolicy list | grep wp-no-shell
+sudo docker compose exec -T nginx nginx -t && sudo docker compose exec -T nginx nginx -s reload
+sudo docker compose exec -T wordpress rm -f /var/www/html/wp-content/uploads/lab-shelltest.php
 ```
 
 **แบบฝึกหัด**
-- เขียนขั้นตอน containment ของ web shell 5 ขั้น (ไม่ลบหลักฐานก่อนเก็บ)
+- อธิบายว่ารอบที่ 3 (hardening) ทำให้รอบที่ 1–2 ยังจำเป็นอยู่หรือไม่ เพราะอะไร
 
 **เกณฑ์ผ่าน**
-- [ ] เกิด alert จาก auditd หรือ Falco พร้อมชื่อ container
-- [ ] หลังเปิด Tetragon policy คำขอเดิมไม่ได้ผล id
+- [ ] รอบที่ 2 ไม่มีผลลัพธ์ของ id และมี alert 100903
+- [ ] หลัง hardening เรียกไฟล์ PHP ใน uploads ได้ 403
 
-**หลักฐาน:** alert + ผล curl ก่อน/หลัง
+**หลักฐาน:** alert 100901 + 100903 + ผล curl ทั้ง 3 รอบ
 
 อ่านเพิ่ม: บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
 
-### วันที่ 56 · บทที่ 22 — WAF: ModSecurity + OWASP CRS (Lab 32)
+### วันที่ 56 · บทที่ 22 — WAF: ModSecurity + OWASP CRS หน้า WordPress (Lab 32)
 
-**เป้าหมาย:** WAF หน้า WordPress ที่เริ่มจากตรวจจับ แล้ว tune ก่อนบล็อก
+**เป้าหมาย:** WAF ทำงานโหมด DetectionOnly ก่อน tune false positive แล้วจึงบล็อก และปิดทางเข้าอ้อม
 
 **ทฤษฎี**
-- CRS ใช้ anomaly scoring: ผลรวมคะแนนเกิน threshold จึงบล็อก
-- Paranoia level 1 เป็นจุดเริ่มต้นที่ false positive ต่ำ
-- ModSecurity ส่งต่อให้ OWASP ดูแลตั้งแต่ ก.ค. 2024 และ Coraza เป็นทางเลือก
+- DetectionOnly บันทึกแต่ไม่บล็อก ใช้เก็บ false positive ก่อน
+- exclusion ของ WordPress admin ทำเฉพาะ path และ rule ที่จำเป็น
+- ถ้า port 8081 ของ nginx ยังเปิด ผู้ใช้เลี่ยง WAF ได้
 
 **ขั้นตอนปฏิบัติ**
-1. รัน owasp/modsecurity-crs:nginx หน้า WordPress
-2. ตั้ง MODSEC_RULE_ENGINE=DetectionOnly
-3. ส่งคำขอทดสอบแล้วดู audit log
-4. ยกเว้น rule ที่ชนกับ wp-admin
-5. เปลี่ยนเป็น On แล้วทดสอบซ้ำ
-6. snapshot ch22-web
+1. เพิ่ม service waf ใน compose โหมด DetectionOnly
+2. ส่งคำขอทดสอบ 5 แบบแล้วนับ ruleId
+3. tune false positive ของ wp-admin
+4. เปลี่ยนเป็น On ปิด port 8081 และย้าย URL ไป 8080
+5. ส่ง log ของ WAF เข้า Wazuh/Graylog แล้ว snapshot ch22-web
 
 **คำสั่งหลัก** (node-01 · aod)
 ```bash
-docker run -d --name waf -p 80:8080 -e BACKEND=http://wordpress:80 -e BLOCKING_PARANOIA=1 -e MODSEC_RULE_ENGINE=DetectionOnly --network wp owasp/modsecurity-crs:nginx
-curl -s -o /dev/null -w "%{http_code}\n" "http://node-01.lab.internal/?exec=/bin/bash"
-docker logs waf 2>&1 | grep -o 'id "[0-9]*"' | sort | uniq -c
+cd /opt/wordpress && sudo docker compose up -d waf
+curl -s -o /dev/null -w "%{http_code}\n" "$W/?id=1%27%20OR%20%271%27=%271"   # 403 หลังเปิด On
+sudo docker compose logs --since 5m waf | grep -o '"ruleId":"[0-9]*"' | sort | uniq -c | sort -rn | head
+curl -s -o /dev/null -w "%{http_code}\n" --max-time 3 http://192.168.10.50:8081/ || echo "8081 ปิดแล้ว"
 ```
 
 **แบบฝึกหัด**
-- บันทึก false positive ที่พบใน wp-admin 1 รายการ พร้อม rule exclusion ที่แคบที่สุด
+- เลือก ruleId ที่ชน wp-admin มา 1 ตัว อธิบายว่ายกเว้นแคบที่สุดได้อย่างไร
 
 **เกณฑ์ผ่าน**
-- [ ] DetectionOnly: ได้ 200 แต่มี log rule
-- [ ] On: ได้ 403 และใช้ wp-admin ได้ปกติ
+- [ ] คำขอปกติได้ 200 และคำขอทดสอบได้ 403
+- [ ] port 8081 เข้าตรงไม่ได้
 
-**หลักฐาน:** ผล curl ทั้งสองโหมด + exclusion rule
+**หลักฐาน:** ตารางผล curl + ไฟล์ exclusion
 
 อ่านเพิ่ม: บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
 
@@ -1933,70 +1942,71 @@ docker logs waf 2>&1 | grep -o 'id "[0-9]*"' | sort | uniq -c
 
 ### วันที่ 57 · บทที่ 23 — Alert ไป LINE Messaging API และ Telegram (Lab 38)
 
-**เป้าหมาย:** alert level สูงถึงมือถือภายในไม่กี่วินาที
+**เป้าหมาย:** alert level 12 ขึ้นไปถึง LINE รายคน level 10 ขึ้นไปถึงกลุ่ม Telegram ไม่ส่งซ้ำใน 5 นาที และ token ไม่อยู่ใน ossec.conf
 
 **ทฤษฎี**
-- LINE Notify ปิดบริการ 31 มี.ค. 2025 ต้องใช้ Messaging API + channel access token
-- Wazuh integration เรียก script ใน /var/ossec/integrations ส่ง alert JSON
-- token เก็บในไฟล์ secret สิทธิ์ 600 ไม่ใส่ใน ossec.conf ตรง
+- LINE Notify ปิดบริการแล้ว ใช้ Messaging API ที่ต้องระบุผู้รับและมีโควตา
+- integration ชื่อ custom-* อ่าน token จาก notify.env (640 root:wazuh)
+- ส่งเฉพาะ field ที่จำเป็น ไม่ส่ง full_log
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง channel ใน LINE Developers และออก token
-2. สร้าง Telegram bot ด้วย BotFather
-3. ทดสอบส่งด้วย curl (อ่าน token ด้วย read -s)
-4. ติดตั้ง integration script และผูก level >= 12
+1. ออก Channel access token และหา user ID ของผู้รับ
+2. สร้าง Telegram bot และหา chat ID ของกลุ่ม
+3. ทดสอบ token ด้วย curl โดยรับค่าด้วย read -s
+4. ติดตั้ง custom-line / custom-telegram และ notify.env แล้วทดสอบ script ด้วยมือก่อนผูก
+5. ผูก <integration> ตามเกณฑ์ level
 
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
 read -rs LINE_TOKEN; export LINE_TOKEN
-curl -s -X POST https://api.line.me/v2/bot/message/push -H "Authorization: Bearer $LINE_TOKEN" -H "Content-Type: application/json" -d '{"to":"<USER_ID>","messages":[{"type":"text","text":"soclab test"}]}'
-read -rs TG_TOKEN; curl -s "https://api.telegram.org/bot$TG_TOKEN/sendMessage" -d chat_id=<CHAT_ID> -d text="soclab test"
-<integration><name>custom-line</name><level>12</level><alert_format>json</alert_format></integration>
+curl -s -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/message/quota; echo
+sudo stat -c "%U:%G %a" /var/ossec/etc/notify.env   # root:wazuh 640
+sudo tail -n 5 /var/ossec/logs/integrations.log
 ```
 
 **แบบฝึกหัด**
-- จัดรูปแบบข้อความให้มี rule.id, agent.name, srcip และลิงก์ไป dashboard
+- ออกแบบเกณฑ์ส่งของทีมคุณ: alert ใดไป dashboard อย่างเดียว ไปกลุ่ม หรือถึงรายคน พร้อมเหตุผล
 
 **เกณฑ์ผ่าน**
-- [ ] brute-force ทดสอบ (วันที่ 38) ทำให้ได้ข้อความทั้ง LINE และ Telegram
-- [ ] ไม่มี token ใน ossec.conf หรือ repo
+- [ ] alert ทดสอบ level 12 ถึง LINE และ level 10 ถึง Telegram
+- [ ] alert เดิมซ้ำใน 5 นาทีไม่ถูกส่งซ้ำ
 
-**หลักฐาน:** ภาพข้อความบนมือถือ (ปิด token)
+**หลักฐาน:** ภาพข้อความบนมือถือ (ปิด token/ID) + integrations.log
 
 อ่านเพิ่ม: บทที่ 23 Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh
 
-### วันที่ 58 · บทที่ 23 — Gmail ผ่าน Postfix relay และย้าย port ของ Wazuh (Lab 39–40)
+### วันที่ 58 · บทที่ 23 — Gmail ผ่าน Postfix relay, ย้าย port ของ Wazuh และย้าย config เข้ากลุ่ม (Lab 39–40, 34)
 
-**เป้าหมาย:** Wazuh ส่ง email ได้ และ dashboard ย้ายไป port ใหม่อย่างปลอดภัย
+**เป้าหมาย:** alert ถึงอีเมลผ่าน relay ที่ใช้ App Password, agent ย้ายจาก 1514 ไป 1614 โดยไม่มีเครื่องใดหลุด และ config ของบริการอยู่ในกลุ่ม
 
 **ทฤษฎี**
-- Gmail ต้องเปิด 2-Step Verification แล้วใช้ App Password ผ่าน smtp.gmail.com:587 (STARTTLS)
-- Wazuh ส่ง mail ผ่าน SMTP ภายใน (Postfix) ไม่เก็บรหัส Gmail เอง
-- ย้าย port ต้องแก้ทั้ง config, firewall และ SELinux ถ้ามี
+- App Password เก็บใน sasl_passwd สิทธิ์ 600 เท่านั้น
+- manager ต้องฟังสอง port ชั่วคราวก่อนย้าย agent
+- การเปลี่ยน port ไม่ใช่มาตรการความปลอดภัย ต้องจำกัดต้นทางด้วย rich rule
 
 **ขั้นตอนปฏิบัติ**
-1. ติดตั้ง postfix และ cyrus-sasl-plain แล้วตั้ง relayhost และ sasl_passwd สิทธิ์ 600
-2. ตั้ง email_notification ใน ossec.conf
-3. ย้าย dashboard ไป 8443
-4. เปิด firewall port ใหม่ ปิด port เดิม
-5. snapshot ch23-final
+1. ตั้ง Postfix relay และทดสอบด้วย mail ก่อนเปิด email_notification
+2. ย้าย dashboard ไป 8443 แล้วปิด 443
+3. เพิ่ม <remote> 1614 ย้าย agent ทีละเครื่องด้วย agent-port.sh แล้วลบ 1514
+4. จำกัดต้นทางด้วย rich rule และย้าย config ของ Docker/Samba เข้ากลุ่ม
+5. รัน ch23-check.sh แล้ว snapshot ch23-final
 
 **คำสั่งหลัก** (wazuh-01 · aod)
 ```bash
-sudo postconf -e "relayhost = [smtp.gmail.com]:587" "smtp_sasl_auth_enable = yes" "smtp_tls_security_level = encrypt" "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
+sudo postconf -e "relayhost = [smtp.gmail.com]:587" "smtp_sasl_auth_enable = yes" "smtp_tls_security_level = encrypt"
 sudo chmod 600 /etc/postfix/sasl_passwd && sudo postmap /etc/postfix/sasl_passwd
-sudo sed -i "s/^server.port: .*/server.port: 8443/" /etc/wazuh-dashboard/opensearch_dashboards.yml && sudo systemctl restart wazuh-dashboard
-sudo firewall-cmd --permanent --add-port=8443/tcp && sudo firewall-cmd --permanent --remove-service=https; sudo firewall-cmd --reload
+.\Invoke-SocLabScript.ps1 -Script ..\..\ch23-alerting\guest\agent-port.sh -Name lab-linux-02   # บน Windows
+sudo /var/ossec/bin/agent_control -l | grep -c Active
 ```
 
 **แบบฝึกหัด**
-- ตรวจ log ของ Postfix ว่า email ส่งผ่าน TLS (status=sent, relay=smtp.gmail.com)
+- เขียน runbook ย้อนกลับ (rollback) ถ้า agent ครึ่งหนึ่งหลุดหลังเปลี่ยน port
 
 **เกณฑ์ผ่าน**
-- [ ] ได้ email alert ทดสอบ
-- [ ] https://wazuh-01:8443 เข้าได้ และ 443 ปิด
+- [ ] อีเมล alert ทดสอบถึง Gmail
+- [ ] agent ทั้ง 5 ตัว Active ที่ 1614 และ ch23-check.sh ผ่าน
 
-**หลักฐาน:** บรรทัด maillog status=sent + ss -tlnp
+**หลักฐาน:** header ของอีเมล (ปิดข้อมูลส่วนตัว) + ผล agent_control -l
 
 อ่านเพิ่ม: บทที่ 23 Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh
 

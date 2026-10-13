@@ -21,7 +21,7 @@ echo "== รายละเอียดของ ${URN}"
 az vm image show --urn "$URN" \
   --query "{urn: '${URN}', hyperVGeneration: hyperVGeneration, plan: plan, architecture: architecture}" -o json
 
-IFS=: read -r PUB OFFER SKU VER <<<"$URN"
+IFS=: read -r PUB OFFER SKU _ <<<"$URN"
 cat <<TFVARS
 
 == ค่าที่ใส่ใน terraform.tfvars

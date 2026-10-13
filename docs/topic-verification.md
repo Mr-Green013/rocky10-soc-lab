@@ -48,6 +48,24 @@
 | 22 | ModSecurity | Trustwave เลิกดูแลตั้งแต่ 1 ก.ค. 2024 และส่งต่อให้ OWASP ดูแลต่อ ส่วน OWASP CRS รองรับทั้ง ModSecurity และ Coraza Lab 32 จะใช้ image ทางการ `owasp/modsecurity-crs:nginx` บน node-01 แทนการ build เอง และมีกล่องข้อความแนะนำ Coraza เป็นทางเลือก |
 | 23 | LINE | ส่งข้อความผ่าน Messaging API (`/v2/bot/message/push`) ด้วย channel access token ที่อ่านจาก secret file ซึ่งมีสิทธิ์ 600 |
 
+## การตรวจโค้ดและไฟล์ Lab (13 ต.ค. 2026)
+
+ตรวจอัตโนมัติทุก code block ในหนังสือและทุกไฟล์ใน repo ผลยืนยันไวยากรณ์และการอ้างอิง ไม่ได้แทนการรันบนเครื่องจริง
+
+| สิ่งที่ตรวจ | เครื่องมือ | ผล |
+| --- | --- | --- |
+| bash 336 block และ script 49 ไฟล์ | `bash -n`, `shellcheck -S warning` | ผ่าน (แก้ตัวแปรไม่ได้ใช้ใน `find-rocky-image.sh`, เปลี่ยนป้าย block ของ sudoers) |
+| PowerShell 5 ไฟล์ | PowerShell 7 parser | ผ่าน |
+| Wazuh custom rule 100 ตัว | ตรวจ `if_sid`, `if_group`, `if_matched_*`, `decoded_as` กับ ruleset ของ Wazuh v4.14.0 | ผ่าน ไม่มี ID ซ้ำ |
+| Graylog pipeline rule 42 ตัว | โครง `rule/when/then/end`, วงเล็บ, ชื่อฟังก์ชัน | ผ่าน |
+| TracingPolicy 12 ตัว | JSON schema จาก CRD ของ Tetragon v1.7.1 | ผ่าน |
+| Docker Compose 2 ไฟล์ | Compose Specification schema | ผ่าน |
+| nginx 2 ไฟล์ (รวม page cache ของ Lab 31) | `nginx -t` | ผ่าน (`http2 on` ต้องใช้ nginx 1.25.1 ขึ้นไป ซึ่ง `nginx:stable` รองรับ) |
+| audit rule 169 บรรทัด | ชื่อ syscall ด้วย `ausyscall x86_64` | ผ่าน |
+| XML, YAML, JSON, Python | parser มาตรฐาน, `py_compile`, `pyflakes` | ผ่าน |
+
+ความสอดคล้องที่แก้ในรอบนี้: ชื่อ snapshot ของบทที่ 12, 19, 20, 21 ใน `book-outline.md`, rule 100811/100813 ของ `suid-guard`, แผนเรียนวันที่ 12, 16, 19, 24–26, 35–58 ให้ตรงกับชื่อผู้ใช้ กลุ่ม ไฟล์ และ rule ในบท
+
 ## แหล่งอ้างอิง
 
 - [Rocky Linux 10.2 Available Now](https://rockylinux.org/news/rocky-linux-10-2-ga-release)

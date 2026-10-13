@@ -37,16 +37,16 @@ Domain `lab.internal`, ผู้ใช้ admin `aod`, template `rocky10-tpl` (V
 | 3 ป้องกันภัยคุกคามเบื้องต้น | 9 | CrowdSec: Ban Brute-force และบล็อก Tor/Proxy | 14, 15 | lab-linux-01/02 | `ch09-crowdsec` |
 | 4 SIEM ด้วย Graylog | 10 | ติดตั้ง Graylog และเปิดใช้อย่างปลอดภัย | 16 (ติดตั้ง, Cloudflare Tunnel, Nginx, SSL) | graylog-01 | `ch10-graylog` |
 | | 11 | รับ Log: Inputs, rsyslog, Streams และ Pipeline | 16 (Inputs, rsyslog, Streams, Pipeline Rules) | graylog-01 + ทุก VM | `ch11-ingest` |
-| | 12 | การค้นหาและสืบสวนใน Graylog | 17 | graylog-01 | – |
+| | 12 | การค้นหาและสืบสวนใน Graylog | 17 | graylog-01 | `ch12-search` |
 | | 13 | Threat Intelligence: CrowdSec, GeoIP และ Global Dashboard | 18, 19, 20 | graylog-01 | `ch13-ti` |
 | 5 Wazuh: ตรวจจับและตอบสนอง | 14 | ติดตั้ง Wazuh, Agent และ Agent Group | 21 (Native deploy, Filebeat, Agent), 34 | wazuh-01 + ทุก VM | `ch14-wazuh` |
 | | 15 | Rule, Tuning และ Active Response | 21 (Syscheck rule, Tuning, Brute-force, Auto-defense, Dashboard) | wazuh-01 | `ch15-rules` |
 | | 16 | File Integrity และ Identity Monitoring | 22 | wazuh-01, lab-linux-01/02 | – |
 | | 17 | Linux Audit (auditd) สำหรับการสืบสวน | 23 | lab-linux-01, node-01 | `ch17-auditd` |
 | 6 Container และ eBPF | 18 | Docker Runtime Security | 24 | node-01 | `ch18-docker` |
-| | 19 | Tetragon: มองเห็นและหยุดภัยระดับ Kernel | 33, 35, 36, 37 | node-01 | `ch19-tetragon` |
-| 7 SOC Operations ขั้นสูง | 20 | SOC Analyst Access และ Sudo Violation Dashboard | 25, 26 | ipa-01, graylog-01 | – |
-| | 21 | ติดตามและบล็อกคำสั่ง Git แบบ Real-time | 27 | lab-linux-01 | – |
+| | 19 | Tetragon: มองเห็นและหยุดภัยระดับ Kernel | 33, 35, 36, 37 | node-01 | `ch19-ebpf` |
+| 7 SOC Operations ขั้นสูง | 20 | SOC Analyst Access และ Sudo Violation Dashboard | 25, 26 | ipa-01, graylog-01 | `ch20-soc` |
+| | 21 | ติดตามและบล็อกคำสั่ง Git แบบ Real-time | 27 | lab-linux-01 | `ch21-git` |
 | | 22 | Application และ Web Logging: Nginx, WordPress, Redis และ WAF | 28, 29, 30, 31, 32 | node-01, graylog-01 | `ch22-web` |
 | 8 แจ้งเตือนและปรับแต่ง | 23 | Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh | 38, 39, 40 | wazuh-01 | `ch23-final` |
 | ภาคผนวก | ก | สร้างห้องแลปบน Azure ด้วย Terraform | – | – | – |
