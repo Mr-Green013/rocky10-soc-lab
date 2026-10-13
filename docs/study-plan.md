@@ -1021,69 +1021,70 @@ sudo rm -f /etc/ssh/sshd_config.d/00-lab-password.conf && sudo systemctl reload 
 
 อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
 
-### วันที่ 30 · บทที่ 12 — ภาษาค้นหาและการกรอง event ยืนยันตัวตน
+### วันที่ 30 · บทที่ 12 — ภาษาค้นหา, วิธียืนยันตัวตน และการตาม session (17.1–17.2)
 
 **เป้าหมาย:** ตอบคำถามสืบสวนพื้นฐานจาก log ได้
 
 **ทฤษฎี**
-- Lucene syntax: field:value, AND/OR/NOT, wildcard, range
-- Time range แบบ relative และ absolute
-- USER_START และ USER_LOGIN ของ auditd บอกการเปิด session
+- Lucene syntax: field:value, AND/OR/NOT (ตัวพิมพ์ใหญ่), wildcard, range และ escape ด้วย \ (17.0)
+- ตั้งช่วงเวลาทุกครั้ง ค่าเริ่มต้นคือ 5 นาทีล่าสุด
+- auth_method บอก password หรือ publickey; USER_START บอกว่า session เปิดจริงพร้อมเลข ses (17.1–17.2)
 
 **ขั้นตอนปฏิบัติ**
-1. เปิด syslog plugin ของ auditd (/etc/audit/plugins.d/syslog.conf: active = yes) เพื่อให้ USER_START เข้า Graylog
-2. ค้น login ล้มเหลวทั้ง lab ใน 24 ชม.
-3. ค้น USER_START ของ aod
-4. จัดกลุ่มผลด้วย Aggregation ตาม src_ip
+1. ใช้ field ที่ pipeline SOC-SSH แยกไว้ (ssh_event, ssh_user, auth_method, src_ip) ไม่ใช่ค้นใน message ดิบ
+2. ค้น login สำเร็จของ aod และดูว่าใช้ password หรือ key (17.1)
+3. เพิ่มคอลัมน์ timestamp, source, ssh_user, src_ip, auth_method ในตารางผล
+4. จด audit_session จากผล session_start แล้วตามทุก event ของ session นั้นโดยระบุ source ด้วย (17.2)
 5. บันทึก saved search
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
-ssh_event:auth_failed AND NOT src_ip:192.168.10.100
-message:"type=USER_START" AND message:"acct=\"aod\""
-_exists_:src_ip AND source:lab-linux-0*
+ssh_event:auth_success AND auth_method:password
+ssh_event:session_start AND ssh_user:aod
+source:lab\-linux\-01.lab.internal AND message:"ses=42 "
 ```
 
 **แบบฝึกหัด**
-- ตอบคำถาม: เมื่อวานใคร login lab-linux-01 สำเร็จบ้าง จาก IP ไหน กี่ครั้ง (ตอบเป็นตาราง)
+- ตอบคำถาม: เมื่อวานใคร login lab-linux-01 สำเร็จบ้าง ใช้ password หรือ key จาก IP ไหน (ตอบเป็นตาราง)
 
 **เกณฑ์ผ่าน**
 - [ ] query ให้ผลถูกต้องเมื่อเทียบกับ /var/log/secure บนเครื่อง
-- [ ] มี saved search อย่างน้อย 3 ตัว
+- [ ] ตามทุก event ของ session ตัวเองด้วยเลข ses ได้
 
 **หลักฐาน:** ตารางคำตอบ + query ที่ใช้
 
 อ่านเพิ่ม: บทที่ 12 การค้นหาและสืบสวนใน Graylog
 
-### วันที่ 31 · บทที่ 12 — เงื่อนไขหลายชั้นสำหรับติดตามบัญชี admin (Lab 17)
+### วันที่ 31 · บทที่ 12 — เงื่อนไขหลายชั้นและ Saved Search สำหรับ SSH Audit (17.3–17.4)
 
-**เป้าหมาย:** สร้างชุดค้นหาเฝ้าบัญชีสิทธิ์สูง
+**เป้าหมาย:** เขียนเงื่อนไขหลายชั้นและทำชุด Saved Search เฝ้าบัญชีสิทธิ์สูงไว้ใช้ซ้ำใน dashboard
 
 **ทฤษฎี**
-- บัญชีสิทธิ์สูง = เป้าหมายแรกของผู้บุกรุก
-- เงื่อนไขซ้อน: admin + นอกเวลางาน + จาก IP ที่ไม่ใช่ admin workstation
-- false positive จากงาน automation ต้องแยกออก
+- เงื่อนไขซ้อนด้วย ( ) และ NOT เช่น ล้มเหลวหรือ invalid user ที่ไม่ได้มาจาก subnet ภายใน (17.3)
+- password spraying เห็นได้จาก Aggregation group by src_ip พร้อม metric card(ssh_user)
+- Saved Search คือฐานของ dashboard ใน Lab 20 (17.4)
 
 **ขั้นตอนปฏิบัติ**
-1. สร้าง query สำหรับ admin login นอกเวลา 08:00–18:00
-2. แยก login จาก Ansible/script ออกด้วย NOT
-3. ทำ dashboard widget จาก query
-4. ทดสอบด้วย login ปลอมจาก lab-linux-02
+1. เขียน query หลายชั้นของ 17.3 ทั้งสี่แบบ และดูด้วย field ที่ pipeline แยกไว้
+2. สร้าง Aggregation group by src_ip, metric count() และ card(ssh_user) หา password spraying
+3. บันทึก Saved Search ทั้ง 7 รายการตามตาราง 17.4
+4. ยืนยัน "SSH - Success after failures" ด้วย login ทดสอบจาก lab-linux-02 (เปิด password ชั่วคราวแล้วลบ)
 
 **คำสั่งหลัก** (graylog-01 · aod)
 ```bash
-ssh_user:(aod OR admin) AND ssh_event:auth_success AND NOT src_ip:192.168.10.100
-timestamp:["2026-10-12 18:00:00.000" TO "2026-10-13 08:00:00.000"]
+(ssh_event:auth_failed OR ssh_event:invalid_user) AND NOT src_ip:192.168.10.*
+ssh_event:auth_success AND auth_method:password AND ssh_user:(root OR admin OR aod)
+ssh_event:invalid_user AND _exists_:src_ip   # แล้ว Create -> Aggregation: group by src_ip, metric count() + card(ssh_user)
 ```
 
 **แบบฝึกหัด**
-- เขียน query ที่จับ "login สำเร็จหลังล้มเหลว 3 ครั้งติดกันจาก IP เดียว" (ใช้ Aggregation + ผลค้นสองชั้น)
+- อธิบายว่าทำไมแถว "IP ที่ล้มเหลวหลายครั้งแล้วสำเร็จหนึ่งครั้ง" ต้องถือเป็น incident และ query จับมันอย่างไร
 
 **เกณฑ์ผ่าน**
-- [ ] login ทดสอบจาก lab-linux-02 ปรากฏใน widget
-- [ ] อธิบาย false positive ที่ตัดออกได้
+- [ ] มี Saved Search ครบ 7 รายการตามตาราง 17.4
+- [ ] Aggregation แสดง IP ที่มี card(ssh_user) สูง (password spraying) ได้
 
-**หลักฐาน:** ภาพ widget + query
+**หลักฐาน:** ภาพ Aggregation + รายการ Saved Search
 
 อ่านเพิ่ม: บทที่ 12 การค้นหาและสืบสวนใน Graylog
 
