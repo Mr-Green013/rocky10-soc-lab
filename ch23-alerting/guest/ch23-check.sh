@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 23 verification: alert integrations, the Postfix relay and Wazuh ports (sudo bash ch23-check.sh on wazuh-01)
 # บทที่ 23 วิธีตรวจสอบ: integration แจ้งเตือน, Postfix relay และ port ของ Wazuh  (sudo bash ch23-check.sh บน wazuh-01)
 set -uo pipefail
 F=0

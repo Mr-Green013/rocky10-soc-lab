@@ -1,10 +1,12 @@
 ﻿#Requires -RunAsAdministrator
 <#
 .SYNOPSIS
+  EN: Chapter 2 step 8: let Windows know the lab machine names (hosts file) and SSH to them by short name (~/.ssh/config)
   บทที่ 2 ขั้นที่ 8: ให้ Windows รู้จักชื่อเครื่องใน lab (hosts file) และ SSH ด้วยชื่อสั้นได้ (~/.ssh/config)
 
 .DESCRIPTION
-  เขียนบล็อก "# SOCLAB-BEGIN ... # SOCLAB-END" ลงไฟล์ทั้งสอง รันซ้ำได้ บล็อกเดิมจะถูกแทนที่
+  เขียนบล็อก "# SOCLAB-BEGIN ... # SOCLAB-END" ลงไฟล์ทั้งสอง รันซ้ำได้ บล็อกเดิมจะถูกแทนที่ (EN: writes the SOCLAB-BEGIN/SOCLAB-END block into both files; safe to rerun, the old block is replaced)
+  EN: -Remove deletes the block from both files
   -Remove ลบบล็อกออกจากทั้งสองไฟล์
 
 .EXAMPLE
@@ -50,6 +52,7 @@ $hostLines += $rows | ForEach-Object { "{0,-15} {1}.{2} {1}" -f $_.ip, $_.name, 
 Set-Block $hostsFile $hostLines ([Text.Encoding]::ASCII)
 
 $names = ($rows | ForEach-Object { $_.name }) -join ' '
+# EN: ssh uses the first match, so pve-01 (root) must come before the *.lab.internal pattern
 # ssh ใช้ค่าแรกที่ตรง จึงต้องวาง pve-01 (root) ก่อน pattern *.lab.internal
 $sshLines = @(
     "Host pve-01 pve-01.$Domain",

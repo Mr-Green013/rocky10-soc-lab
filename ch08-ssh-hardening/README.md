@@ -1,14 +1,16 @@
-# บทที่ 8 SSH Hardening: Key Authentication และ Session Limit
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 12, 13
+# Chapter 8 SSH Hardening: Key Authentication and Session Limits
 
-กลไกของ SSH key authentication, ปิด password authentication, จำกัด session และ connection ด้วย MaxSessions, MaxStartups, ClientAlive และ limit ของ PAM
+Course labs: 12, 13
 
-สิ่งที่ได้เมื่อจบบท:
+How SSH key authentication works, turning off password authentication, and limiting sessions and connections with MaxSessions, MaxStartups, ClientAlive and PAM limits.
 
-- SSH ที่ใช้ key อย่างเดียวและจำกัด session
-- อ่าน log การ login ของ sshd ได้ถูกต้อง
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch08-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- SSH that accepts keys only and limits sessions
+- You read sshd login logs correctly
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch08-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

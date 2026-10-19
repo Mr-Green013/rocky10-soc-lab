@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 14 verification: Wazuh all-in-one, agents, alerts to Graylog and agent groups (sudo bash ch14-check.sh)
 # บทที่ 14 วิธีตรวจสอบ: Wazuh all-in-one, agent, การส่ง alert ไป Graylog และ agent group  (sudo bash ch14-check.sh)
 set -uo pipefail
 F=0

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 22 verification: app logs, the WordPress stack, Redis and the WAF (sudo bash ch22-check.sh on lab-linux-01 or node-01)
 # บทที่ 22 วิธีตรวจสอบ: app log, WordPress stack, Redis และ WAF  (sudo bash ch22-check.sh บน lab-linux-01 หรือ node-01)
 set -uo pipefail
 F=0

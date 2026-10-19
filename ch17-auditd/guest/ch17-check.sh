@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 17 verification: auditd rules, locking and the Wazuh connection (sudo bash ch17-check.sh)
 # บทที่ 17 วิธีตรวจสอบ: auditd rule, การล็อก และการต่อเข้า Wazuh  (sudo bash ch17-check.sh)
 set -uo pipefail
 F=0

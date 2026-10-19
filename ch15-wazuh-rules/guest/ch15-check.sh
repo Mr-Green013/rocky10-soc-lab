@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 15 verification: rules, tuning and Active Response (sudo bash ch15-check.sh on wazuh-01)
 # บทที่ 15 วิธีตรวจสอบ: rule, tuning และ Active Response  (sudo bash ch15-check.sh บน wazuh-01)
 set -uo pipefail
 F=0

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Find the Rocky Linux 10 image in the given region and print the values to put in terraform.tfvars
 # หา image ของ Rocky Linux 10 ใน region ที่ระบุ แล้วแสดงค่าที่ต้องใส่ใน terraform.tfvars
+# EN: Usage: ./scripts/find-rocky-image.sh [region]
 # ใช้: ./scripts/find-rocky-image.sh [region]
 set -euo pipefail
 LOC="${1:-southeastasia}"

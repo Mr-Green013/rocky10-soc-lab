@@ -1,14 +1,16 @@
-# บทที่ 5 Command Line ที่ SOC ต้องใช้ทุกวัน
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 9.1–9.15
+# Chapter 5 The Command Line a SOC Uses Every Day
 
-โครงสร้าง filesystem, การเดินทางใน directory, nano, การจัดการ output, sudo และ sudoers, journalctl แบบกรอง, rsync, shutdown และ I/O redirection โดยใช้ตัวอย่างจาก log จริงของ lab
+Course labs: 9.1–9.15
 
-สิ่งที่ได้เมื่อจบบท:
+Filesystem layout, moving around directories, nano, handling output, sudo and sudoers, filtered journalctl, rsync, shutdown and I/O redirection, using real logs from the lab as examples.
 
-- ค้นและกรอง log ด้วย journalctl, grep, awk
-- คัดลอกข้อมูลหลักฐานด้วย rsync โดยรักษา metadata
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch05-check.sh` (ยังต้องยืนยันบนเครื่องจริง)
+- Search and filter logs with journalctl, grep and awk
+- Copy evidence with rsync while preserving metadata
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab file: `guest/ch05-check.sh` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

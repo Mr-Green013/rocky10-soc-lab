@@ -1,4 +1,6 @@
+# EN: 40-keyguard.yaml : from chapter 19 (test with tetra tracingpolicy add before placing it in this directory)
 # 40-keyguard.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
+# EN: Phase 1 (observe). Enforce phase: change the action to Sigkill and remove rateLimit per step 5 of 24-E
 # ระยะที่ 1 (สังเกต) ระยะบังคับ: เปลี่ยน action เป็น Sigkill และลบ rateLimit ตามขั้นตอนที่ 5 ของ 24-E
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy

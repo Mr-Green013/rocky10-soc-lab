@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 6 verification: password policy, accounts, sudoers and offboarding (sudo bash ch06-check.sh)
 # บทที่ 6 วิธีตรวจสอบ: นโยบายรหัสผ่าน, บัญชี, sudoers และ offboarding  (sudo bash ch06-check.sh)
 set -uo pipefail
 F=0

@@ -1,3 +1,4 @@
+<!-- EN: Chapter 21: add to local_decoder.xml -->
 <!-- บทที่ 21: เพิ่มใน local_decoder.xml -->
 <decoder name="git-guard">
   <program_name>^git-guard$</program_name>

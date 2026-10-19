@@ -1,7 +1,9 @@
-# ไฟล์ config ของบทที่ 13
+**English** · [ภาษาไทย](README.th.md)
 
-สำเนาของไฟล์ที่บทที่ 13 สร้างด้วย `sudo tee FILE <<'EOF'` จัดตาม path จริงบนเครื่อง ใช้เทียบเมื่อพิมพ์ผิด หรือคัดลอกไปวางแทนการพิมพ์ (ตรวจค่าเฉพาะเครื่อง เช่น IP และชื่อโดเมนก่อนใช้)
+# Chapter 13 config files
 
-| ไฟล์ใน repo | ตำแหน่งบนเครื่อง | หมายเหตุ |
+Copies of the files that chapter 13 creates with `sudo tee FILE <<'EOF'`, laid out by their real path on the machine. Use them to compare against what you typed, or copy them instead of typing (check machine-specific values such as IP addresses and the domain name first). Comment lines that start with `EN:` are English translations of the Thai comment on the next line; they do not change how the file works.
+
+| File in repo | Location on the machine | Note |
 | --- | --- | --- |
 | `files/etc/crowdsec/notifications/http_graylog.yaml` | `/etc/crowdsec/notifications/http_graylog.yaml` | |

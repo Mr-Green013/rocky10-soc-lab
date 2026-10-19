@@ -1,4 +1,6 @@
+# EN: /opt/graylog/docker-compose.yml as it stands at the end of chapter 10
 # /opt/graylog/docker-compose.yml สถานะหลังจบบทที่ 10
+# EN: cloudflared is in the "tunnel" profile: it starts only with sudo docker compose --profile tunnel up -d
 # cloudflared อยู่ใน profile "tunnel": เริ่มเฉพาะเมื่อสั่ง  sudo docker compose --profile tunnel up -d
 services:
   mongodb:
@@ -40,7 +42,7 @@ services:
       GRAYLOG_HTTP_EXTERNAL_URI: ${GRAYLOG_EXTERNAL_URI}
       GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
     ports:
-      - "127.0.0.1:9000:9000/tcp"   # Web UI และ API: เข้าผ่าน nginx เท่านั้น (16.10)
+      - "127.0.0.1:9000:9000/tcp"   # Web UI และ API: เข้าผ่าน nginx เท่านั้น (16.10) (EN: Web UI and API: reachable only through nginx (16.10))
       - "1514:1514/tcp"             # Syslog TCP
       - "1514:1514/udp"             # Syslog UDP
       - "12201:12201/tcp"           # GELF HTTP/TCP
@@ -61,7 +63,7 @@ services:
       - ./nginx/tls:/etc/nginx/tls:ro,Z
 
   cloudflared:
-    image: cloudflare/cloudflared:latest   # เปลี่ยนเป็นเวอร์ชันที่ทดสอบแล้ว
+    image: cloudflare/cloudflared:latest   # เปลี่ยนเป็นเวอร์ชันที่ทดสอบแล้ว (EN: pin to a tested version)
     profiles: [tunnel]
     restart: unless-stopped
     networks: [graylog]

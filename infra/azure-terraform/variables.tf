@@ -1,5 +1,7 @@
 #
+# EN: Values you must set yourself: admin_source_cidrs and admin_ssh_public_key_path
 # ค่าที่ต้องกำหนดเอง: admin_source_cidrs และ admin_ssh_public_key_path
+# EN: Everything else has defaults that match the course documents (IP plan 192.168.10.0/24, domain lab.internal)
 # ค่าอื่นมี default ตรงกับเอกสารหลักสูตร (IP plan 192.168.10.0/24, domain lab.internal)
 #
 
@@ -104,8 +106,11 @@ variable "os_disk_type" {
 }
 
 #
+# EN: The Rocky Linux 10.1 image
 # Image ของ Rocky Linux 10.1
+# EN: source = "marketplace" uses publisher/offer/sku (check the real names with scripts/find-rocky-image.sh)
 #   source = "marketplace" ใช้ publisher/offer/sku (ตรวจชื่อจริงด้วย scripts/find-rocky-image.sh)
+# EN: source = "image_id" uses an image ID, e.g. from the Community Gallery or your own Azure Compute Gallery
 #   source = "image_id"    ใช้ image ID เช่น Community Gallery หรือ Azure Compute Gallery ของตัวเอง
 #
 variable "image" {

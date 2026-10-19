@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 step 10: clone all 6 lab machines from the rocky10-tpl template according to lab-hosts.csv
 # บทที่ 1 ขั้นที่ 10: clone เครื่องทั้ง 6 ของ lab จาก template rocky10-tpl ตาม lab-hosts.csv
+# EN: Run on pve-01 as root:
 # รันบน pve-01 ในฐานะ root:
-#   bash pve-clone-lab.sh                 # ทุกเครื่องใน lab-hosts.csv
-#   bash pve-clone-lab.sh ipa-01 node-01  # เฉพาะบางเครื่อง
-#   DRY_RUN=1 bash pve-clone-lab.sh       # แสดงคำสั่งโดยไม่ทำจริง
+#   bash pve-clone-lab.sh                 # ทุกเครื่องใน lab-hosts.csv (EN: every machine in lab-hosts.csv)
+#   bash pve-clone-lab.sh ipa-01 node-01  # เฉพาะบางเครื่อง (EN: only some machines)
+#   DRY_RUN=1 bash pve-clone-lab.sh       # แสดงคำสั่งโดยไม่ทำจริง (EN: print the commands without running them)
+# EN: Machines that already exist (same VM ID) are skipped, never overwritten
 # เครื่องที่มีอยู่แล้ว (VM ID ซ้ำ) จะถูกข้าม ไม่ถูกเขียนทับ
 set -euo pipefail
 
@@ -25,7 +28,9 @@ if [ "${DRY_RUN:-0}" != 1 ]; then
   [ -s "$SSH_KEY" ] || { echo "ไม่พบ SSH public key ที่ $SSH_KEY (คัดลอกจาก Windows ตามขั้นที่ 7)" >&2; exit 1; }
   grep -qE '^(ssh-ed25519|ssh-rsa|ecdsa-sha2-)' "$SSH_KEY" || { echo "$SSH_KEY ไม่ใช่ public key" >&2; exit 1; }
   qm config "$TEMPLATE" | grep -q '^template: 1' || { echo "VM $TEMPLATE ยังไม่เป็น template (รัน pve-make-template.sh)" >&2; exit 1; }
+  # EN: Rocky's cloud-init always locks the default user's password; unless it is set again you cannot log in at the console
   # cloud-init ของ Rocky ล็อก password ของผู้ใช้หลักเสมอ ถ้าไม่ตั้งใหม่จะ login ที่ console ไม่ได้
+  # EN: Passed to Proxmox only as a hash (SHA-512); the real password never appears in the config or the process list
   # ส่งให้ Proxmox เป็น hash (SHA-512) เท่านั้น ไม่มี password จริงอยู่ใน config หรือ process list
   if [ -z "${CI_PASSWORD_HASH:-}" ]; then
     read -r -s -p "ตั้ง password ของ $CI_USER สำหรับทุกเครื่อง (อย่างน้อย 12 ตัวอักษร): " p1; echo

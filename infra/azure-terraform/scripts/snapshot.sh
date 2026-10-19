@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Incremental snapshot of every machine's OS disk, in place of the snapshots in the course documents
 # snapshot แบบ incremental ของ OS disk ทุกเครื่อง ใช้แทน snapshot ในเอกสารหลักสูตร
+# EN: Usage: ./scripts/snapshot.sh m05-done (default RG = rg-soclab)
 # ใช้: ./scripts/snapshot.sh m05-done        (ค่า RG default = rg-soclab)
 set -euo pipefail
 LABEL="${1:?ระบุชื่อ snapshot เช่น m05-done}"

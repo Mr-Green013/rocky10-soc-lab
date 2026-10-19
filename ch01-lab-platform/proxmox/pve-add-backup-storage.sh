@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 optional step B: turn the disk added from Hyper-V (a VHDX on the second NVMe drive) into the Proxmox "backup" storage
 # บทที่ 1 ขั้นเสริม B: ทำ disk ที่เพิ่มจาก Hyper-V (VHDX บน NVMe ลูกที่สอง) เป็น storage "backup" ของ Proxmox
+# EN: Run on pve-01 as root: bash pve-add-backup-storage.sh /dev/sdb
 # รันบน pve-01 ในฐานะ root:  bash pve-add-backup-storage.sh /dev/sdb
+# EN: Warning: all data on the given disk is erased. The script asks you to confirm by typing the disk name again
 # คำเตือน: ข้อมูลทั้งหมดบน disk ที่ระบุจะถูกลบ script จะถามยืนยันด้วยการพิมพ์ชื่อ disk ซ้ำ
 set -euo pipefail
 
@@ -13,6 +16,7 @@ KEEP=${KEEP:-3}
 [ -b "$DEV" ] || { echo "$DEV ไม่ใช่ block device" >&2; exit 1; }
 [ "$(lsblk -dno TYPE "$DEV")" = disk ] || { echo "$DEV ไม่ใช่ทั้ง disk (ระบุแบบ /dev/sdb ไม่ใช่ /dev/sdb1)" >&2; exit 1; }
 
+# EN: Guard against wiping a system disk: one that holds / or the Proxmox LVM
 # ป้องกันการลบ disk ระบบ: disk ที่มี / หรือ LVM ของ Proxmox อยู่
 root_disk=$(lsblk -no PKNAME "$(pvs --noheadings -o pv_name 2>/dev/null | awk 'NR==1{print $1}')" 2>/dev/null || true)
 if [ "/dev/${root_disk}" = "$DEV" ]; then echo "$DEV คือ disk ระบบของ Proxmox ห้ามใช้" >&2; exit 1; fi
@@ -40,6 +44,7 @@ grep -q "$UUID" /etc/fstab || echo "UUID=$UUID $MNT ext4 defaults,nofail 0 2" >>
 systemctl daemon-reload
 mount "$MNT"
 
+# EN: is_mountpoint: if the disk is not mounted, Proxmox will not write backups to the root filesystem instead
 # is_mountpoint: ถ้า disk ไม่ถูก mount Proxmox จะไม่เขียน backup ลง root filesystem แทน
 pvesm add dir "$STORE" --path "$MNT" --content backup --is_mountpoint yes --prune-backups "keep-last=$KEEP"
 pvesm status | awk -v s="$STORE" 'NR==1 || $1==s'

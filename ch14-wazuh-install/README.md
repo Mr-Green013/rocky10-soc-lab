@@ -1,14 +1,16 @@
-# บทที่ 14 ติดตั้ง Wazuh, Agent และ Agent Group
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 21, 34
+# Chapter 14 Installing Wazuh, Agents and Agent Groups
 
-ติดตั้ง Wazuh manager, indexer และ dashboard ส่ง alert ด้วย Filebeat ติดตั้ง agent ทุกเครื่องและจัดกลุ่ม agent เพื่อแจก configuration ตามหน้าที่ของเครื่อง
+Course labs: 21, 34
 
-สิ่งที่ได้เมื่อจบบท:
+Install the Wazuh manager, indexer and dashboard, ship alerts with Filebeat, install an agent on every machine, and group agents so configuration is distributed by the machine's role.
 
-- ทุกเครื่องรายงานเข้า Wazuh
-- agent group ที่แยก config ตามบทบาท
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch14-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Every machine reports to Wazuh
+- Agent groups that split config by role
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch14-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

@@ -1,14 +1,16 @@
-# บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 16
+# Chapter 11 Ingesting Logs: Inputs, rsyslog, Streams and Pipelines
 
-สร้าง input แบบ Syslog และ GELF ส่ง log จากทุกเครื่องด้วย rsyslog แยก stream ตามประเภท และเขียน pipeline rule แยก field ของ SSH สำหรับงาน SOC
+Course lab: 16
 
-สิ่งที่ได้เมื่อจบบท:
+Create Syslog and GELF inputs, send logs from every machine with rsyslog, split them into streams by type, and write pipeline rules that extract SSH fields for SOC work.
 
-- log ของทุกเครื่องเข้า Graylog แบบ real-time
-- field ของ event SSH พร้อมใช้ค้นหา
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch11-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Logs from every machine reach Graylog in real time
+- SSH event fields ready for searching
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch11-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

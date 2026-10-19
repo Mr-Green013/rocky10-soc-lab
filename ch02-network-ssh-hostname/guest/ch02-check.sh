@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 2 verification: network, hostname and SSH of this machine (sudo bash ch02-check.sh)
 # บทที่ 2 วิธีตรวจสอบ: network, hostname และ SSH ของเครื่องนี้  (sudo bash ch02-check.sh)
 set -uo pipefail
 F=0

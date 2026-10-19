@@ -1,14 +1,16 @@
-# บทที่ 7 Centralized Identity ด้วย FreeIPA
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 11
+# Chapter 7 Centralized Identity with FreeIPA
 
-ติดตั้ง FreeIPA พร้อม DNS และ CA ให้ทุกเครื่อง join domain ตั้ง password policy, HBAC rule, sudo rule และ SSH key แบบรวมศูนย์ และค้นข้อมูลผ่าน LDAP
+Course lab: 11
 
-สิ่งที่ได้เมื่อจบบท:
+Install FreeIPA with DNS and a CA, join every machine to the domain, set the password policy, HBAC rules, sudo rules and centralized SSH keys, and query data over LDAP.
 
-- login ทุกเครื่องด้วยบัญชีเดียว
-- ipa-01 เป็น DNS ของทั้ง lab
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch07-check.sh` (ยังต้องยืนยันบนเครื่องจริง)
+- One account logs in to every machine
+- ipa-01 is the DNS server for the whole lab
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab file: `guest/ch07-check.sh` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

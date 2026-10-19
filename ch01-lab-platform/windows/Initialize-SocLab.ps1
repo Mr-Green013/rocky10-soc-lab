@@ -1,12 +1,18 @@
 ﻿<#
 .SYNOPSIS
+  EN: Chapter 1 step 11: post-clone tasks for every lab machine (run from Windows)
   บทที่ 1 ขั้นที่ 11: งานหลัง clone ของทุกเครื่องใน lab (รันจาก Windows)
 
 .DESCRIPTION
+  EN: For each machine in lab-hosts.csv:
   สำหรับแต่ละเครื่องใน lab-hosts.csv:
+    EN: 1. Wait for port 22 to open (cloud-init has finished the first boot)
     1. รอให้ port 22 เปิด (cloud-init บูตครั้งแรกเสร็จ)
+    EN: 2. Copy guest\post-clone.sh and guest\soclab-check.sh to /tmp
     2. คัดลอก guest\post-clone.sh และ guest\soclab-check.sh ไปที่ /tmp
+    EN: 3. Run post-clone.sh with sudo: grow the disk, disable cloud-init, install soclab-check
     3. รัน post-clone.sh ด้วย sudo: ขยาย disk, ปิด cloud-init, ติดตั้ง soclab-check
+  EN: Uses the ssh/scp that ships with Windows (OpenSSH client) and the key in ssh-agent or -KeyPath
   ใช้ ssh/scp ที่มากับ Windows (OpenSSH client) และ key ใน ssh-agent หรือ -KeyPath
 
 .EXAMPLE
@@ -57,6 +63,7 @@ $results = foreach ($h in $hosts) {
     $target = "$User@$($h.ip)"
     & scp @sshOpts $files "${target}:/tmp/" | Out-Host
     if ($LASTEXITCODE -ne 0) { [pscustomobject]@{ Name = $h.name; IP = $h.ip; Result = 'SCP-FAIL' }; continue }
+    # EN: sed strips CR in case git on Windows converted the file to CRLF
     # sed ลบ CR เผื่อ git บน Windows แปลงไฟล์เป็น CRLF
     & ssh @sshOpts $target "sed -i 's/\r`$//' /tmp/post-clone.sh /tmp/soclab-check.sh && sudo bash /tmp/post-clone.sh" | Out-Host
     $r = if ($LASTEXITCODE -eq 0) { 'OK' } else { "FAIL($LASTEXITCODE)" }

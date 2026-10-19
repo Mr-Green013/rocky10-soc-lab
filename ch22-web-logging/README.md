@@ -1,15 +1,17 @@
-# บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 28, 29, 30, 31, 32
+# Chapter 22 Application and Web Logging: Nginx, WordPress, Redis and WAF
 
-ส่ง log ของ application เข้า Graylog, แยก log ของ Nginx กับ WordPress, เขียน rule ดักจับและบล็อก shell execution ใน WordPress, เร่งความเร็วด้วย Redis และวาง Web Application Firewall (ModSecurity + OWASP CRS) แบบตรวจจับก่อนแล้วจึงบล็อก
+Course labs: 28, 29, 30, 31, 32
 
-สิ่งที่ได้เมื่อจบบท:
+Send application logs to Graylog, separate the Nginx and WordPress logs, write rules that detect and block shell execution in WordPress, speed things up with Redis, and put a Web Application Firewall (ModSecurity + OWASP CRS) in front — detecting first, then blocking.
 
-- log ของ web stack แยกและค้นได้
-- ตรวจจับ web shell ได้
-- WAF ที่ tune แล้วส่ง log เข้า Graylog
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch22-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Web stack logs that are separated and searchable
+- Web shell detection
+- A tuned WAF that sends its logs to Graylog
 
-หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)
+Status: chapter fully written. Lab files: `guest/ch22-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+For the newly added subtopics see [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

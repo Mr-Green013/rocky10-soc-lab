@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 optional step B: back up the lab VMs and the template to the "backup" storage with vzdump
 # บทที่ 1 ขั้นเสริม B: backup VM ของ lab และ template ไปที่ storage "backup" ด้วย vzdump
+# EN: Run on pve-01 as root:
 # รันบน pve-01 ในฐานะ root:
-#   bash pve-backup.sh                 # ทุกเครื่องใน lab-hosts.csv + template 9000
-#   bash pve-backup.sh ipa-01 node-01  # เฉพาะบางเครื่อง
+#   bash pve-backup.sh                 # ทุกเครื่องใน lab-hosts.csv + template 9000 (EN: every machine in lab-hosts.csv + template 9000)
+#   bash pve-backup.sh ipa-01 node-01  # เฉพาะบางเครื่อง (EN: only some machines)
+# EN: mode snapshot: back up while the VM is running, without stopping it
 # mode snapshot: backup ได้ขณะ VM รันอยู่ โดย VM ไม่ต้องหยุด
 set -euo pipefail
 

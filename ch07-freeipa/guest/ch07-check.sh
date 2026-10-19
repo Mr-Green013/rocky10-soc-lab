@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 7 verification: on ipa-01 checks the server services, on other machines checks client enrollment (sudo bash ch07-check.sh)
 # บทที่ 7 วิธีตรวจสอบ: บน ipa-01 ตรวจ service ของ server, เครื่องอื่นตรวจการเป็น client  (sudo bash ch07-check.sh)
 set -uo pipefail
 F=0
@@ -9,7 +10,7 @@ t()   { local m=$1; shift; if "$@" >/dev/null 2>&1; then ok "$m"; else bad "$m";
 [ "$(id -u)" -eq 0 ] || { echo "ต้องรันด้วย sudo"; exit 99; }
 IPA_IP=192.168.10.10
 
-if systemctl cat ipa.service >/dev/null 2>&1; then   # ipa.service มีเฉพาะบน server
+if systemctl cat ipa.service >/dev/null 2>&1; then   # ipa.service มีเฉพาะบน server (EN: ipa.service exists only on the server)
   echo "== บทบาท: IPA server"
   out=$(ipactl status 2>&1)
   for s in "Directory Service" krb5kdc kadmin named httpd pki-tomcatd; do

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Chapter 11 verification: sending logs to Graylog (sudo bash ch11-check.sh)
 # บทที่ 11 วิธีตรวจสอบ: การส่ง log เข้า Graylog  (sudo bash ch11-check.sh)
+# EN: On graylog-01: checks DOCKER-USER (+ inputs/streams through the API if GL_TOKEN is set). On other machines: checks the client side
 # บน graylog-01: ตรวจ DOCKER-USER (+ input/stream ผ่าน API ถ้าตั้ง GL_TOKEN)  บนเครื่องอื่น: ตรวจฝั่ง client
 set -uo pipefail
 F=0

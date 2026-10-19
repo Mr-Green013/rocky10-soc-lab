@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Chapter 13 verification: CrowdSec → Graylog, GeoIP and the dashboard (sudo bash ch13-check.sh)
 # บทที่ 13 วิธีตรวจสอบ: CrowdSec → Graylog, GeoIP และ dashboard  (sudo bash ch13-check.sh)
+# EN: The dashboard is checked through the API: read -rs GL_TOKEN && export GL_TOKEN && sudo --preserve-env=GL_TOKEN bash ch13-check.sh
 # dashboard ตรวจผ่าน API: read -rs GL_TOKEN && export GL_TOKEN && sudo --preserve-env=GL_TOKEN bash ch13-check.sh
 set -uo pipefail
 F=0

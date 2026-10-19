@@ -1,3 +1,4 @@
+<!-- EN: Chapter 21: put rules 100370–100372 in 130-audit_rules.xml, append 100375–100377, and put 100378 in the tetragon group of 160-container_rules.xml -->
 <!-- บทที่ 21: วาง rule 100370–100372 ใน 130-audit_rules.xml, 100375–100377 ต่อท้าย และ 100378 ใน group tetragon ของ 160-container_rules.xml -->
 <rule id="100370" level="3">
   <if_sid>80700</if_sid>

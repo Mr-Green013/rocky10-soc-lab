@@ -1,8 +1,10 @@
+## EN: 23.10 Changes to the system time
 ## 23.10 การเปลี่ยนเวลาระบบ
 -a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k time-change
 -a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k time-change
 -w /etc/localtime -p wa -k time-change
 
+## EN: 23.11 The user and group database
 ## 23.11 ฐานข้อมูลผู้ใช้และกลุ่ม
 -w /etc/group -p wa -k identity
 -w /etc/passwd -p wa -k identity
@@ -10,6 +12,7 @@
 -w /etc/shadow -p wa -k identity
 -w /etc/security/opasswd -p wa -k identity
 
+## EN: 23.12 Network settings and the hostname
 ## 23.12 ค่า network และชื่อเครื่อง
 -a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale
 -w /etc/hosts -p wa -k system-locale
@@ -20,6 +23,7 @@
 -w /etc/selinux -p wa -k MAC-policy
 -w /usr/share/selinux -p wa -k MAC-policy
 
+## EN: 23.14 Logins and logouts
 ## 23.14 login และ logout
 -w /var/log/lastlog -p wa -k logins
 -w /var/run/faillock -p wa -k logins
@@ -29,23 +33,29 @@
 -w /var/log/wtmp -p wa -k session
 -w /var/log/btmp -p wa -k session
 
+## EN: 23.16 DAC permission changes, 32-bit (64-bit is already in 30-soc.rules, key perm_mod)
 ## 23.16 การเปลี่ยนสิทธิ์ DAC แบบ 32 บิต (64 บิตอยู่ใน 30-soc.rules key perm_mod แล้ว)
 -a always,exit -F arch=b32 -S chmod,fchmod,fchmodat,chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -k perm_mod
 
+## EN: 23.17 Denied file access
 ## 23.17 การเข้าถึงไฟล์ที่ถูกปฏิเสธ
 -a always,exit -F arch=b64 -S open,openat,openat2,truncate,ftruncate,creat -F exit=-EACCES -F auid>=1000 -F auid!=unset -k access
 -a always,exit -F arch=b64 -S open,openat,openat2,truncate,ftruncate,creat -F exit=-EPERM -F auid>=1000 -F auid!=unset -k access
 
+## EN: 23.19 Mounts
 ## 23.19 การ mount
 -a always,exit -F arch=b64 -S mount,umount2 -F auid>=1000 -F auid!=unset -k mounts
 
+## EN: 23.20 File deletion and renaming by users
 ## 23.20 การลบและเปลี่ยนชื่อไฟล์โดยผู้ใช้
 -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat,renameat2 -F auid>=1000 -F auid!=unset -k delete
 
+## EN: 23.21 sudoers scope
 ## 23.21 ขอบเขตของ sudoers
 -w /etc/sudoers -p wa -k scope
 -w /etc/sudoers.d -p wa -k scope
 
+## EN: 23.22 Use of sudo
 ## 23.22 การใช้ sudo
 -w /var/log/sudo.log -p wa -k actions
 -a always,exit -F arch=b64 -C euid!=uid -F auid!=unset -S execve -k actions
@@ -55,16 +65,19 @@
 -w /etc/sysctl.d -p wa -k sysctl
 -a always,exit -F path=/usr/sbin/sysctl -F perm=x -F auid>=1000 -F auid!=unset -k sysctl
 
+## EN: 23.25 cron and at
 ## 23.25 cron และ at
 -w /etc/crontab -p wa -k cron
 -w /etc/cron.d -p wa -k cron
 -w /var/spool/cron -p wa -k cron
 -w /var/spool/at -p wa -k cron
 
+## EN: 23.26 Installing and removing software
 ## 23.26 การติดตั้งและลบ software
 -a always,exit -F path=/usr/bin/rpm -F perm=x -F auid>=1000 -F auid!=unset -k software_mgmt
 -a always,exit -F path=/usr/bin/dnf-3 -F perm=x -F auid>=1000 -F auid!=unset -k software_mgmt
 
+## EN: 23.27 Writing data out to media (USB) - watch mounts of removable devices
 ## 23.27 การเขียนข้อมูลออกสื่อ (USB) - ดูการ mount ของอุปกรณ์ที่ถอดได้
 -w /usr/bin/udisksctl -p x -k export
 -w /run/media -p wa -k export

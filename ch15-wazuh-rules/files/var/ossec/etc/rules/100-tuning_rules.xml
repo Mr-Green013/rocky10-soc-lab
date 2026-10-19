@@ -1,6 +1,8 @@
+<!-- EN: Chapter 15: rules in 100-tuning_rules.xml (collected from the chapter's steps) -->
 <!-- บทที่ 15: rule ใน 100-tuning_rules.xml (คัดจากขั้นตอนของบท) -->
 <group name="local,">
 
+<!-- EN: Raise: a successful root login over SSH must never happen in this lab -->
 <!-- ยกระดับ: login สำเร็จของ root ผ่าน SSH ต้องไม่เกิดขึ้นใน lab นี้ -->
 <rule id="100001" level="12">
   <if_sid>5715</if_sid>
@@ -10,6 +12,7 @@
   <group>authentication_success,</group>
 </rule>
 
+<!-- EN: Lower: service account sessions that happen all the time -->
 <!-- ลดระดับ: session ของ service account ที่เกิดตลอดเวลา -->
 <rule id="100002" level="0">
   <if_sid>5501,5502</if_sid>

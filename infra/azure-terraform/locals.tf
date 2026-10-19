@@ -1,5 +1,7 @@
 locals {
+  # EN: The same IP plan as the course documents (section 1, Lab 0)
   # IP plan เดียวกับเอกสารหลักสูตร (หมวด 1, Lab 0)
+  # EN: admin-01 stands in for the "admin workstation 192.168.10.100" and is the only machine with a public IP
   # admin-01 แทน "admin workstation 192.168.10.100" และเป็นเครื่องเดียวที่มี public IP
   hosts = {
     "admin-01" = {
@@ -69,7 +71,9 @@ locals {
 
   admin_ssh_public_key = trimspace(file(pathexpand(var.admin_ssh_public_key_path)))
 
+  # EN: /etc/hosts on every machine: makes the .lab.internal names work before FreeIPA DNS exists
   # /etc/hosts ของทุกเครื่อง: ให้ชื่อ .lab.internal ใช้ได้ตั้งแต่ก่อนมี FreeIPA DNS
+  # EN: FreeIPA needs its own FQDN to resolve to the real IP, not 127.0.0.1
   # FreeIPA ต้องการให้ FQDN ของตัวเอง resolve เป็น IP จริง ไม่ใช่ 127.0.0.1
   etc_hosts = join("\n", concat(
     [
@@ -102,7 +106,9 @@ locals {
           content     = local.etc_hosts
         },
         {
+          # EN: Sorts after 01-soclab-auth.conf (chapter 8) but before 50-redhat.conf; does not touch PasswordAuthentication
           # เรียงหลัง 01-soclab-auth.conf (บทที่ 8) แต่ก่อน 50-redhat.conf; ไม่แตะ PasswordAuthentication
+          # EN: so that Lab 14 can enable passwords temporarily as the documents describe
           # เพื่อให้ Lab 14 เปิด password ชั่วคราวได้ตามเอกสาร
           path        = "/etc/ssh/sshd_config.d/05-soclab-baseline.conf"
           permissions = "0600"
@@ -121,6 +127,7 @@ locals {
         ["systemctl", "enable", "--now", "firewalld"],
         ["firewall-cmd", "--permanent", "--add-service=ssh"],
         ["firewall-cmd", "--reload"],
+        # EN: If the image ships with SELinux disabled, the whole machine must be relabeled at the next reboot
         # ถ้า image ปิด SELinux มาตั้งแต่ต้น ต้อง relabel ทั้งเครื่องตอน reboot ครั้งถัดไป
         ["sh", "-c", "[ \"$(getenforce)\" = Disabled ] && touch /.autorelabel; sed -i 's/^SELINUX=.*/SELINUX=enforcing/' /etc/selinux/config; setenforce 1 || true"],
         ["sh", "-c", "systemctl reload sshd || true"],

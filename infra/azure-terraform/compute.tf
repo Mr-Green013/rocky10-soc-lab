@@ -16,6 +16,7 @@ resource "azurerm_network_interface" "vm" {
   tags = local.common_tags
 }
 
+# EN: Accept the marketplace image terms (once per subscription)
 # ยอมรับ terms ของ marketplace image (ครั้งเดียวต่อ subscription)
 resource "azurerm_marketplace_agreement" "rocky" {
   count = local.use_marketplace_image && var.image.plan_required && var.accept_marketplace_terms ? 1 : 0
@@ -71,9 +72,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
     }
   }
 
+  # EN: cloud-init: hostname/FQDN, timezone, /etc/hosts, base packages, firewalld, SELinux enforcing
   # cloud-init: hostname/FQDN, timezone, /etc/hosts, package พื้นฐาน, firewalld, SELinux enforcing
   custom_data = base64encode("#cloud-config\n${yamlencode(local.cloud_init[each.key])}")
 
+  # EN: managed storage: view the console log and use the Serial Console when SSH does not work
   # managed storage: ดู console log และใช้ Serial Console ตอน SSH เข้าไม่ได้
   boot_diagnostics {}
 
@@ -88,6 +91,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   ]
 
   lifecycle {
+    # EN: cloud-init is used only when the machine is created; changing locals later should not recreate the VM
     # cloud-init ใช้แค่ตอนสร้างเครื่อง แก้ locals ภายหลังไม่ควรทำให้ VM ถูกสร้างใหม่
     ignore_changes = [custom_data]
   }

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 9 verification: CrowdSec, bouncer, whitelist, Tor import and restoring sshd (sudo bash ch09-check.sh)
 # บทที่ 9 วิธีตรวจสอบ: CrowdSec, bouncer, whitelist, Tor import และการคืนค่า sshd  (sudo bash ch09-check.sh)
 set -uo pipefail
 F=0

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 3 verification: kernel, system version and time (sudo bash ch03-check.sh)
 # บทที่ 3 วิธีตรวจสอบ: kernel, เวอร์ชันระบบ และเวลา  (sudo bash ch03-check.sh)
 set -uo pipefail
 F=0

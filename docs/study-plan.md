@@ -1,71 +1,73 @@
-# แผนเรียน 60 วัน (2 ชั่วโมง/วัน)
+**English** · [ภาษาไทย](study-plan.th.md)
 
-สัปดาห์ละ 5 วัน รวม 12 สัปดาห์ ฉบับจัดรูปแบบพร้อมภาพประกอบอยู่ในคู่มือผู้เรียน (.docx) ไฟล์นี้สร้างจากข้อมูลชุดเดียวกัน
+# 60-day study plan (2 hours/day)
 
-![แผนเรียน](../assets/diagrams/study-plan/fig01-roadmap.png)
+5 days a week, 12 weeks in total. The formatted Thai learner guide (.docx) with illustrations is built from the same data as this file.
+
+![Study plan](../assets/diagrams/study-plan/en/fig01-roadmap.png)
 
 ## Rubric
 
-| ด้าน | 4 ดีเยี่ยม | 3 ผ่าน | 2 ต้องปรับ | 1 ยังไม่ผ่าน |
+| Area | 4 Excellent | 3 Pass | 2 Needs work | 1 Not yet |
 | --- | --- | --- | --- | --- |
-| ทำงานได้ (40%) | ทุกข้อผ่าน และรันซ้ำได้ (idempotent) | ทุกข้อในเกณฑ์ผ่าน | ผ่านบางข้อ ต้องมีคนช่วย | ระบบไม่ทำงาน |
-| หลักฐานและการตรวจสอบ (25%) | มี output, เวลา และอธิบายว่าพิสูจน์อะไร | มี output ครบตามที่ระบุ | มีบางส่วน หรือไม่ระบุเครื่อง/เวลา | ไม่มีหลักฐาน |
-| ความปลอดภัย (20%) | least privilege, ไม่มี secret รั่ว, ย้อนกลับได้ และเพิ่มการป้องกันเอง | ไม่ปิด SELinux/firewall, secret ไม่อยู่ใน config หรือ repo | มีจุดเสี่ยง 1 จุด เช่น สิทธิ์ไฟล์กว้างเกิน | ปิดชั้นป้องกัน หรือ secret รั่ว |
-| ความเข้าใจและการสื่อสาร (15%) | อธิบายเหตุผลและทางเลือกอื่นได้ สอนคนอื่นได้ | อธิบายได้ว่าทำอะไรและทำไม | อธิบายได้แค่ขั้นตอน | อธิบายไม่ได้ |
+| Works (40%) | Every item passes and can be rerun (idempotent) | Every item in the pass criteria passes | Some items pass; needed help | The system does not work |
+| Evidence and verification (25%) | Output, times, and an explanation of what it proves | All the required output | Partial, or the machine/time is not stated | No evidence |
+| Security (20%) | Least privilege, no leaked secrets, reversible, and extra protections added on your own | SELinux/firewall not disabled; no secrets in configs or the repo | One risky spot, such as file permissions that are too wide | A protection layer disabled, or a secret leaked |
+| Understanding and communication (15%) | Explains the reasons and the alternatives; can teach others | Explains what was done and why | Can only explain the steps | Cannot explain |
 
-คะแนน = Σ(ระดับ ÷ 4 × น้ำหนัก) ผ่านเมื่อ ≥ 75% และไม่มีด้านใดได้ระดับ 1 ด้านความปลอดภัยได้ระดับ 1 = ไม่ผ่านทันที
+Score = Σ(level ÷ 4 × weight). Pass at ≥ 75% with no area at level 1. Level 1 in Security is an immediate fail.
 
-## ภาค 0 เตรียมห้องแลป
+## Part 0 Preparing the lab
 
-### วันที่ 1 · บทที่ 1 — เปิด Hyper-V และสร้าง pve-01
+### Day 1 · Chapter 1 — Enable Hyper-V and create pve-01
 
-**เป้าหมาย:** เครื่อง Windows พร้อมรัน nested virtualization และมี VM pve-01 ที่บูตตัวติดตั้ง Proxmox
+**Goal:** The Windows machine can run nested virtualization and has a pve-01 VM that boots the Proxmox installer
 
-**ทฤษฎี**
-- Hypervisor type 1 กับ type 2 และเหตุที่ lab ซ้อน 2 ชั้น (Hyper-V → Proxmox → Rocky)
-- Nested virtualization ต้องเปิด ExposeVirtualizationExtensions ให้ VM ชั้นแรก
-- Rocky Linux 10 ต้องการ CPU ระดับ x86-64-v3 VM จึงต้องใช้ CPU type host
+**Theory**
+- Type 1 vs type 2 hypervisors, and why the lab is nested two levels deep (Hyper-V → Proxmox → Rocky)
+- Nested virtualization requires ExposeVirtualizationExtensions on the first-level VM
+- Rocky Linux 10 requires an x86-64-v3 CPU, so VMs must use CPU type host
 
-**ขั้นตอนปฏิบัติ**
-1. ตรวจ CPU, RAM และพื้นที่ disk ตามตาราง Hardware ในบทที่ 1
-2. เปิด feature Hyper-V แล้ว restart
-3. ดาวน์โหลด Proxmox VE ISO และไฟล์ Lab
-4. สร้าง pve-01 ด้วย New-ProxmoxLabHost.ps1
+**Steps**
+1. Check CPU, RAM and disk space against the Hardware table in chapter 1
+2. Enable the Hyper-V feature and restart
+3. Download the Proxmox VE ISO and the lab files
+4. Create pve-01 with New-ProxmoxLabHost.ps1
 
-**คำสั่งหลัก** (Windows · PowerShell)
+**Key commands** (Windows · PowerShell)
 ```bash
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All
 .\windows\New-ProxmoxLabHost.ps1 -IsoPath D:\ISO\proxmox-ve_9.2-1.iso -VMPath D:\Hyper-V
 Get-VMProcessor pve-01 | Format-List ExposeVirtualizationExtensions
 ```
 
-**แบบฝึกหัด**
-- อธิบายด้วยคำของตัวเองว่าทำไม Hyper-V checkpoint ของ pve-01 ไม่เหมาะกับการ rollback รายเครื่อง
+**Exercises**
+- Explain in your own words why a Hyper-V checkpoint of pve-01 is not suitable for rolling back individual machines
 
-**เกณฑ์ผ่าน**
+**Pass criteria**
 - [ ] ExposeVirtualizationExtensions = True
-- [ ] pve-01 บูตเข้าหน้าติดตั้ง Proxmox
+- [ ] pve-01 boots into the Proxmox installer
 
-**หลักฐาน:** ภาพหน้าจอผล Get-VMProcessor
+**Evidence:** Screenshot of the Get-VMProcessor output
 
-อ่านเพิ่ม: บทที่ 1 สร้างห้องแลป: Proxmox VE บน Hyper-V และ Rocky Linux 10
+Further reading: Chapter 1 Building the Lab: Proxmox VE on Hyper-V and Rocky Linux 10
 
-### วันที่ 2 · บทที่ 1 — ติดตั้ง Proxmox VE และ network ของ lab
+### Day 2 · Chapter 1 — Install Proxmox VE and the lab network
 
-**เป้าหมาย:** Proxmox ใช้งานได้ มี vmbr1 (192.168.10.1/24) พร้อม NAT ออก internet
+**Goal:** Proxmox is usable, with vmbr1 (192.168.10.1/24) and NAT out to the internet
 
-**ทฤษฎี**
-- Linux bridge คือ switch เสมือน vmbr0 ต่อ uplink, vmbr1 คือ network ของ lab
-- NAT (masquerade) ทำให้ VM ออก internet ผ่าน IP ของ pve-01
-- repository แบบ no-subscription สำหรับ lab
+**Theory**
+- A Linux bridge is a virtual switch: vmbr0 connects to the uplink, vmbr1 is the lab network
+- NAT (masquerade) lets VMs reach the internet through the IP of pve-01
+- The no-subscription repository for the lab
 
-**ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Proxmox VE จาก ISO แล้วถอด ISO
-2. คัดลอก repo ไปที่ pve-01 และตั้ง repository
-3. สร้าง vmbr1 และ NAT ด้วย script
-4. สร้าง SSH key ed25519 บน Windows
+**Steps**
+1. Install Proxmox VE from the ISO, then remove the ISO
+2. Copy the repo to pve-01 and set up the repositories
+3. Create vmbr1 and NAT with the script
+4. Create an ed25519 SSH key on Windows
 
-**คำสั่งหลัก** (pve-01 · root)
+**Key commands** (pve-01 · root)
 ```bash
 bash pve-repos.sh
 bash pve-setup-network.sh
@@ -73,33 +75,33 @@ ip -br addr show vmbr1
 nft list ruleset | grep -i masquerade
 ```
 
-**แบบฝึกหัด**
-- วาดผัง network ของ lab ด้วยมือ ระบุ bridge, IP และทิศทางของ NAT
+**Exercises**
+- Draw the lab network by hand, marking the bridges, IPs and the direction of NAT
 
-**เกณฑ์ผ่าน**
-- [ ] เปิด Web UI https://pve-01:8006 ได้
-- [ ] vmbr1 มี IP 192.168.10.1/24
+**Pass criteria**
+- [ ] The Web UI at https://pve-01:8006 opens
+- [ ] vmbr1 has IP 192.168.10.1/24
 
-**หลักฐาน:** ผลของ ip -br addr และภาพผังที่วาด
+**Evidence:** Output of ip -br addr and the diagram you drew
 
-อ่านเพิ่ม: บทที่ 1 สร้างห้องแลป: Proxmox VE บน Hyper-V และ Rocky Linux 10
+Further reading: Chapter 1 Building the Lab: Proxmox VE on Hyper-V and Rocky Linux 10
 
-### วันที่ 3 · บทที่ 1 — Rocky Linux 10 golden image และ template
+### Day 3 · Chapter 1 — Rocky Linux 10 golden image and template
 
-**เป้าหมาย:** มี template rocky10-tpl (VM 9000) ที่สะอาดพร้อม clone
+**Goal:** A clean rocky10-tpl template (VM 9000) ready to clone
 
-**ทฤษฎี**
-- Golden image คือเครื่องต้นแบบที่ลบข้อมูลเฉพาะเครื่องออกแล้ว
-- ข้อมูลที่ต้องลบ: machine-id, SSH host key, NetworkManager profile
-- cloud-init ตั้งค่าเครื่องใหม่ตอนบูตครั้งแรกจาก drive ของ Proxmox
+**Theory**
+- A golden image is a reference machine with machine-specific data removed
+- Data to remove: machine-id, SSH host keys, NetworkManager profiles
+- cloud-init configures a new machine at first boot from a Proxmox drive
 
-**ขั้นตอนปฏิบัติ**
-1. ดาวน์โหลด Rocky 10 Minimal ISO บน pve-01
-2. สร้าง VM 9000 และติดตั้ง Rocky ด้วย IP ชั่วคราว .99
-3. ตรวจเวอร์ชัน, LVM และ SELinux (Lab 1)
-4. รัน golden-prep.sh แล้วแปลงเป็น template
+**Steps**
+1. Download the Rocky 10 Minimal ISO on pve-01
+2. Create VM 9000 and install Rocky with the temporary IP .99
+3. Check the version, LVM and SELinux (Lab 1)
+4. Run golden-prep.sh and convert to a template
 
-**คำสั่งหลัก** (pve-01 · root)
+**Key commands** (pve-01 · root)
 ```bash
 bash pve-get-iso.sh https://download.rockylinux.org/pub/rocky/10/isos/x86_64/<minimal.iso>
 bash pve-create-golden.sh
@@ -107,35 +109,35 @@ bash pve-make-template.sh
 qm config 9000 | grep -E "^(template|cpu|ide2)"
 ```
 
-**แบบฝึกหัด**
-- ก่อนรัน golden-prep.sh ให้จด machine-id ไว้ หลัง clone ในวันที่ 4 ตรวจว่าทุกเครื่องได้ค่าใหม่
+**Exercises**
+- Before running golden-prep.sh, note the machine-id; after cloning on day 4, check that every machine got a new value
 
-**เกณฑ์ผ่าน**
-- [ ] VM 9000 เป็น template
+**Pass criteria**
+- [ ] VM 9000 is a template
 - [ ] cpu: host
-- [ ] getenforce = Enforcing (ก่อนแปลง)
+- [ ] getenforce = Enforcing (before converting)
 
-**หลักฐาน:** ผลของ qm config 9000
+**Evidence:** Output of qm config 9000
 
-อ่านเพิ่ม: บทที่ 1 สร้างห้องแลป: Proxmox VE บน Hyper-V และ Rocky Linux 10
+Further reading: Chapter 1 Building the Lab: Proxmox VE on Hyper-V and Rocky Linux 10
 
-### วันที่ 4 · บทที่ 1 — Clone 6 เครื่อง, snapshot และการใช้งานประจำวัน
+### Day 4 · Chapter 1 — Clone 6 machines, snapshots and day-to-day use
 
-**เป้าหมาย:** ห้องแลป 7 เครื่องผ่าน Test-SocLab.ps1 และมี snapshot ch01-base
+**Goal:** The 7-machine lab passes Test-SocLab.ps1 and has the ch01-base snapshot
 
-**ทฤษฎี**
-- Full clone ต่างจาก linked clone อย่างไร
-- Snapshot ต่างจาก backup: snapshot อยู่บน storage เดียวกับ VM
-- ลำดับการเปิดเครื่องตาม startup order (ipa-01 ขึ้นก่อน)
+**Theory**
+- How a full clone differs from a linked clone
+- Snapshot vs backup: a snapshot lives on the same storage as the VM
+- Boot order follows the startup order (ipa-01 comes up first)
 
-**ขั้นตอนปฏิบัติ**
-1. Clone ทุกเครื่องจาก lab-hosts.csv
-2. รัน Initialize-SocLab.ps1 จาก Windows
-3. ตรวจด้วย Test-SocLab.ps1
-4. สร้าง snapshot ch01-base
-5. ลองเปิดปิดเครื่องด้วย pve-lab-power.sh
+**Steps**
+1. Clone every machine from lab-hosts.csv
+2. Run Initialize-SocLab.ps1 from Windows
+3. Check with Test-SocLab.ps1
+4. Create the ch01-base snapshot
+5. Try starting and stopping machines with pve-lab-power.sh
 
-**คำสั่งหลัก** (pve-01 · root)
+**Key commands** (pve-01 · root)
 ```bash
 bash pve-clone-lab.sh
 bash pve-snapshot.sh ch01-base
@@ -143,36 +145,36 @@ bash pve-snapshot.sh --list
 bash pve-lab-power.sh status
 ```
 
-**แบบฝึกหัด**
-- ทำแบบฝึกหัด "ทดสอบ rollback" ท้ายบทที่ 1 กับ lab-linux-02
+**Exercises**
+- Do the "rollback test" exercise at the end of chapter 1 with lab-linux-02
 
-**เกณฑ์ผ่าน**
-- [ ] Test-SocLab.ps1 ไม่มี FAIL (exit code 0)
-- [ ] machine-id ไม่ซ้ำกันทุกเครื่อง
-- [ ] มี snapshot ch01-base ครบ 6 เครื่อง
+**Pass criteria**
+- [ ] Test-SocLab.ps1 shows no FAIL (exit code 0)
+- [ ] machine-id is unique on every machine
+- [ ] The ch01-base snapshot exists on all 6 machines
 
-**หลักฐาน:** ภาพผลของ Test-SocLab.ps1
+**Evidence:** Screenshot of the Test-SocLab.ps1 result
 
-อ่านเพิ่ม: บทที่ 1 สร้างห้องแลป: Proxmox VE บน Hyper-V และ Rocky Linux 10
+Further reading: Chapter 1 Building the Lab: Proxmox VE on Hyper-V and Rocky Linux 10
 
-## ภาค 1 พื้นฐานระบบและเครือข่าย
+## Part 1 System and network basics
 
-### วันที่ 5 · บทที่ 2 — NetworkManager, DNS search และ hostname แบบ FQDN
+### Day 5 · Chapter 2 — NetworkManager, DNS search and FQDN hostnames
 
-**เป้าหมาย:** ทุกเครื่องมี FQDN ที่ resolve เป็น IP จริง ไม่ใช่ 127.0.0.1
+**Goal:** Every machine has an FQDN that resolves to its real IP, not 127.0.0.1
 
-**ทฤษฎี**
-- NetworkManager แยก device (การ์ด) กับ connection (profile ค่า)
-- ลำดับการแปลงชื่อ: /etc/hosts → DNS ตาม /etc/nsswitch.conf
-- FreeIPA ต้องการ FQDN ที่ชี้ IP จริง cloud-init ใส่ FQDN ไว้กับ 127.0.0.1 จึงต้องแก้
+**Theory**
+- NetworkManager separates devices (cards) from connections (profiles of settings)
+- Name resolution order: /etc/hosts → DNS, per /etc/nsswitch.conf
+- FreeIPA needs an FQDN that points to the real IP; cloud-init maps the FQDN to 127.0.0.1, so it must be fixed
 
-**ขั้นตอนปฏิบัติ**
-1. สำรวจ device และ connection ของ lab-linux-01
-2. เปลี่ยนชื่อ profile เป็น lab และตั้ง DNS search
-3. ฝึกเพิ่มและลบ IP ที่สองชั่วคราว
-4. ตั้ง FQDN ทุกเครื่องด้วย set-identity.sh
+**Steps**
+1. Explore the devices and connections of lab-linux-01
+2. Rename the profile to lab and set the DNS search domain
+3. Practice adding and removing a temporary second IP
+4. Set the FQDN on every machine with set-identity.sh
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 nmcli -f NAME,DEVICE,TYPE connection show
 nmcli connection show lab | grep -E "ipv4\.(addresses|dns|dns-search)"
@@ -180,68 +182,68 @@ hostnamectl
 getent hosts $(hostname -f)
 ```
 
-**แบบฝึกหัด**
-- ใช้ nmtui ดูค่า profile lab บน lab-linux-02 (ห้ามบันทึก) แล้วเทียบกับผลของ nmcli
+**Exercises**
+- Use nmtui to view the lab profile on lab-linux-02 (do not save), then compare with the nmcli output
 
-**เกณฑ์ผ่าน**
-- [ ] hostname -f คืนค่า <ชื่อ>.lab.internal
-- [ ] getent hosts คืน IP 192.168.10.x ไม่ใช่ 127.0.0.1
+**Pass criteria**
+- [ ] hostname -f returns <name>.lab.internal
+- [ ] getent hosts returns 192.168.10.x, not 127.0.0.1
 
-**หลักฐาน:** ผลของ ch02-check.sh ทุกเครื่อง
+**Evidence:** ch02-check.sh output from every machine
 
-อ่านเพิ่ม: บทที่ 2 Network, SSH และ Hostname
+Further reading: Chapter 2 Network, SSH and Hostname
 
-### วันที่ 6 · บทที่ 2 — SSH server, ลำดับ config และ host key
+### Day 6 · Chapter 2 — SSH server, config order and host keys
 
-**เป้าหมาย:** อ่านค่าจริงของ sshd ได้ และ Windows รู้จักชื่อเครื่องใน lab
+**Goal:** Read the effective sshd settings, and Windows knows the names of the lab machines
 
-**ทฤษฎี**
-- sshd อ่านไฟล์ใน sshd_config.d ตามลำดับชื่อ และค่าที่เจอก่อนเป็นค่าที่ใช้
-- sshd -T แสดงค่าหลังรวมทุกไฟล์แล้ว
-- host key fingerprint ใช้ยืนยันว่าต่อถูกเครื่อง (ป้องกัน MITM)
+**Theory**
+- sshd reads the files in sshd_config.d in name order, and the first value found wins
+- sshd -T shows the values after all files are merged
+- The host key fingerprint confirms you reached the right machine (prevents MITM)
 
-**ขั้นตอนปฏิบัติ**
-1. ดูไฟล์ใน /etc/ssh/sshd_config.d และ drop-in ของ cloud-init
-2. ตรวจค่าด้วย sshd -T
-3. ยืนยัน host key ของทุกเครื่อง
-4. ตั้ง hosts และ ssh config บน Windows
+**Steps**
+1. Look at the files in /etc/ssh/sshd_config.d and the cloud-init drop-in
+2. Check the values with sshd -T
+3. Confirm the host key of every machine
+4. Set up hosts and the ssh config on Windows
 5. snapshot ch02-network
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 ls -1 /etc/ssh/sshd_config.d/
 sudo sshd -T | grep -E "^(permitrootlogin|passwordauthentication|pubkeyauthentication)"
 ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
-**แบบฝึกหัด**
-- หาบรรทัด login ล่าสุดของ aod ใน /var/log/secure แล้วระบุ key ที่ใช้จาก fingerprint
+**Exercises**
+- Find the latest login line for aod in /var/log/secure and identify the key used from its fingerprint
 
-**เกณฑ์ผ่าน**
-- [ ] ssh lab-linux-01 จาก Windows เข้าได้โดยไม่ถามรหัสผ่าน
-- [ ] อธิบายได้ว่าค่า permitrootlogin มาจากไฟล์ใด
+**Pass criteria**
+- [ ] ssh lab-linux-01 from Windows works without a password prompt
+- [ ] You can explain which file the permitrootlogin value comes from
 
-**หลักฐาน:** ผลของ sshd -T และ ch02-check.sh
+**Evidence:** Output of sshd -T and ch02-check.sh
 
-อ่านเพิ่ม: บทที่ 2 Network, SSH และ Hostname
+Further reading: Chapter 2 Network, SSH and Hostname
 
-### วันที่ 7 · บทที่ 3 — Kernel, เวอร์ชันระบบ, timezone และ NTP
+### Day 7 · Chapter 3 — Kernel, system version, timezone and NTP
 
-**เป้าหมาย:** ทุกเครื่อง sync เวลาจาก pve-01 และระบุเวอร์ชัน OS/kernel ได้
+**Goal:** Every machine syncs time from pve-01, and you can identify the OS/kernel version
 
-**ทฤษฎี**
-- อ่านเลข kernel 6.12.0-xxx.el10 และ dist tag
-- BTF ใน kernel คือสิ่งที่ eBPF tools (Tetragon, Falco) ต้องใช้ในภาค 6
-- เวลาที่คลาดกันทำให้เรียง timeline ของ log จากหลายเครื่องผิด
+**Theory**
+- Reading the kernel number 6.12.0-xxx.el10 and the dist tag
+- BTF in the kernel is what eBPF tools (Tetragon, Falco) need in Part 6
+- Clock skew puts the timeline of logs from many machines in the wrong order
 
-**ขั้นตอนปฏิบัติ**
-1. อ่านเวอร์ชัน kernel และ OS (Lab 4, 7)
-2. ตรวจ /sys/kernel/btf/vmlinux
-3. ตั้ง pve-01 เป็น NTP server
-4. ตั้ง timezone และ chrony ทุกเครื่องด้วย set-time.sh
+**Steps**
+1. Read the kernel and OS version (Lab 4, 7)
+2. Check /sys/kernel/btf/vmlinux
+3. Make pve-01 the NTP server
+4. Set the timezone and chrony on every machine with set-time.sh
 5. snapshot ch03-time
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 uname -r; rpm -q kernel
 . /etc/os-release; echo "$ID $VERSION_ID"
@@ -250,34 +252,34 @@ timedatectl
 chronyc sources -v; chronyc tracking
 ```
 
-**แบบฝึกหัด**
-- เขียน script 1 บรรทัดที่พิมพ์ ID, VERSION_ID และ kernel แล้วรันกับทุกเครื่องด้วย Invoke-SocLabScript.ps1
+**Exercises**
+- Write a one-line script that prints ID, VERSION_ID and the kernel, and run it on every machine with Invoke-SocLabScript.ps1
 
-**เกณฑ์ผ่าน**
-- [ ] chronyc sources มี ^* ที่ 192.168.10.1
+**Pass criteria**
+- [ ] chronyc sources shows ^* at 192.168.10.1
 - [ ] Time zone = Asia/Bangkok
 - [ ] System clock synchronized: yes
 
-**หลักฐาน:** ผลของ ch03-check.sh ทุกเครื่อง
+**Evidence:** ch03-check.sh output from every machine
 
-อ่านเพิ่ม: บทที่ 3 Kernel, เวอร์ชันระบบ, Timezone และ NTP
+Further reading: Chapter 3 Kernel, System Version, Timezone and NTP
 
-### วันที่ 8 · บทที่ 4 — SELinux: label, AVC และการแก้โดยไม่ปิด SELinux
+### Day 8 · Chapter 4 — SELinux: labels, AVCs and fixing without disabling SELinux
 
-**เป้าหมาย:** วินิจฉัย AVC denial แล้วแก้ด้วย semanage
+**Goal:** Diagnose an AVC denial and fix it with semanage
 
-**ทฤษฎี**
-- DAC (rwx) กับ MAC (SELinux) ต้องผ่านทั้งสองชั้น
-- Label รูปแบบ user:role:type:level และ type enforcement
-- ลำดับแก้: อ่าน AVC → audit2why → boolean / semanage → restorecon (ไม่ใช่ setenforce 0)
+**Theory**
+- DAC (rwx) and MAC (SELinux): both layers must allow access
+- The user:role:type:level label format and type enforcement
+- Fix order: read the AVC → audit2why → boolean / semanage → restorecon (not setenforce 0)
 
-**ขั้นตอนปฏิบัติ**
-1. สำรวจโหมดและ label ของไฟล์และ process
-2. Mini-lab: ย้าย sshd ไป port 2222 แล้วดู SELinux บล็อก
-3. แก้ด้วย semanage port
-4. คืนค่าเดิม (cleanup)
+**Steps**
+1. Explore the mode and the labels of files and processes
+2. Mini-lab: move sshd to port 2222 and watch SELinux block it
+3. Fix it with semanage port
+4. Restore the original settings (cleanup)
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sestatus; ls -Z /etc/ssh/sshd_config; ps -eZ | grep sshd
 sudo ausearch -m AVC -ts recent | audit2why
@@ -285,33 +287,33 @@ sudo semanage port -a -t ssh_port_t -p tcp 2222
 sudo semanage port -l | grep ssh_port_t
 ```
 
-**แบบฝึกหัด**
-- สร้าง /srv/labweb ตั้ง label httpd_sys_content_t ด้วย semanage fcontext และ restorecon
+**Exercises**
+- Create /srv/labweb and label it httpd_sys_content_t with semanage fcontext and restorecon
 
-**เกณฑ์ผ่าน**
-- [ ] อ่าน AVC แล้วระบุ scontext, tcontext และ permission ที่ถูกปฏิเสธได้
-- [ ] getenforce ยังเป็น Enforcing ตลอด lab
+**Pass criteria**
+- [ ] You can read an AVC and name the denied scontext, tcontext and permission
+- [ ] getenforce stays Enforcing throughout the lab
 
-**หลักฐาน:** บรรทัด AVC ที่อ่าน พร้อมคำอธิบาย 3 บรรทัด
+**Evidence:** The AVC line you read, with a three-line explanation
 
-อ่านเพิ่ม: บทที่ 4 SELinux และ systemd
+Further reading: Chapter 4 SELinux and systemd
 
-### วันที่ 9 · บทที่ 4 — systemd: unit, drop-in, journal และ service ของตัวเอง
+### Day 9 · Chapter 4 — systemd: units, drop-ins, the journal and your own service
 
-**เป้าหมาย:** สร้าง service ที่ restart อัตโนมัติ และปรับ service ด้วย drop-in
+**Goal:** Create a service that restarts automatically, and adjust a service with a drop-in
 
-**ทฤษฎี**
-- unit, target และ dependency (Wants, After)
-- drop-in ใน /etc/systemd/system/<unit>.d ไม่ต้องแก้ไฟล์ของ package
-- journalctl กรองตาม unit, priority และช่วงเวลา
+**Theory**
+- Units, targets and dependencies (Wants, After)
+- A drop-in in /etc/systemd/system/<unit>.d avoids editing the package file
+- journalctl filtering by unit, priority and time range
 
-**ขั้นตอนปฏิบัติ**
-1. ใช้ systemctl status, list-units --failed
-2. สร้าง heartbeat.service พร้อม Restart=on-failure
-3. kill process แล้วดูว่า systemd เปิดคืน
-4. ตรวจทุกเครื่องด้วย ch04-check.sh
+**Steps**
+1. Use systemctl status and list-units --failed
+2. Create heartbeat.service with Restart=on-failure
+3. Kill the process and watch systemd bring it back
+4. Check every machine with ch04-check.sh
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 systemctl list-units --type=service --state=failed
 sudo systemctl edit chronyd
@@ -319,66 +321,66 @@ systemctl cat chronyd
 journalctl -u heartbeat -p warning --since "10 min ago"
 ```
 
-**แบบฝึกหัด**
-- แปลง heartbeat ให้รันทุก 5 นาทีด้วย .timer แทน loop ใน script
+**Exercises**
+- Convert heartbeat to run every 5 minutes with a .timer instead of a loop in the script
 
-**เกณฑ์ผ่าน**
-- [ ] heartbeat กลับมาเองภายใน 5 วินาทีหลัง kill
-- [ ] systemctl revert คืนค่า chronyd ได้
+**Pass criteria**
+- [ ] heartbeat comes back by itself within 5 seconds after kill
+- [ ] systemctl revert restores chronyd
 
-**หลักฐาน:** ผลของ ch04-check.sh และ unit file ที่เขียน
+**Evidence:** ch04-check.sh output and the unit file you wrote
 
-อ่านเพิ่ม: บทที่ 4 SELinux และ systemd
+Further reading: Chapter 4 SELinux and systemd
 
-### ◆ วันที่ 10 — Checkpoint 1: ภาค 0–1
+### ◆ Day 10 — Checkpoint 1: Parts 0–1
 
-**เป้าหมาย:** พิสูจน์ว่า lab พื้นฐานถูกต้องก่อนเริ่มงาน identity
+**Goal:** Prove the base lab is correct before starting identity work
 
-**ทฤษฎี**
-- ทบทวนคำถามท้ายบทที่ 1–4
+**Theory**
+- Review the end-of-chapter questions for chapters 1–4
 
-**ขั้นตอนปฏิบัติ**
-1. รัน check script ของบทที่ 1–4 ทุกเครื่องแล้วเก็บผล
-2. Rollback lab-linux-02 ไป ch03-time แล้วตรวจซ้ำ
-3. ทำ Practical: แก้ปัญหาที่เพื่อนหรือ script สุ่มทำให้เสีย 3 ข้อ (ดูตาราง "วิธีแก้ปัญหา" บทที่ 1–4)
+**Steps**
+1. Run the check scripts of chapters 1–4 on every machine and keep the results
+2. Roll lab-linux-02 back to ch03-time and check again
+3. Practical: fix 3 problems that a classmate or a script breaks at random (see the "Troubleshooting" tables in chapters 1–4)
 
-**คำสั่งหลัก** (Windows · PowerShell)
+**Key commands** (Windows · PowerShell)
 ```bash
 .\Test-SocLab.ps1
 .\tools\windows\Invoke-SocLabScript.ps1 -Script ..\..\ch03-kernel-time-ntp\guest\ch03-check.sh
 .\tools\windows\Invoke-SocLabScript.ps1 -Script ..\..\ch04-selinux-systemd\guest\ch04-check.sh
 ```
 
-**แบบฝึกหัด**
-- สอบย่อย 10 ข้อจากคำถามทบทวนบทที่ 1–4
+**Exercises**
+- A 10-question quiz from the review questions of chapters 1–4
 
-**เกณฑ์ผ่าน**
-- [ ] check script ผ่านทุกเครื่อง
-- [ ] สอบย่อยได้อย่างน้อย 7/10
-- [ ] Rubric รวมได้ระดับ 3 ขึ้นไปทุกด้าน
+**Pass criteria**
+- [ ] Check scripts pass on every machine
+- [ ] At least 7/10 on the quiz
+- [ ] Overall rubric at level 3 or above in every area
 
-**หลักฐาน:** ไฟล์ผลของ check script ทั้งหมด + บันทึกการแก้ปัญหา
+**Evidence:** Result files of all check scripts + troubleshooting notes
 
 
 
-## ภาค 2 คำสั่งและตัวตน
+## Part 2 Commands and identity
 
-### วันที่ 11 · บทที่ 5 — Filesystem, navigation, nano และ output (Lab 9.1–9.5)
+### Day 11 · Chapter 5 — Filesystem, navigation, nano and output (Lab 9.1–9.5)
 
-**เป้าหมาย:** เดินทางใน filesystem และแก้ไฟล์ config อย่างปลอดภัย
+**Goal:** Move around the filesystem and edit config files safely
 
-**ทฤษฎี**
-- FHS: /etc = config, /var/log = log, /usr = โปรแกรม, /home, /tmp
-- path แบบ absolute กับ relative
-- สำรองไฟล์ก่อนแก้ทุกครั้ง (cp -a ไฟล์ ไฟล์.bak)
+**Theory**
+- FHS: /etc = config, /var/log = logs, /usr = programs, /home, /tmp
+- Absolute vs relative paths
+- Back up a file every time before editing it (cp -a file file.bak)
 
-**ขั้นตอนปฏิบัติ**
-1. สำรวจ / ด้วย ls, tree, du
-2. สร้าง directory หลายชั้นด้วย mkdir -p
-3. แก้ไฟล์ด้วย nano (บันทึก Ctrl+O, ออก Ctrl+X)
-4. จัด output ด้วย head, tail, less, wc
+**Steps**
+1. Explore / with ls, tree, du
+2. Create nested directories with mkdir -p
+3. Edit files with nano (save Ctrl+O, exit Ctrl+X)
+4. Shape output with head, tail, less, wc
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 ls -la /etc | head; du -sh /var/log/*
 mkdir -p ~/lab/day11/{logs,notes}
@@ -386,32 +388,32 @@ sudo cp -a /etc/chrony.conf /etc/chrony.conf.bak
 tail -n 20 /var/log/messages | less
 ```
 
-**แบบฝึกหัด**
-- หาไฟล์ใน /etc ที่แก้ไขภายใน 7 วัน (find /etc -mtime -7) แล้วอธิบายว่าแต่ละไฟล์ถูกแก้จากบทไหน
+**Exercises**
+- Find files in /etc changed in the last 7 days (find /etc -mtime -7) and explain which chapter changed each one
 
-**เกณฑ์ผ่าน**
-- [ ] อธิบายหน้าที่ของ 6 directory หลักได้
-- [ ] แก้ไฟล์แล้วมี .bak ทุกครั้ง
+**Pass criteria**
+- [ ] You can explain the role of the 6 main directories
+- [ ] Every edited file has a .bak
 
-**หลักฐาน:** ผล find พร้อมคำอธิบาย
+**Evidence:** The find output with explanations
 
-อ่านเพิ่ม: บทที่ 5 Command Line ที่ SOC ต้องใช้ทุกวัน
+Further reading: Chapter 5 The Command Line a SOC Uses Every Day
 
-### วันที่ 12 · บทที่ 5 — sudo, sudoers และ journalctl แบบกรอง (Lab 9.6–9.10)
+### Day 12 · Chapter 5 — sudo, sudoers and filtered journalctl (Lab 9.6–9.10)
 
-**เป้าหมาย:** ให้สิทธิ์ sudo แบบจำกัดคำสั่ง และค้น log ด้วย journalctl
+**Goal:** Grant sudo limited to specific commands, and search logs with journalctl
 
-**ทฤษฎี**
-- sudo บันทึกทุกคำสั่งลง log (ใช้สืบสวนในบทที่ 20)
-- แก้ sudoers ด้วย visudo เสมอ เพื่อตรวจ syntax ก่อนบันทึก
+**Theory**
+- sudo logs every command (used for investigation in chapter 20)
+- Always edit sudoers with visudo so the syntax is checked before saving
 - journalctl: -u, -p, --since, -o json
 
-**ขั้นตอนปฏิบัติ**
-1. สร้างไฟล์ใน /etc/sudoers.d ด้วย visudo -f
-2. ทดสอบสิทธิ์ด้วย sudo -l -U
-3. ค้น log ของ sshd และ sudo ด้วย journalctl
+**Steps**
+1. Create a file in /etc/sudoers.d with visudo -f
+2. Test the permissions with sudo -l -U
+3. Search sshd and sudo logs with journalctl
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo visudo -cf /etc/sudoers.d/20-containerops
 sudo -l -U anan
@@ -419,33 +421,33 @@ journalctl _COMM=sudo --since today
 journalctl -u sshd -p warning -o short-iso
 ```
 
-**แบบฝึกหัด**
-- ให้ helpdesk รัน systemctl restart chronyd ได้คำสั่งเดียว แล้วพิสูจน์ว่า restart sshd ไม่ได้
+**Exercises**
+- Let helpdesk run only systemctl restart chronyd, then prove it cannot restart sshd
 
-**เกณฑ์ผ่าน**
-- [ ] visudo -c ผ่าน
-- [ ] helpdesk ทำได้เฉพาะคำสั่งที่อนุญาต และมี log ทุกครั้ง
+**Pass criteria**
+- [ ] visudo -c passes
+- [ ] helpdesk can run only the allowed command, and every use is logged
 
-**หลักฐาน:** ไฟล์ sudoers.d และบรรทัด log ที่พิสูจน์
+**Evidence:** The sudoers.d file and the log lines that prove it
 
-อ่านเพิ่ม: บทที่ 5 Command Line ที่ SOC ต้องใช้ทุกวัน
+Further reading: Chapter 5 The Command Line a SOC Uses Every Day
 
-### วันที่ 13 · บทที่ 5 — grep/awk, rsync หลักฐาน, shutdown และ I/O redirect (Lab 9.11–9.15)
+### Day 13 · Chapter 5 — grep/awk, collecting evidence with rsync, shutdown and I/O redirects (Lab 9.11–9.15)
 
-**เป้าหมาย:** สรุป log ด้วย pipeline และเก็บหลักฐานโดยรักษา metadata
+**Goal:** Summarize logs with a pipeline and collect evidence while preserving metadata
 
-**ทฤษฎี**
-- stdin/stdout/stderr และ >, >>, 2>&1, |
-- rsync -a รักษาเวลา, สิทธิ์ และเจ้าของ (สำคัญกับหลักฐาน)
-- hash (sha256sum) ยืนยันว่าหลักฐานไม่เปลี่ยน
+**Theory**
+- stdin/stdout/stderr and >, >>, 2>&1, |
+- rsync -a preserves times, permissions and ownership (important for evidence)
+- A hash (sha256sum) proves the evidence has not changed
 
-**ขั้นตอนปฏิบัติ**
-1. นับ login ที่ล้มเหลวด้วย grep และ awk
-2. เก็บ /var/log เป็นสำเนาหลักฐานใน /srv/evidence ด้วย rsync
-3. ทำ hash ของสำเนา แล้วตรวจซ้ำภายหลัง (ไฟล์ต้นทางที่ยังถูกเขียนอยู่จะ hash ไม่ตรง จึงต้อง hash ที่สำเนา)
-4. ตั้ง shutdown ล่วงหน้าแล้วยกเลิก
+**Steps**
+1. Count failed logins with grep and awk
+2. Copy /var/log as evidence into /srv/evidence with rsync
+3. Hash the copy and verify it again later (source files that are still being written will not match, so hash the copy)
+4. Schedule a shutdown and then cancel it
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo grep "Failed password" /var/log/secure | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn
 E=/srv/evidence/l01-$(date +%F); sudo mkdir -p $E && sudo rsync -aHAX --info=stats1 /var/log/ $E/
@@ -454,68 +456,68 @@ cd $E && sudo sha256sum --quiet -c /srv/evidence/l01.sha256 && echo INTACT
 sudo shutdown -r +30 && sudo shutdown -c
 ```
 
-**แบบฝึกหัด**
-- เขียน one-liner ที่แสดง 5 user ที่ใช้ sudo บ่อยที่สุดวันนี้
+**Exercises**
+- Write a one-liner that shows the 5 users who used sudo most today
 
-**เกณฑ์ผ่าน**
-- [ ] sha256sum -c ของสำเนาขึ้น INTACT
-- [ ] อธิบายได้ว่าทำไมไม่ใช้ cp ธรรมดา
+**Pass criteria**
+- [ ] sha256sum -c of the copy prints INTACT
+- [ ] You can explain why plain cp is not used
 
-**หลักฐาน:** ผล sha256sum -c และ one-liner
+**Evidence:** sha256sum -c output and the one-liner
 
-อ่านเพิ่ม: บทที่ 5 Command Line ที่ SOC ต้องใช้ทุกวัน
+Further reading: Chapter 5 The Command Line a SOC Uses Every Day
 
-### วันที่ 14 · บทที่ 6 — passwd, shadow และสร้างผู้ใช้หลายคน (Lab 10.1–10.4)
+### Day 14 · Chapter 6 — passwd, shadow and creating many users (Lab 10.1–10.4)
 
-**เป้าหมาย:** อ่าน /etc/passwd, /etc/shadow ได้ และสร้างผู้ใช้จาก CSV ด้วย script
+**Goal:** Read /etc/passwd and /etc/shadow, and create users from a CSV with a script
 
-**ทฤษฎี**
-- 7 ช่องของ /etc/passwd และ 9 ช่องของ /etc/shadow
-- Rocky 10 ใช้ hash แบบ yescrypt ($y$) และ root ถูกล็อกเป็นค่าเริ่มต้น
-- UID < 1000 คือบัญชีระบบ
+**Theory**
+- The 7 fields of /etc/passwd and the 9 fields of /etc/shadow
+- Rocky 10 uses yescrypt hashes ($y$) and locks root by default
+- UID < 1000 means a system account
 
-**ขั้นตอนปฏิบัติ**
-1. อ่านโครงสร้างไฟล์ด้วย getent
-2. เขียน script อ่าน users.csv แล้ว useradd
-3. ตั้งรหัสผ่านเริ่มต้นและบังคับเปลี่ยนตอน login แรก
+**Steps**
+1. Read the file structure with getent
+2. Write a script that reads users.csv and runs useradd
+3. Set an initial password and force a change at first login
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 getent passwd aod; grep ^ENCRYPT_METHOD /etc/login.defs
 sudo useradd -m -c "Analyst 01" -s /bin/bash somchai
 sudo passwd somchai && sudo chage -d 0 somchai
-sudo getent shadow somchai | cut -d: -f2 | cut -c1-4   # แสดงเฉพาะต้น hash
+sudo getent shadow somchai | cut -d: -f2 | cut -c1-4   # show only the start of the hash
 sudo awk -F: '$3>=1000 && $3<60000 {print $1}' /etc/passwd
 ```
 
-**แบบฝึกหัด**
-- ปรับ script ให้ข้ามผู้ใช้ที่มีอยู่แล้ว และรันซ้ำได้โดยไม่ error
-- เทียบต้น hash ของ aod (ตั้งผ่าน cloud-init ของ Proxmox) กับ somchai แล้วอธิบายว่าทำไมอาจต่างกัน
+**Exercises**
+- Make the script skip users that already exist so it can be rerun without errors
+- Compare the start of the hash for aod (set through Proxmox cloud-init) with somchai and explain why they may differ
 
-**เกณฑ์ผ่าน**
-- [ ] hash ของ somchai ขึ้นต้นด้วย $y$ (yescrypt)
-- [ ] script รันซ้ำแล้วไม่สร้างซ้ำ
+**Pass criteria**
+- [ ] The hash for somchai starts with $y$ (yescrypt)
+- [ ] Rerunning the script does not create duplicates
 
-**หลักฐาน:** script และผลการรัน 2 ครั้ง
+**Evidence:** The script and the output of two runs
 
-อ่านเพิ่ม: บทที่ 6 ผู้ใช้ กลุ่ม และนโยบายรหัสผ่าน
+Further reading: Chapter 6 Users, Groups and Password Policy
 
-### วันที่ 15 · บทที่ 6 — นโยบายรหัสผ่าน: aging, history, ความซับซ้อน, faillock
+### Day 15 · Chapter 6 — Password policy: aging, history, complexity, faillock
 
-**เป้าหมาย:** บังคับนโยบายรหัสผ่านด้วย PAM ผ่าน authselect
+**Goal:** Enforce the password policy with PAM through authselect
 
-**ทฤษฎี**
-- chage กำหนดอายุรหัสผ่าน (-M, -m, -W)
-- pwquality.conf กำหนดความยาวและความซับซ้อน
-- authselect feature with-pwhistory และ with-faillock แทนการแก้ไฟล์ PAM เอง
+**Theory**
+- chage sets password age (-M, -m, -W)
+- pwquality.conf sets length and complexity
+- The authselect features with-pwhistory and with-faillock replace hand-editing PAM files
 
-**ขั้นตอนปฏิบัติ**
-1. ตั้งอายุรหัสผ่านให้ผู้ใช้ทดสอบ
-2. ตั้ง minlen = 12 ใน pwquality.conf
-3. เปิด password history และ faillock แล้วตั้ง deny = 5 ใน /etc/security/faillock.conf
-4. ทดสอบใส่รหัสผิด 5 ครั้งแล้วดูการล็อก
+**Steps**
+1. Set password aging for the test user
+2. Set minlen = 12 in pwquality.conf
+3. Enable password history and faillock, then set deny = 5 in /etc/security/faillock.conf
+4. Enter a wrong password 5 times and watch the account lock
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo chage -M 90 -m 1 -W 7 somchai && sudo chage -l somchai
 sudo authselect enable-feature with-pwhistory
@@ -523,68 +525,68 @@ sudo authselect enable-feature with-faillock
 sudo faillock --user somchai
 ```
 
-**แบบฝึกหัด**
-- พิสูจน์ว่าตั้งรหัสผ่านเดิมซ้ำไม่ได้ (remember = 5 ใน /etc/security/pwhistory.conf)
+**Exercises**
+- Prove that an old password cannot be reused (remember = 5 in /etc/security/pwhistory.conf)
 
-**เกณฑ์ผ่าน**
-- [ ] authselect current แสดง feature ทั้งสอง
-- [ ] faillock แสดงการล็อกหลังใส่ผิดครบ
-- [ ] faillock --reset ปลดได้
+**Pass criteria**
+- [ ] authselect current shows both features
+- [ ] faillock shows the lock after the failed attempts
+- [ ] faillock --reset unlocks it
 
-**หลักฐาน:** ผล authselect current และ faillock
+**Evidence:** Output of authselect current and faillock
 
-อ่านเพิ่ม: บทที่ 6 ผู้ใช้ กลุ่ม และนโยบายรหัสผ่าน
+Further reading: Chapter 6 Users, Groups and Password Policy
 
-### วันที่ 16 · บทที่ 6 — สิทธิ์ super user, ล็อก/ปิดบัญชี และกลุ่ม (Lab 10.9–10.13)
+### Day 16 · Chapter 6 — Super user rights, locking/disabling accounts and groups (Lab 10.9–10.13)
 
-**เป้าหมาย:** ทำ offboarding อย่างถูกวิธี และตรวจจุดยกระดับสิทธิ์ผ่านกลุ่ม
+**Goal:** Do offboarding correctly and check for privilege escalation through groups
 
-**ทฤษฎี**
-- กลุ่ม wheel = sudo เต็ม, NOPASSWD ที่ cloud-init ให้ไว้เป็นความเสี่ยง
-- ล็อกรหัสผ่านอย่างเดียวไม่พอถ้ามี SSH key ต้องปิด shell หรือหมดอายุบัญชีด้วย
-- ไม่ลบบัญชีทันที เพื่อคงเจ้าของไฟล์และหลักฐาน
+**Theory**
+- The wheel group = full sudo; the NOPASSWD that cloud-init grants is a risk
+- Locking only the password is not enough if there is an SSH key; also disable the shell or expire the account
+- Do not delete the account right away, so file ownership and evidence are kept
 
-**ขั้นตอนปฏิบัติ**
-1. ตรวจไฟล์ sudoers ที่มี NOPASSWD
-2. ล็อกบัญชีด้วย 3 วิธีแล้วเทียบผล (10.10)
-3. สร้างกลุ่ม soc-analyst (GID 5000) แล้วเพิ่มสมาชิก
-4. ทดสอบ login ของบัญชีที่ปิดต้องถูกปฏิเสธ
+**Steps**
+1. Check sudoers files for NOPASSWD
+2. Lock an account in 3 ways and compare the results (10.10)
+3. Create the soc-analyst group (GID 5000) and add members
+4. Test that logging in to the disabled account is refused
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo grep -r NOPASSWD /etc/sudoers /etc/sudoers.d/
-sudo useradd -m exstaff && sudo usermod -L -e 1 -s /sbin/nologin exstaff   # บัญชีทดสอบ ลบด้วย userdel -r หลังจบ
+sudo useradd -m exstaff && sudo usermod -L -e 1 -s /sbin/nologin exstaff   # test account; remove with userdel -r when done
 sudo passwd -S exstaff; sudo chage -l exstaff
 sudo groupadd -g 5000 soc-analyst && sudo usermod -aG soc-analyst somchai && id somchai
 ```
 
-**แบบฝึกหัด**
-- เขียน checklist offboarding 6 ข้อ (รวมถอด authorized_keys และ cron ของผู้ใช้) แล้วทำกับ exstaff
+**Exercises**
+- Write a 6-item offboarding checklist (including removing the user's authorized_keys and cron) and apply it to exstaff
 
-**เกณฑ์ผ่าน**
-- [ ] ssh ด้วย exstaff ถูกปฏิเสธทั้ง password และ key
-- [ ] id somchai แสดงกลุ่ม soc
+**Pass criteria**
+- [ ] ssh as exstaff is refused for both password and key
+- [ ] id somchai shows the soc group
 
-**หลักฐาน:** checklist + ผลการทดสอบ login; snapshot ch06-users
+**Evidence:** Checklist + login test results; snapshot ch06-users
 
-อ่านเพิ่ม: บทที่ 6 ผู้ใช้ กลุ่ม และนโยบายรหัสผ่าน
+Further reading: Chapter 6 Users, Groups and Password Policy
 
-### วันที่ 17 · บทที่ 7 — ติดตั้ง FreeIPA server (Lab 11)
+### Day 17 · Chapter 7 — Install the FreeIPA server (Lab 11)
 
-**เป้าหมาย:** ipa-01 เป็น IdM, DNS และ CA ของ lab.internal
+**Goal:** ipa-01 is the IdM, DNS and CA for lab.internal
 
-**ทฤษฎี**
+**Theory**
 - FreeIPA = LDAP (389-ds) + Kerberos + DNS (BIND) + CA (Dogtag) + SSSD
 - Realm LAB.INTERNAL, domain lab.internal
-- บน EL10 ไม่มี module stream idm ติดตั้ง package ตรงได้
+- EL10 has no idm module stream; install the packages directly
 
-**ขั้นตอนปฏิบัติ**
-1. ตรวจ FQDN และเวลาของ ipa-01 (จากบทที่ 2–3)
-2. ติดตั้ง package และรัน ipa-server-install (--no-ntp เพื่อคง pve-01 เป็น NTP ตามบทที่ 3)
-3. เปิด firewall service ที่จำเป็น
-4. ทดสอบ kinit admin
+**Steps**
+1. Check the FQDN and time on ipa-01 (from chapters 2–3)
+2. Install the packages and run ipa-server-install (--no-ntp keeps pve-01 as the NTP source, per chapter 3)
+3. Open the required firewall services
+4. Test kinit admin
 
-**คำสั่งหลัก** (ipa-01 · aod)
+**Key commands** (ipa-01 · aod)
 ```bash
 sudo dnf install -y ipa-server ipa-server-dns
 sudo ipa-server-install --setup-dns --auto-forwarders --auto-reverse --no-ntp --realm LAB.INTERNAL --domain lab.internal
@@ -592,33 +594,33 @@ sudo firewall-cmd --permanent --add-service={freeipa-4,dns} && sudo firewall-cmd
 kinit admin && ipa user-find --sizelimit=5
 ```
 
-**แบบฝึกหัด**
-- ใช้ dig ถาม SRV record _ldap._tcp.lab.internal จาก ipa-01 แล้วอธิบายว่า client ใช้ record นี้ทำอะไร
+**Exercises**
+- Use dig on ipa-01 to query the SRV record _ldap._tcp.lab.internal and explain what clients use it for
 
-**เกณฑ์ผ่าน**
-- [ ] ipactl status ทุก service RUNNING
-- [ ] kinit admin สำเร็จ
+**Pass criteria**
+- [ ] ipactl status shows every service RUNNING
+- [ ] kinit admin succeeds
 
-**หลักฐาน:** ผล ipactl status และ dig SRV
+**Evidence:** Output of ipactl status and dig SRV
 
-อ่านเพิ่ม: บทที่ 7 Centralized Identity ด้วย FreeIPA
+Further reading: Chapter 7 Centralized Identity with FreeIPA
 
-### วันที่ 18 · บทที่ 7 — Join domain และ password policy
+### Day 18 · Chapter 7 — Joining the domain and password policy
 
-**เป้าหมาย:** ทุกเครื่องเป็น client ของ FreeIPA และใช้ ipa-01 เป็น DNS
+**Goal:** Every machine is a FreeIPA client and uses ipa-01 as DNS
 
-**ทฤษฎี**
-- ipa-client-install ตั้ง SSSD, Kerberos และ DNS ให้
-- mkhomedir สร้าง home ตอน login แรก
-- password policy ของ IPA ใช้แทนค่าในเครื่อง
+**Theory**
+- ipa-client-install sets up SSSD, Kerberos and DNS
+- mkhomedir creates the home directory at first login
+- The IPA password policy replaces the local settings
 
-**ขั้นตอนปฏิบัติ**
-1. ชี้ DNS ของทุกเครื่องไป 192.168.10.10
-2. รัน ipa-client-install ทุกเครื่อง
-3. สร้างผู้ใช้ IPA และตั้ง password policy
-4. login ด้วยผู้ใช้ IPA
+**Steps**
+1. Point the DNS of every machine to 192.168.10.10
+2. Run ipa-client-install on every machine
+3. Create IPA users and set the password policy
+4. Log in as an IPA user
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo nmcli connection modify lab ipv4.dns 192.168.10.10 && sudo nmcli connection up lab
 sudo ipa-client-install --mkhomedir --no-ntp --domain lab.internal --server ipa-01.lab.internal
@@ -626,34 +628,34 @@ kinit admin && ipa pwpolicy-mod --minlength=12 --history=5 --maxfail=5 --lockout
 id somsak@lab.internal
 ```
 
-**แบบฝึกหัด**
-- อธิบายความต่างระหว่าง faillock (บทที่ 6) กับ --maxfail ของ IPA และบอกว่าตัวไหนมีผลกับผู้ใช้ IPA
+**Exercises**
+- Explain the difference between faillock (chapter 6) and IPA --maxfail, and say which one applies to IPA users
 
-**เกณฑ์ผ่าน**
-- [ ] getent passwd <ผู้ใช้ IPA> ได้ผลบนทุกเครื่อง
-- [ ] login ssh ด้วยผู้ใช้ IPA สำเร็จ
+**Pass criteria**
+- [ ] getent passwd <IPA user> works on every machine
+- [ ] ssh login as an IPA user succeeds
 
-**หลักฐาน:** ผล ipa host-find และ getent
+**Evidence:** Output of ipa host-find and getent
 
-อ่านเพิ่ม: บทที่ 7 Centralized Identity ด้วย FreeIPA
+Further reading: Chapter 7 Centralized Identity with FreeIPA
 
-### วันที่ 19 · บทที่ 7 — HBAC, sudo rule, SSH key รวมศูนย์ และ LDAP
+### Day 19 · Chapter 7 — HBAC, sudo rules, centralized SSH keys and LDAP
 
-**เป้าหมาย:** ควบคุมว่าใคร login เครื่องไหนได้ และใช้ sudo อะไรได้ จากที่เดียว
+**Goal:** Control from one place who can log in to which machine and what they can run with sudo
 
-**ทฤษฎี**
-- HBAC rule = ใคร + เครื่องไหน + service ไหน
-- ต้องสร้าง rule ที่จำเป็นก่อนปิด allow_all มิฉะนั้นจะ lock ตัวเองออก
-- sudo rule และ SSH public key เก็บใน LDAP
+**Theory**
+- HBAC rule = who + which host + which service
+- Create the rules you need before disabling allow_all, or you will lock yourself out
+- sudo rules and SSH public keys are stored in LDAP
 
-**ขั้นตอนปฏิบัติ**
-1. สร้าง host group และ HBAC rule สำหรับทีม SOC
-2. ทดสอบด้วย ipa hbactest แล้วจึงปิด allow_all
-3. สร้าง sudo rule web_nginx_ops ให้กลุ่ม sysadmins
-4. เพิ่ม SSH key ให้ผู้ใช้ และค้นด้วย ldapsearch
+**Steps**
+1. Create a host group and an HBAC rule for the SOC team
+2. Test with ipa hbactest, then disable allow_all
+3. Create the sudo rule web_nginx_ops for the sysadmins group
+4. Add an SSH key to a user and look it up with ldapsearch
 5. snapshot ch07-ipa
 
-**คำสั่งหลัก** (ipa-01 · aod)
+**Key commands** (ipa-01 · aod)
 ```bash
 ipa hbacrule-add allow_sysadmins_web && ipa hbacrule-add-user allow_sysadmins_web --groups=sysadmins
 ipa hbactest --user=somsak --host=lab-linux-01.lab.internal --service=sshd --rules=allow_sysadmins_web
@@ -662,33 +664,33 @@ ipa sudorule-add web_nginx_ops && ipa sudorule-add-user web_nginx_ops --groups=s
 ldapsearch -Y GSSAPI -b "cn=users,cn=accounts,dc=lab,dc=internal" uid=somsak ipaSshPubKey
 ```
 
-**แบบฝึกหัด**
-- ออกแบบ HBAC 3 rule สำหรับ admin, soc และ dev แล้วพิสูจน์ด้วย hbactest 6 กรณี
+**Exercises**
+- Design 3 HBAC rules for admin, soc and dev, and prove them with 6 hbactest cases
 
-**เกณฑ์ผ่าน**
-- [ ] hbactest คืนค่าตรงกับที่ออกแบบทุกกรณี
-- [ ] aod ยัง login ทุกเครื่องได้หลังปิด allow_all
+**Pass criteria**
+- [ ] hbactest matches your design in every case
+- [ ] aod can still log in to every machine after allow_all is disabled
 
-**หลักฐาน:** ตาราง hbactest 6 กรณี
+**Evidence:** Table of the 6 hbactest cases
 
-อ่านเพิ่ม: บทที่ 7 Centralized Identity ด้วย FreeIPA
+Further reading: Chapter 7 Centralized Identity with FreeIPA
 
-### วันที่ 20 · บทที่ 8 — SSH key authentication และปิด password (Lab 12)
+### Day 20 · Chapter 8 — SSH key authentication and disabling passwords (Lab 12)
 
-**เป้าหมาย:** SSH ใช้ key อย่างเดียว ปิดทั้ง password และ keyboard-interactive โดยไม่ lock ตัวเองออก
+**Goal:** SSH accepts keys only, with password and keyboard-interactive both off, without locking yourself out
 
-**ทฤษฎี**
-- กลไก public key: server ท้าให้ client พิสูจน์ด้วย private key
-- ed25519 สั้น เร็ว และปลอดภัยกว่า RSA ขนาดเดิม
-- 04-ipa.conf เปิด keyboard-interactive ไฟล์ของเราจึงต้องชื่อ 01- เพื่อให้ถูกอ่านก่อน
+**Theory**
+- The public key mechanism: the server challenges the client to prove it holds the private key
+- ed25519 is shorter, faster and stronger than RSA of comparable size
+- 04-ipa.conf enables keyboard-interactive, so our file must be named 01- to be read first
 
-**ขั้นตอนปฏิบัติ**
-1. สร้าง key ใหม่ id_ed25519_lab บน Windows และวางบน lab-linux-01
-2. ทดสอบด้วย IdentitiesOnly และเทียบ fingerprint ใน /var/log/secure
-3. เพิ่ม Host lab01 ใน ~/.ssh/config
-4. เขียน 01-soclab-auth.conf แล้ว sshd -t และ reload
+**Steps**
+1. Create a new key id_ed25519_lab on Windows and install it on lab-linux-01
+2. Test with IdentitiesOnly and match the fingerprint in /var/log/secure
+3. Add Host lab01 to ~/.ssh/config
+4. Write 01-soclab-auth.conf, then sshd -t and reload
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo sshd -T | grep -E "^(passwordauthentication|kbdinteractiveauthentication)"
 sudo grep -H -i -E "challengeresponse|kbdinteractive" /etc/ssh/sshd_config.d/*.conf
@@ -697,34 +699,34 @@ sudo sshd -t && sudo systemctl reload sshd
 sudo grep "Accepted publickey for aod" /var/log/secure | tail -2
 ```
 
-**แบบฝึกหัด**
-- จาก Windows รัน ssh -o PubkeyAuthentication=no -o GSSAPIAuthentication=no lab-linux-01 รายการวิธีใน Permission denied ต้องไม่มี password หรือ keyboard-interactive
+**Exercises**
+- From Windows run ssh -o PubkeyAuthentication=no -o GSSAPIAuthentication=no lab-linux-01; the methods listed in Permission denied must not include password or keyboard-interactive
 
-**เกณฑ์ผ่าน**
-- [ ] sshd -T แสดง passwordauthentication no และ kbdinteractiveauthentication no
-- [ ] ssh lab01 เข้าได้ด้วย key ใหม่
+**Pass criteria**
+- [ ] sshd -T shows passwordauthentication no and kbdinteractiveauthentication no
+- [ ] ssh lab01 works with the new key
 
-**หลักฐาน:** ผล sshd -T และข้อความ Permission denied
+**Evidence:** Output of sshd -T and the Permission denied message
 
-อ่านเพิ่ม: บทที่ 8 SSH Hardening: Key Authentication และ Session Limit
+Further reading: Chapter 8 SSH Hardening: Key Authentication and Session Limits
 
-### วันที่ 21 · บทที่ 8 — จำกัด session และ connection (Lab 13)
+### Day 21 · Chapter 8 — Limiting sessions and connections (Lab 13)
 
-**เป้าหมาย:** จำกัดการลองยืนยันตัวตน, connection ที่รอ, login พร้อมกัน, กลุ่มที่ใช้ SSH และ session ที่ว่าง
+**Goal:** Limit authentication attempts, pending connections, concurrent logins, the groups allowed to use SSH, and idle sessions
 
-**ทฤษฎี**
-- MaxSessions = channel ต่อ connection, MaxStartups = connection ที่รอยืนยันตัวตน
-- ClientAlive ตัดเฉพาะ client ที่หลุด ส่วน idle ต้องใช้ ChannelTimeout session:*= หรือ TMOUT
-- pam_limits maxlogins จำกัดจำนวน login ต่อผู้ใช้
+**Theory**
+- MaxSessions = channels per connection; MaxStartups = connections waiting to authenticate
+- ClientAlive only drops clients that have gone away; idle sessions need ChannelTimeout session:*= or TMOUT
+- pam_limits maxlogins limits the number of logins per user
 
-**ขั้นตอนปฏิบัติ**
-1. ยืนยันว่า aod อยู่ใน wheel ก่อนใส่ AllowGroups
-2. เขียน 20-session-limit.conf และ limits.d/90-maxlogins.conf
-3. ตั้ง TMOUT ใน /etc/profile.d
-4. ทดสอบ MaxAuthTries, LoginGraceTime, AllowGroups และ maxlogins แล้วอ่าน log
+**Steps**
+1. Confirm aod is in wheel before adding AllowGroups
+2. Write 20-session-limit.conf and limits.d/90-maxlogins.conf
+3. Set TMOUT in /etc/profile.d
+4. Test MaxAuthTries, LoginGraceTime, AllowGroups and maxlogins, then read the logs
 5. snapshot ch08-ssh
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 id aod | grep -o wheel
 sudo sshd -T | grep -Ei "^(maxauthtries|logingracetime|maxstartups|channeltimeout|allowgroups|persourcepenalties)"
@@ -732,36 +734,36 @@ sudo journalctl -u sshd --since "15 min ago" | grep -E "maximum authentication|T
 sudo journalctl --since "15 min ago" | grep "Too many logins"
 ```
 
-**แบบฝึกหัด**
-- คำนวณว่า client ที่หลุดเงียบจะถูกตัดภายในกี่นาทีจาก ClientAliveInterval × ClientAliveCountMax แล้วพิสูจน์ด้วยการลดค่าชั่วคราว
+**Exercises**
+- Work out how many minutes it takes to drop a silently disconnected client from ClientAliveInterval × ClientAliveCountMax, then prove it by lowering the values temporarily
 
-**เกณฑ์ผ่าน**
-- [ ] ch08-check.sh ผ่านทุกข้อ
-- [ ] อธิบายตัวเลข 3 ตัวของ MaxStartups ได้
+**Pass criteria**
+- [ ] ch08-check.sh passes every item
+- [ ] You can explain the three numbers of MaxStartups
 
-**หลักฐาน:** บรรทัด log ของแต่ละ limit + ผล ch08-check.sh
+**Evidence:** Log lines for each limit + ch08-check.sh output
 
-อ่านเพิ่ม: บทที่ 8 SSH Hardening: Key Authentication และ Session Limit
+Further reading: Chapter 8 SSH Hardening: Key Authentication and Session Limits
 
-## ภาค 3 ป้องกันภัยเบื้องต้น
+## Part 3 Basic threat defense
 
-### วันที่ 22 · บทที่ 9 — CrowdSec: ติดตั้ง, scenario sshd และ bouncer (Lab 14)
+### Day 22 · Chapter 9 — CrowdSec: install, the sshd scenario and the bouncer (Lab 14)
 
-**เป้าหมาย:** IP ที่เดารหัสผ่าน SSH ซ้ำถูก ban อัตโนมัติที่ nftables โดยเครื่อง admin ไม่ถูก ban
+**Goal:** An IP that keeps guessing SSH passwords is banned automatically in nftables, while the admin machine is never banned
 
-**ทฤษฎี**
-- CrowdSec แยก Security Engine (ตรวจจับ), LAPI (เก็บ decision) และ bouncer (บังคับใช้)
-- scenario ssh-bf เป็น leaky bucket: จุ 5 รั่ว 1 ทุก 10 วินาที
-- parser crowdsecurity/whitelists ยกเว้น IP ภายในทั้งหมด จึงต้อง whitelist admin แล้วถอดออกใน lab
+**Theory**
+- CrowdSec splits into the Security Engine (detection), LAPI (stores decisions) and the bouncer (enforcement)
+- The ssh-bf scenario is a leaky bucket: capacity 5, leaks 1 every 10 seconds
+- The crowdsecurity/whitelists parser exempts every internal IP, so whitelist the admin and remove that parser in the lab
 
-**ขั้นตอนปฏิบัติ**
-1. เปิด password ชั่วคราวด้วย 00-lab-password.conf (ยกเว้น lab-linux-02 จาก PerSourcePenalties)
-2. ติดตั้ง crowdsec และ firewall bouncer แบบ nftables (อ่าน script ของ repository ก่อนรัน)
-3. whitelist 192.168.10.100 แล้วถอด crowdsecurity/whitelists
-4. จาก lab-linux-02 ทดสอบ login ผิดด้วยผู้ใช้ที่ไม่มีจริง
-5. ดู alert, decision และ nftables แล้วลบ decision
+**Steps**
+1. Temporarily enable passwords with 00-lab-password.conf (exempting lab-linux-02 from PerSourcePenalties)
+2. Install crowdsec and the nftables firewall bouncer (read the repository script before running it)
+3. Whitelist 192.168.10.100 and remove crowdsecurity/whitelists
+4. From lab-linux-02, try failed logins with a user that does not exist
+5. Look at the alerts, decisions and nftables, then delete the decision
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 curl -fsSL https://install.crowdsec.net -o crowdsec-repo.sh && less crowdsec-repo.sh
 sudo sh crowdsec-repo.sh && sudo dnf install -y crowdsec crowdsec-firewall-bouncer-nftables
@@ -771,34 +773,34 @@ sudo cscli explain --file /var/log/secure --type syslog | tail -30
 sudo cscli decisions delete --ip 192.168.10.42
 ```
 
-**แบบฝึกหัด**
-- ทดสอบ bouncer โดยไม่ต้อง login ผิด: cscli decisions add --ip 192.168.10.42 --duration 5m แล้ว ping จาก lab-linux-02
+**Exercises**
+- Test the bouncer without failed logins: cscli decisions add --ip 192.168.10.42 --duration 5m, then ping from lab-linux-02
 
-**เกณฑ์ผ่าน**
-- [ ] หลัง login ผิดตามเกณฑ์ lab-linux-02 ต่อ port 22 ไม่ได้
-- [ ] ลบ decision แล้วกลับมาต่อได้
+**Pass criteria**
+- [ ] After the threshold of failed logins, lab-linux-02 cannot connect to port 22
+- [ ] After deleting the decision it can connect again
 
-**หลักฐาน:** ผล cscli alerts list และ decisions list
+**Evidence:** Output of cscli alerts list and decisions list
 
-อ่านเพิ่ม: บทที่ 9 CrowdSec: Ban Brute-force และบล็อก Tor/Proxy
+Further reading: Chapter 9 CrowdSec: Banning Brute-force and Blocking Tor/Proxies
 
-### วันที่ 23 · บทที่ 9 — บล็อก Tor exit node และ anonymous proxy (Lab 15)
+### Day 23 · Chapter 9 — Blocking Tor exit nodes and anonymous proxies (Lab 15)
 
-**เป้าหมาย:** IP ของ Tor exit node ถูกบล็อกล่วงหน้าและอัปเดตเองทุก 12 ชั่วโมง
+**Goal:** Tor exit node IPs are blocked in advance and updated automatically every 12 hours
 
-**ทฤษฎี**
-- reactive (ssh-bf) ต่างจาก proactive (blocklist ตามชื่อเสียงของ IP)
-- decision มีอายุ 13 ชม. แต่นำเข้าใหม่ทุก 12 ชม. IP ที่ยังอยู่ใน list จึงถูกต่ออายุ
-- list รวม VPN อาจบล็อกผู้ใช้จริง ต้องเริ่มด้วยการเก็บ log
+**Theory**
+- Reactive (ssh-bf) vs proactive (blocklists based on IP reputation)
+- Decisions last 13 hours but are re-imported every 12 hours, so IPs still on the list are renewed
+- Lists that include VPNs may block real users; start by collecting logs
 
-**ขั้นตอนปฏิบัติ**
-1. นำเข้า Tor exit list ด้วย cscli decisions import
-2. ติดตั้ง script, service และ timer
-3. ทดสอบด้วยการนำเข้า IP ของ lab-linux-02 อายุ 5 นาที
-4. ลบ 00-lab-password.conf และปลด ban lab-linux-02
+**Steps**
+1. Import the Tor exit list with cscli decisions import
+2. Install the script, service and timer
+3. Test by importing the IP of lab-linux-02 for 5 minutes
+4. Remove 00-lab-password.conf and unban lab-linux-02
 5. snapshot ch09-crowdsec
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo systemctl start crowdsec-tor-import.service
 systemctl list-timers crowdsec-tor-import.timer
@@ -807,66 +809,66 @@ sudo cscli metrics show decisions
 sudo rm /etc/ssh/sshd_config.d/00-lab-password.conf && sudo systemctl reload sshd
 ```
 
-**แบบฝึกหัด**
-- เขียน 1 ย่อหน้า: องค์กรประเภทใดไม่ควรบล็อก Tor ทั้งหมด และควรใช้มาตรการอะไรแทน
+**Exercises**
+- Write one paragraph: what kind of organization should not block all of Tor, and what it should do instead
 
-**เกณฑ์ผ่าน**
-- [ ] มี decision จาก origin cscli-import และ timer มีเวลารันครั้งถัดไป
-- [ ] ch09-check.sh ผ่านทุกข้อ
+**Pass criteria**
+- [ ] There are decisions from origin cscli-import, and the timer shows its next run time
+- [ ] ch09-check.sh passes every item
 
-**หลักฐาน:** ผล list-timers และ metrics show decisions
+**Evidence:** Output of list-timers and metrics show decisions
 
-อ่านเพิ่ม: บทที่ 9 CrowdSec: Ban Brute-force และบล็อก Tor/Proxy
+Further reading: Chapter 9 CrowdSec: Banning Brute-force and Blocking Tor/Proxies
 
-### ◆ วันที่ 24 — Checkpoint 2: ภาค 2–3
+### ◆ Day 24 — Checkpoint 2: Parts 2–3
 
-**เป้าหมาย:** พิสูจน์ identity, SSH และการป้องกันเบื้องต้นทำงานร่วมกัน
+**Goal:** Prove that identity, SSH and basic defenses work together
 
-**ทฤษฎี**
-- ทบทวนคำถามท้ายบทที่ 5–9
+**Theory**
+- Review the end-of-chapter questions for chapters 5–9
 
-**ขั้นตอนปฏิบัติ**
-1. Scenario: พนักงาน intern ลาออกวันนี้ ให้ offboard ทั้งใน IPA และเครื่อง local
-2. จาก lab-linux-02 ทดสอบ login ด้วยบัญชีนั้น ต้องถูกปฏิเสธ และถ้าผิดซ้ำต้องถูก ban
-3. เขียนรายงาน 1 หน้า: ทำอะไร หลักฐานคืออะไร ย้อนกลับอย่างไร
+**Steps**
+1. Scenario: an intern leaves today; offboard them both in IPA and on the local machines
+2. From lab-linux-02, try logging in with that account: it must be refused, and repeated failures must get banned
+3. Write a one-page report: what you did, what the evidence is, how to undo it
 
-**คำสั่งหลัก** (ipa-01 · aod)
+**Key commands** (ipa-01 · aod)
 ```bash
-ipa user-disable intern   # บัญชีที่ผู้สอนสร้างไว้สำหรับ scenario
+ipa user-disable intern   # account the instructor created for the scenario
 ipa user-show intern --all | grep -i "account disabled"
 sudo cscli decisions list
 ```
 
-**แบบฝึกหัด**
-- สอบย่อย 10 ข้อจากคำถามทบทวนบทที่ 5–9
+**Exercises**
+- A 10-question quiz from the review questions of chapters 5–9
 
-**เกณฑ์ผ่าน**
-- [ ] บัญชีถูกปิดครบทุกช่องทาง (password, key, sudo)
-- [ ] รายงานมี timeline พร้อมเวลา
-- [ ] Rubric ระดับ 3 ขึ้นไปทุกด้าน
+**Pass criteria**
+- [ ] The account is disabled on every channel (password, key, sudo)
+- [ ] The report has a timeline with times
+- [ ] Rubric level 3 or above in every area
 
-**หลักฐาน:** รายงาน 1 หน้า + log ประกอบ
+**Evidence:** One-page report + supporting logs
 
 
 
-## ภาค 4 SIEM ด้วย Graylog
+## Part 4 SIEM with Graylog
 
-### วันที่ 25 · บทที่ 10 — Graylog 7.1 ด้วย Docker Compose
+### Day 25 · Chapter 10 — Graylog 7.1 with Docker Compose
 
-**เป้าหมาย:** Graylog, MongoDB และ Data Node รันบน graylog-01
+**Goal:** Graylog, MongoDB and the Data Node run on graylog-01
 
-**ทฤษฎี**
-- ส่วนประกอบ: Graylog server, MongoDB (config), Data Node / OpenSearch (เก็บ log)
-- Secret (password_secret, root password hash) อยู่ใน .env ที่สิทธิ์ 600 และไม่ commit
-- Docker CE บน Rocky 10: ถ้า dockerd ไม่ขึ้นเพราะ addrtype ให้ติดตั้ง kernel-modules-extra
+**Theory**
+- Components: Graylog server, MongoDB (config), Data Node / OpenSearch (log storage)
+- Secrets (password_secret, root password hash) live in .env with mode 600 and are never committed
+- Docker CE on Rocky 10: if dockerd fails because of addrtype, install kernel-modules-extra
 
-**ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Docker CE และ compose plugin
-2. สร้าง .env ด้วย secret ที่สุ่มขึ้น
-3. sudo docker compose up -d แล้วดู health
-4. login Web UI ผ่าน port ภายใน
+**Steps**
+1. Install Docker CE and the compose plugin
+2. Create .env with randomly generated secrets
+3. sudo docker compose up -d and check health
+4. Log in to the Web UI on the internal port
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
 sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
 sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && sudo systemctl enable --now docker
@@ -874,34 +876,34 @@ umask 077; printf "GRAYLOG_PASSWORD_SECRET=%s\n" "$(openssl rand -hex 48)" > .en
 sudo docker compose up -d && sudo docker compose ps
 ```
 
-**แบบฝึกหัด**
-- อธิบายว่าถ้า MongoDB หาย ข้อมูลอะไรหาย และถ้า Data Node หาย ข้อมูลอะไรหาย
+**Exercises**
+- Explain what data is lost if MongoDB is lost, and what is lost if the Data Node is lost
 
-**เกณฑ์ผ่าน**
-- [ ] docker compose ps ทุก container healthy/running
-- [ ] .env สิทธิ์ 600 และอยู่ใน .gitignore
+**Pass criteria**
+- [ ] docker compose ps shows every container healthy/running
+- [ ] .env has mode 600 and is in .gitignore
 
-**หลักฐาน:** ผล docker compose ps + ls -l .env
+**Evidence:** Output of docker compose ps + ls -l .env
 
-อ่านเพิ่ม: บทที่ 10 ติดตั้ง Graylog และเปิดใช้อย่างปลอดภัย
+Further reading: Chapter 10 Installing Graylog and Exposing It Safely
 
-### วันที่ 26 · บทที่ 10 — Nginx reverse proxy, TLS และ Cloudflare Tunnel (16.16)
+### Day 26 · Chapter 10 — Nginx reverse proxy, TLS and Cloudflare Tunnel (16.16)
 
-**เป้าหมาย:** เข้า Graylog ผ่าน HTTPS และจากภายนอกผ่าน tunnel โดยไม่เปิด port
+**Goal:** Reach Graylog over HTTPS, and from outside through the tunnel without opening a port
 
-**ทฤษฎี**
-- Reverse proxy รับ TLS แทน application และส่งต่อภายใน
-- Cloudflare Tunnel เป็น connection ขาออก จึงไม่ต้องเปิด port ขาเข้าที่ router
-- tunnel token เป็น secret ต้องเก็บนอก repo
+**Theory**
+- The reverse proxy terminates TLS for the application and forwards internally
+- Cloudflare Tunnel is an outbound connection, so no inbound port is opened on the router
+- The tunnel token is a secret and must be kept outside the repo
 
-**ขั้นตอนปฏิบัติ**
-1. สร้าง certificate (จาก FreeIPA CA หรือ self-signed)
-2. เพิ่ม nginx ใน compose และ proxy ไป graylog:9000
-3. เพิ่ม cloudflared ใน network เดียวกัน ชี้ ingress ไป http://nginx:80
-4. reload nginx โดยไม่ดับ service
+**Steps**
+1. Create a certificate (from the FreeIPA CA or self-signed)
+2. Add nginx to compose and proxy to graylog:9000
+3. Add cloudflared to the same network with ingress pointing to http://nginx:80
+4. Reload nginx without taking the service down
 5. snapshot ch10-graylog
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
 sudo docker compose exec nginx nginx -t && sudo docker compose exec nginx nginx -s reload
 sudo docker compose logs cloudflared | grep -i "registered tunnel connection"
@@ -909,33 +911,33 @@ curl -skI https://graylog-01.lab.internal/ | head -3
 sudo ss -tlnp | grep -E ":(80|443|9000)\b"
 ```
 
-**แบบฝึกหัด**
-- ตรวจจากภายนอกว่า port 9000 ของ Graylog ไม่ได้เปิดให้เข้าตรง (เข้าได้ทาง Nginx เท่านั้น)
+**Exercises**
+- Check from outside that Graylog port 9000 is not directly reachable (only through Nginx)
 
-**เกณฑ์ผ่าน**
-- [ ] เปิด public hostname แล้วได้หน้า login ผ่าน HTTPS
-- [ ] nginx -t ผ่านก่อน reload ทุกครั้ง
+**Pass criteria**
+- [ ] The public hostname opens the login page over HTTPS
+- [ ] nginx -t passes before every reload
 
-**หลักฐาน:** ภาพหน้า login + ผล ss -tlnp
+**Evidence:** Screenshot of the login page + ss -tlnp output
 
-อ่านเพิ่ม: บทที่ 10 ติดตั้ง Graylog และเปิดใช้อย่างปลอดภัย
+Further reading: Chapter 10 Installing Graylog and Exposing It Safely
 
-### วันที่ 27 · บทที่ 11 — Inputs, DOCKER-USER และ rsyslog จากทุกเครื่อง (16.18–16.20)
+### Day 27 · Chapter 11 — Inputs, DOCKER-USER and rsyslog from every machine (16.18–16.20)
 
-**เป้าหมาย:** ทุกเครื่องส่ง log เข้า Graylog แบบ TCP พร้อม disk queue และ port รับ log เปิดเฉพาะ lab
+**Goal:** Every machine sends logs to Graylog over TCP with a disk queue, and the log ports are open to the lab only
 
-**ทฤษฎี**
-- TCP + disk queue ทำให้ log ไม่หายเมื่อ Graylog ล่ม UDP ทิ้งเงียบ ๆ
-- port ที่ Docker publish ไม่ผ่าน firewalld ต้องจำกัดด้วย DOCKER-USER
-- SELinux อนุญาต rsyslog เฉพาะ syslogd_port_t จึงต้องเพิ่ม 1514
+**Theory**
+- TCP + a disk queue keeps logs when Graylog is down; UDP drops them silently
+- Ports published by Docker bypass firewalld, so restrict them with DOCKER-USER
+- SELinux only lets rsyslog use syslogd_port_t, so 1514 must be added
 
-**ขั้นตอนปฏิบัติ**
-1. สร้าง input syslog-tcp-1514 และ gelf-http-12201
-2. ติดตั้ง docker-user-lab.service บน graylog-01
-3. semanage port 1514 และเขียน 90-graylog.conf บน client
-4. ทดสอบด้วย logger และทดสอบ queue ด้วยการหยุด Graylog
+**Steps**
+1. Create the inputs syslog-tcp-1514 and gelf-http-12201
+2. Install docker-user-lab.service on graylog-01
+3. semanage port 1514 and write 90-graylog.conf on the clients
+4. Test with logger, and test the queue by stopping Graylog
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo semanage port -a -t syslogd_port_t -p tcp 1514
 sudo rsyslogd -N1 && sudo systemctl restart rsyslog
@@ -943,264 +945,264 @@ logger -p authpriv.notice -t lab-test "hello graylog from $(hostname -s)"
 sudo ss -tnp | grep ':1514'
 ```
 
-**แบบฝึกหัด**
-- หยุด Graylog 2 นาที ส่ง logger 10 ข้อความ แล้วเปิดคืน ตรวจว่าครบ 10
+**Exercises**
+- Stop Graylog for 2 minutes, send 10 logger messages, start it again and check that all 10 arrive
 
-**เกณฑ์ผ่าน**
-- [ ] เห็นข้อความทดสอบจากทุกเครื่องใน Search โดย source เป็น FQDN
-- [ ] ไม่มีข้อความหายในแบบฝึกหัด
+**Pass criteria**
+- [ ] Test messages from every machine show up in Search with the FQDN as source
+- [ ] No messages are lost in the exercise
 
-**หลักฐาน:** ภาพ Search + ผล ch11-check.sh บน client
+**Evidence:** Screenshot of Search + ch11-check.sh output on a client
 
-อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
+Further reading: Chapter 11 Ingesting Logs: Inputs, rsyslog, Streams and Pipelines
 
-### วันที่ 28 · บทที่ 11 — auditd เข้า syslog และ Streams (16.21–16.24)
+### Day 28 · Chapter 11 — auditd into syslog, and Streams (16.21–16.24)
 
-**เป้าหมาย:** audit event เข้า Graylog และ log ถูกแยกเป็น 3 stream
+**Goal:** Audit events reach Graylog and logs are split into 3 streams
 
-**ทฤษฎี**
-- auditd บันทึกจาก kernel ผ่าน PAM และมี auid ที่ติดตัวผู้ใช้แม้ sudo
-- stream rule ทำงานใน Filter Chain ก่อน pipeline
-- OpenSSH 9.8+ เขียน log ในชื่อ sshd-session จึงต้องใช้ regex ^sshd(-session)?$
+**Theory**
+- auditd records from the kernel through PAM and keeps an auid tied to the user even through sudo
+- Stream rules run in the Filter Chain before the pipeline
+- OpenSSH 9.8+ logs as sshd-session, so use the regex ^sshd(-session)?$
 
-**ขั้นตอนปฏิบัติ**
-1. เปิด syslog plugin ของ auditd และ 10-audit-local.conf
-2. สร้าง stream sudo-activity, auth-logs, suspicious-ip
-3. ทดสอบ rule ด้วย Load a message to test rules
+**Steps**
+1. Enable the auditd syslog plugin and 10-audit-local.conf
+2. Create the streams sudo-activity, auth-logs and suspicious-ip
+3. Test the rules with Load a message to test rules
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo sed -i 's/^active = no/active = yes/' /etc/audit/plugins.d/syslog.conf
 sudo auditctl --signal reload 2>/dev/null || sudo service auditd restart
 sudo grep -c "sshd-session\[" /var/log/secure
-sudo id   # สร้าง event ของ stream sudo-activity
+sudo id   # creates an event for the sudo-activity stream
 ```
 
-**แบบฝึกหัด**
-- ออกแบบ stream 5 ตัวของ lab พร้อมเหตุผลเรื่อง retention ของแต่ละตัว
+**Exercises**
+- Design 5 streams for the lab with the retention reasoning for each
 
-**เกณฑ์ผ่าน**
-- [ ] ข้อความ sshd-session เข้า auth-logs และ sudo เข้า sudo-activity
-- [ ] อธิบายผลของ "Remove matches from Default Stream" ได้
+**Pass criteria**
+- [ ] sshd-session messages go to auth-logs and sudo goes to sudo-activity
+- [ ] You can explain the effect of "Remove matches from Default Stream"
 
-**หลักฐาน:** ภาพหน้า Streams 3 ตัวที่ Running
+**Evidence:** Screenshot of the Streams page with 3 running streams
 
-อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
+Further reading: Chapter 11 Ingesting Logs: Inputs, rsyslog, Streams and Pipelines
 
-### วันที่ 29 · บทที่ 11 — Pipeline SOC-SSH และ Test Login (16.25)
+### Day 29 · Chapter 11 — The SOC-SSH pipeline and Test Login (16.25)
 
-**เป้าหมาย:** log SSH ทุกบรรทัดมี ssh_event, ssh_user, src_ip และ severity
+**Goal:** Every SSH log line has ssh_event, ssh_user, src_ip and severity
 
-**ทฤษฎี**
-- rule ใน stage เดียวกันไม่รับประกันลำดับ งานที่พึ่งกันต้องคนละ stage
-- stage ต้องตั้ง None or more rules match
-- route_to_stream() ส่งข้อความเข้า stream หลังมี field แล้ว
+**Theory**
+- Rules in the same stage have no guaranteed order; work that depends on other work goes in a different stage
+- Stages must be set to None or more rules match
+- route_to_stream() sends the message to a stream once the fields exist
 
-**ขั้นตอนปฏิบัติ**
-1. วาง rule 12 ตัวจาก SOC-SSH-pipeline.rules
-2. สร้าง pipeline 5 stage และผูกกับ auth-logs
-3. ตรวจลำดับ Message Processors
-4. Test Login 5 เหตุการณ์ (เปิด password ชั่วคราวแล้วลบ)
+**Steps**
+1. Paste the 12 rules from SOC-SSH-pipeline.rules
+2. Create a 5-stage pipeline and connect it to auth-logs
+3. Check the Message Processors order
+4. Test Login with 5 events (enable passwords temporarily, then remove)
 5. snapshot ch11-ingest
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
-ssh -o BatchMode=yes nosuchuser@192.168.10.41 true   # จาก lab-linux-02
+ssh -o BatchMode=yes nosuchuser@192.168.10.41 true   # from lab-linux-02
 sudo journalctl -u sshd --since '-5min' -o cat | grep -E 'Invalid user|Accepted'
 sudo rm -f /etc/ssh/sshd_config.d/00-lab-password.conf && sudo systemctl reload sshd
 ```
 
-**แบบฝึกหัด**
-- เพิ่ม rule ที่ดึง fingerprint จาก Accepted publickey ลง field ssh_key_fp
+**Exercises**
+- Add a rule that extracts the fingerprint from Accepted publickey into the field ssh_key_fp
 
-**เกณฑ์ผ่าน**
-- [ ] ค้น ssh_event:invalid_user แล้วได้ ssh_user, src_ip และอยู่ใน suspicious-ip
-- [ ] Rule Simulation แสดง field ครบ
+**Pass criteria**
+- [ ] Searching ssh_event:invalid_user gives ssh_user and src_ip, and the message is in suspicious-ip
+- [ ] Rule Simulation shows all fields
 
-**หลักฐาน:** ตาราง Test Login 5 เหตุการณ์พร้อม query
+**Evidence:** Table of the 5 Test Login events with their queries
 
-อ่านเพิ่ม: บทที่ 11 รับ Log: Inputs, rsyslog, Streams และ Pipeline
+Further reading: Chapter 11 Ingesting Logs: Inputs, rsyslog, Streams and Pipelines
 
-### วันที่ 30 · บทที่ 12 — ภาษาค้นหา, วิธียืนยันตัวตน และการตาม session (17.1–17.2)
+### Day 30 · Chapter 12 — Search syntax, authentication methods and following a session (17.1–17.2)
 
-**เป้าหมาย:** ตอบคำถามสืบสวนพื้นฐานจาก log ได้
+**Goal:** Answer basic investigation questions from logs
 
-**ทฤษฎี**
-- Lucene syntax: field:value, AND/OR/NOT (ตัวพิมพ์ใหญ่), wildcard, range และ escape ด้วย \ (17.0)
-- ตั้งช่วงเวลาทุกครั้ง ค่าเริ่มต้นคือ 5 นาทีล่าสุด
-- auth_method บอก password หรือ publickey; USER_START บอกว่า session เปิดจริงพร้อมเลข ses (17.1–17.2)
+**Theory**
+- Lucene syntax: field:value, AND/OR/NOT (uppercase), wildcards, ranges and escaping with \ (17.0)
+- Always set the time range; the default is the last 5 minutes
+- auth_method says password or publickey; USER_START shows the session really opened, with its ses number (17.1–17.2)
 
-**ขั้นตอนปฏิบัติ**
-1. ใช้ field ที่ pipeline SOC-SSH แยกไว้ (ssh_event, ssh_user, auth_method, src_ip) ไม่ใช่ค้นใน message ดิบ
-2. ค้น login สำเร็จของ aod และดูว่าใช้ password หรือ key (17.1)
-3. เพิ่มคอลัมน์ timestamp, source, ssh_user, src_ip, auth_method ในตารางผล
-4. จด audit_session จากผล session_start แล้วตามทุก event ของ session นั้นโดยระบุ source ด้วย (17.2)
-5. บันทึก saved search
+**Steps**
+1. Use the fields the SOC-SSH pipeline extracted (ssh_event, ssh_user, auth_method, src_ip), not the raw message
+2. Search for successful logins by aod and see whether a password or a key was used (17.1)
+3. Add the columns timestamp, source, ssh_user, src_ip, auth_method to the results table
+4. Note the audit_session from the session_start result, then follow every event of that session, also filtering by source (17.2)
+5. Save it as a saved search
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
 ssh_event:auth_success AND auth_method:password
 ssh_event:session_start AND ssh_user:aod
 source:lab\-linux\-01.lab.internal AND message:"ses=42 "
 ```
 
-**แบบฝึกหัด**
-- ตอบคำถาม: เมื่อวานใคร login lab-linux-01 สำเร็จบ้าง ใช้ password หรือ key จาก IP ไหน (ตอบเป็นตาราง)
+**Exercises**
+- Answer: who logged in to lab-linux-01 successfully yesterday, with a password or a key, from which IP (answer as a table)
 
-**เกณฑ์ผ่าน**
-- [ ] query ให้ผลถูกต้องเมื่อเทียบกับ /var/log/secure บนเครื่อง
-- [ ] ตามทุก event ของ session ตัวเองด้วยเลข ses ได้
+**Pass criteria**
+- [ ] The query results match /var/log/secure on the machine
+- [ ] You can follow every event of your own session by its ses number
 
-**หลักฐาน:** ตารางคำตอบ + query ที่ใช้
+**Evidence:** Answer table + the queries used
 
-อ่านเพิ่ม: บทที่ 12 การค้นหาและสืบสวนใน Graylog
+Further reading: Chapter 12 Searching and Investigating in Graylog
 
-### วันที่ 31 · บทที่ 12 — เงื่อนไขหลายชั้นและ Saved Search สำหรับ SSH Audit (17.3–17.4)
+### Day 31 · Chapter 12 — Multi-condition queries and Saved Searches for SSH Audit (17.3–17.4)
 
-**เป้าหมาย:** เขียนเงื่อนไขหลายชั้นและทำชุด Saved Search เฝ้าบัญชีสิทธิ์สูงไว้ใช้ซ้ำใน dashboard
+**Goal:** Write multi-level conditions and build a set of Saved Searches that watch privileged accounts, reusable in dashboards
 
-**ทฤษฎี**
-- เงื่อนไขซ้อนด้วย ( ) และ NOT เช่น ล้มเหลวหรือ invalid user ที่ไม่ได้มาจาก subnet ภายใน (17.3)
-- password spraying เห็นได้จาก Aggregation group by src_ip พร้อม metric card(ssh_user)
-- Saved Search คือฐานของ dashboard ใน Lab 20 (17.4)
+**Theory**
+- Nest conditions with ( ) and NOT, e.g. failures or invalid users that do not come from the internal subnet (17.3)
+- Password spraying shows up in an Aggregation grouped by src_ip with the metric card(ssh_user)
+- Saved Searches are the basis of the Lab 20 dashboard (17.4)
 
-**ขั้นตอนปฏิบัติ**
-1. เขียน query หลายชั้นของ 17.3 ทั้งสี่แบบ และดูด้วย field ที่ pipeline แยกไว้
-2. สร้าง Aggregation group by src_ip, metric count() และ card(ssh_user) หา password spraying
-3. บันทึก Saved Search ทั้ง 7 รายการตามตาราง 17.4
-4. ยืนยัน "SSH - Success after failures" ด้วย login ทดสอบจาก lab-linux-02 (เปิด password ชั่วคราวแล้วลบ)
+**Steps**
+1. Write all four multi-level queries of 17.3 and view them with the pipeline fields
+2. Create an Aggregation grouped by src_ip with metrics count() and card(ssh_user) to find password spraying
+3. Save all 7 Saved Searches from table 17.4
+4. Confirm "SSH - Success after failures" with a test login from lab-linux-02 (enable passwords temporarily, then remove)
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
 (ssh_event:auth_failed OR ssh_event:invalid_user) AND NOT src_ip:192.168.10.*
 ssh_event:auth_success AND auth_method:password AND ssh_user:(root OR admin OR aod)
-ssh_event:invalid_user AND _exists_:src_ip   # แล้ว Create -> Aggregation: group by src_ip, metric count() + card(ssh_user)
+ssh_event:invalid_user AND _exists_:src_ip   # then Create -> Aggregation: group by src_ip, metric count() + card(ssh_user)
 ```
 
-**แบบฝึกหัด**
-- อธิบายว่าทำไมแถว "IP ที่ล้มเหลวหลายครั้งแล้วสำเร็จหนึ่งครั้ง" ต้องถือเป็น incident และ query จับมันอย่างไร
+**Exercises**
+- Explain why the row "an IP that failed many times and then succeeded once" must be treated as an incident, and how the query catches it
 
-**เกณฑ์ผ่าน**
-- [ ] มี Saved Search ครบ 7 รายการตามตาราง 17.4
-- [ ] Aggregation แสดง IP ที่มี card(ssh_user) สูง (password spraying) ได้
+**Pass criteria**
+- [ ] All 7 Saved Searches from table 17.4 exist
+- [ ] The Aggregation shows IPs with a high card(ssh_user) (password spraying)
 
-**หลักฐาน:** ภาพ Aggregation + รายการ Saved Search
+**Evidence:** Screenshot of the Aggregation + the list of Saved Searches
 
-อ่านเพิ่ม: บทที่ 12 การค้นหาและสืบสวนใน Graylog
+Further reading: Chapter 12 Searching and Investigating in Graylog
 
-### วันที่ 32 · บทที่ 13 — CrowdSec decision เข้า Graylog และ GeoIP (Lab 18–19)
+### Day 32 · Chapter 13 — CrowdSec decisions into Graylog, and GeoIP (Lab 18–19)
 
-**เป้าหมาย:** IP ใน log มีตำแหน่งประเทศ และเห็น decision ของ CrowdSec ใน Graylog
+**Goal:** IPs in logs have a country, and CrowdSec decisions are visible in Graylog
 
-**ทฤษฎี**
-- GeoIP ต้องใช้ฐานข้อมูล MaxMind GeoLite2 City (สมัครบัญชีฟรี, license key เป็น secret)
-- IP ภายใน (192.168.x) ไม่มีตำแหน่ง
-- ทดสอบ IP ต่างประเทศด้วย event จำลองที่ใส่ IP สาธารณะ ไม่ต้องมีการเชื่อมต่อจริง
+**Theory**
+- GeoIP needs the MaxMind GeoLite2 City database (free account; the license key is a secret)
+- Internal IPs (192.168.x) have no location
+- Test foreign IPs with simulated events that contain a public IP; no real connection is needed
 
-**ขั้นตอนปฏิบัติ**
-1. วางไฟล์ GeoLite2-City.mmdb ใน volume ของ Graylog
-2. เปิด Geo-Location Processor
-3. ส่ง log ของ crowdsec เข้า stream แยก
-4. ส่ง event จำลองที่มี IP ต่างประเทศด้วย logger
+**Steps**
+1. Put GeoLite2-City.mmdb in the Graylog volume
+2. Enable the Geo-Location Processor
+3. Send the crowdsec logs into a separate stream
+4. Send simulated events with foreign IPs using logger
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 logger -p authpriv.info -t sshd "Failed password for invalid user test from 203.0.113.50 port 50000 ssh2"
 logger -p authpriv.info -t sshd "Failed password for invalid user test from 8.8.8.8 port 50001 ssh2"
 sudo journalctl -u crowdsec --since "10 min ago" | tail
 ```
 
-**แบบฝึกหัด**
-- อธิบายว่าทำไม 203.0.113.50 (TEST-NET-3) ไม่มีตำแหน่ง แต่ 8.8.8.8 มี
+**Exercises**
+- Explain why 203.0.113.50 (TEST-NET-3) has no location but 8.8.8.8 does
 
-**เกณฑ์ผ่าน**
-- [ ] field src_ip_geolocation มีค่าสำหรับ IP สาธารณะ
-- [ ] decision ของ CrowdSec ค้นเจอใน Graylog
+**Pass criteria**
+- [ ] The src_ip_geolocation field has a value for public IPs
+- [ ] CrowdSec decisions can be found in Graylog
 
-**หลักฐาน:** ภาพข้อความที่มี field geo
+**Evidence:** Screenshot of a message with the geo field
 
-อ่านเพิ่ม: บทที่ 13 Threat Intelligence: CrowdSec, GeoIP และ Global Dashboard
+Further reading: Chapter 13 Threat Intelligence: CrowdSec, GeoIP and a Global Dashboard
 
-### วันที่ 33 · บทที่ 13 — Global Threat Intelligence Dashboard (Lab 20)
+### Day 33 · Chapter 13 — Global Threat Intelligence Dashboard (Lab 20)
 
-**เป้าหมาย:** dashboard แผนที่และสถิติภัยคุกคามของ lab
+**Goal:** A map and statistics dashboard of threats against the lab
 
-**ทฤษฎี**
-- Dashboard ที่ดีตอบคำถามเดียวต่อ widget
-- แผนที่ (World Map) ใช้ field geolocation
-- ตัวเลขสำคัญ: จำนวน IP ที่ถูก ban, ประเทศต้นทาง, user ที่ถูกลอง
+**Theory**
+- A good dashboard answers one question per widget
+- The World Map uses the geolocation field
+- Key numbers: IPs banned, source countries, usernames tried
 
-**ขั้นตอนปฏิบัติ**
-1. สร้าง widget แผนที่จาก src_ip_geolocation
-2. Top 10 ประเทศ, Top 10 username ที่ถูกลอง
-3. จำนวน decision ของ CrowdSec ต่อชั่วโมง
+**Steps**
+1. Create a map widget from src_ip_geolocation
+2. Top 10 countries, top 10 usernames tried
+3. CrowdSec decisions per hour
 4. snapshot ch13-ti
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
 # Dashboards → Create → Add widget: Aggregation (group by src_ip_country_code)
 ssh_event:auth_failed AND _exists_:src_ip_geolocation
 ```
 
-**แบบฝึกหัด**
-- นำเสนอ dashboard 3 นาทีเหมือนรายงานผู้บริหาร: เกิดอะไร รุนแรงแค่ไหน ทำอะไรแล้ว
+**Exercises**
+- Present the dashboard in 3 minutes like an executive report: what happened, how serious, what was done
 
-**เกณฑ์ผ่าน**
-- [ ] dashboard มีอย่างน้อย 4 widget ที่ตอบคำถามต่างกัน
-- [ ] นำเสนอได้ภายใน 3 นาที
+**Pass criteria**
+- [ ] The dashboard has at least 4 widgets that answer different questions
+- [ ] You can present it within 3 minutes
 
-**หลักฐาน:** ภาพ dashboard + บทพูด 5 บรรทัด
+**Evidence:** Screenshot of the dashboard + a 5-line script of what you said
 
-อ่านเพิ่ม: บทที่ 13 Threat Intelligence: CrowdSec, GeoIP และ Global Dashboard
+Further reading: Chapter 13 Threat Intelligence: CrowdSec, GeoIP and a Global Dashboard
 
-### ◆ วันที่ 34 — Checkpoint 3: ภาค 4 SIEM
+### ◆ Day 34 — Checkpoint 3: Part 4 SIEM
 
-**เป้าหมาย:** สืบสวนเหตุการณ์จำลองจาก Graylog อย่างเดียว
+**Goal:** Investigate a simulated incident using Graylog only
 
-**ทฤษฎี**
-- ทบทวนคำถามท้ายบทที่ 10–13
+**Theory**
+- Review the end-of-chapter questions for chapters 10–13
 
-**ขั้นตอนปฏิบัติ**
-1. ผู้สอนหรือ script สร้างเหตุการณ์: login ผิดหลายครั้ง, login สำเร็จ, sudo, แก้ไฟล์
-2. ผู้เรียนใช้ Graylog อย่างเดียวตอบ ใคร ทำอะไร ที่ไหน เมื่อไร
-3. เขียน timeline 10 บรรทัด
+**Steps**
+1. The instructor or a script creates events: many failed logins, a successful login, sudo, a file change
+2. Using Graylog only, answer who, what, where and when
+3. Write a 10-line timeline
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
-# ใช้ saved search จากวันที่ 30–31 และ dashboard วันที่ 33
+# use the saved searches from days 30–31 and the dashboard from day 33
 ```
 
-**แบบฝึกหัด**
-- สอบย่อย 10 ข้อจากคำถามทบทวนบทที่ 10–13
+**Exercises**
+- A 10-question quiz from the review questions of chapters 10–13
 
-**เกณฑ์ผ่าน**
-- [ ] timeline ถูกต้องตามเหตุการณ์ที่สร้างอย่างน้อย 8/10 บรรทัด
-- [ ] ทุกบรรทัดอ้าง query ที่หาเจอ
-- [ ] Rubric ระดับ 3 ขึ้นไป
+**Pass criteria**
+- [ ] At least 8/10 timeline lines match the events created
+- [ ] Every line cites the query that found it
+- [ ] Rubric level 3 or above
 
-**หลักฐาน:** timeline + query ประกอบ
+**Evidence:** Timeline + supporting queries
 
 
 
-## ภาค 5 Wazuh: ตรวจจับและตอบสนอง
+## Part 5 Wazuh: detection and response
 
-### วันที่ 35 · บทที่ 14 — ติดตั้ง Wazuh 4.14 แบบ all-in-one
+### Day 35 · Chapter 14 — Install Wazuh 4.14 all-in-one
 
-**เป้าหมาย:** Wazuh indexer, server และ dashboard รันบน wazuh-01
+**Goal:** The Wazuh indexer, server and dashboard run on wazuh-01
 
-**ทฤษฎี**
-- ส่วนประกอบ: indexer (เก็บ alert), server/manager (วิเคราะห์), dashboard (UI), Filebeat (ส่ง alert ไป indexer)
-- เอกสาร Wazuh 4.14 ระบุ RHEL 10 เป็นระบบที่รองรับ Rocky 10 เข้ากันได้ แต่ถ้า assistant ปฏิเสธต้องใช้ -i
-- รหัสผ่านเริ่มต้นอยู่ใน wazuh-install-files.tar ต้องเก็บรักษาและเปลี่ยน
+**Theory**
+- Components: indexer (stores alerts), server/manager (analysis), dashboard (UI), Filebeat (ships alerts to the indexer)
+- The Wazuh 4.14 documentation lists RHEL 10 as supported and Rocky 10 is compatible, but if the assistant refuses, use -i
+- The initial passwords are in wazuh-install-files.tar; keep them safe and change them
 
-**ขั้นตอนปฏิบัติ**
-1. ดาวน์โหลด installer ของรุ่น 4.14
-2. ติดตั้งแบบ -a และเปิด firewall 1514, 1515, 55000, https
-3. เก็บไฟล์รหัสผ่านไว้นอกเครื่องอย่างปลอดภัย
-4. ตั้ง heap ของ indexer 2 GB (14.3.1)
-5. login dashboard
+**Steps**
+1. Download the 4.14 installer
+2. Install with -a and open firewall ports 1514, 1515, 55000 and https
+3. Keep the password file safely off the machine
+4. Set the indexer heap to 2 GB (14.3.1)
+5. Log in to the dashboard
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh
 sudo bash wazuh-install.sh -a
@@ -1208,271 +1210,271 @@ sudo tar -O -xf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt 
 sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard filebeat --no-pager | grep -E "●|Active"
 ```
 
-**แบบฝึกหัด**
-- วาดผังการไหลของ alert จาก agent → manager → Filebeat → indexer → dashboard
+**Exercises**
+- Draw the alert flow from agent → manager → Filebeat → indexer → dashboard
 
-**เกณฑ์ผ่าน**
-- [ ] ทั้ง 4 service active (running)
-- [ ] filebeat test output ผ่าน
+**Pass criteria**
+- [ ] All 4 services are active (running)
+- [ ] filebeat test output passes
 
-**หลักฐาน:** ผล systemctl status + ผังที่วาด
+**Evidence:** systemctl status output + the flow you drew
 
-อ่านเพิ่ม: บทที่ 14 ติดตั้ง Wazuh, Agent และ Agent Group
+Further reading: Chapter 14 Installing Wazuh, Agents and Agent Groups
 
-### วันที่ 36 · บทที่ 14 — Agent ทุกเครื่อง, alert เข้า Graylog และ Agent Group (Lab 34)
+### Day 36 · Chapter 14 — Agents on every machine, alerts into Graylog and Agent Groups (Lab 34)
 
-**เป้าหมาย:** ทุกเครื่องรายงานเข้า Wazuh, alert ระดับ 5 ขึ้นไปเข้า Graylog และแยก config ตามบทบาท
+**Goal:** Every machine reports to Wazuh, alerts of level 5 and above reach Graylog, and config is split by role
 
-**ทฤษฎี**
-- agent ลงทะเบียนกับ manager ผ่าน port 1515 และส่งข้อมูลที่ 1514
-- Agent group แจก agent.conf จาก /var/ossec/etc/shared/<group>/
-- เครื่องหนึ่งอยู่ได้หลาย group
+**Theory**
+- An agent enrolls with the manager on port 1515 and sends data on 1514
+- Agent groups distribute agent.conf from /var/ossec/etc/shared/<group>/
+- One machine can be in several groups
 
-**ขั้นตอนปฏิบัติ**
-1. เพิ่ม repo ของ Wazuh (import GPG key + wazuh.repo) แล้วติดตั้ง agent ทุกเครื่องพร้อมตัวแปร WAZUH_MANAGER
-2. เปิด syslog_output ไป Graylog และสร้าง stream wazuh-alerts กับ pipeline Wazuh
-3. สร้าง group linux-base, container-hosts, file-servers และใส่ agent
-4. ตรวจว่า config ถูกแจก (agent_groups -S) และรัน ch14-check.sh
+**Steps**
+1. Add the Wazuh repo (import the GPG key + wazuh.repo) and install the agent on every machine with WAZUH_MANAGER set
+2. Enable syslog_output to Graylog and create the wazuh-alerts stream and a Wazuh pipeline
+3. Create the groups linux-base, container-hosts and file-servers and assign agents
+4. Check that config was distributed (agent_groups -S) and run ch14-check.sh
 5. snapshot ch14-wazuh
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo WAZUH_MANAGER='192.168.10.30' WAZUH_AGENT_NAME="$(hostname -s)" WAZUH_AGENT_GROUP='default' dnf install -y wazuh-agent
 sudo sed -i 's/^enabled=1/enabled=0/' /etc/yum.repos.d/wazuh.repo
-sudo /var/ossec/bin/agent_groups -a -g linux-base -q   # บน wazuh-01
+sudo /var/ossec/bin/agent_groups -a -g linux-base -q   # on wazuh-01
 sudo /var/ossec/bin/verify-agent-conf -f /var/ossec/etc/shared/linux-base/agent.conf
 ```
 
-**แบบฝึกหัด**
-- พิสูจน์ว่า node-01 ได้ค่าจากทั้ง linux-base และ container-hosts และบอกว่า label role ค่าใดชนะเพราะอะไร
+**Exercises**
+- Prove that node-01 gets settings from both linux-base and container-hosts, and say which role label wins and why
 
-**เกณฑ์ผ่าน**
-- [ ] agent_control -l แสดงทั้ง 5 เครื่องเป็น Active
-- [ ] Graylog ค้น event_source:wazuh แล้วมี field wazuh_rule_id
-- [ ] ch14-check.sh ผ่านทุกข้อ
+**Pass criteria**
+- [ ] agent_control -l shows all 5 machines as Active
+- [ ] Searching event_source:wazuh in Graylog shows the wazuh_rule_id field
+- [ ] ch14-check.sh passes every item
 
-**หลักฐาน:** ผล agent_control -l + ch14-check.sh
+**Evidence:** Output of agent_control -l + ch14-check.sh
 
-อ่านเพิ่ม: บทที่ 14 ติดตั้ง Wazuh, Agent และ Agent Group
+Further reading: Chapter 14 Installing Wazuh, Agents and Agent Groups
 
-### วันที่ 37 · บทที่ 15 — Decoder, rule และ wazuh-logtest
+### Day 37 · Chapter 15 — Decoders, rules and wazuh-logtest
 
-**เป้าหมาย:** เขียน custom rule ช่วง 100000–100999 และทดสอบก่อนใช้
+**Goal:** Write custom rules in the 100000–100999 range and test them before use
 
-**ทฤษฎี**
-- decoder แยก field, rule ตัดสิน level
-- if_sid ต่อยอด rule เดิมแทนการเขียนใหม่
-- ทดสอบทุก rule ด้วย wazuh-logtest ก่อน restart manager
+**Theory**
+- Decoders extract fields; rules decide the level
+- if_sid builds on an existing rule instead of writing a new one
+- Test every rule with wazuh-logtest before restarting the manager
 
-**ขั้นตอนปฏิบัติ**
-1. เปิด wazuh-logtest วางบรรทัด sshd ตัวอย่าง
-2. เขียน rule ใน 110-ssh_rules.xml (ไม่ใช้ local_rules.xml เพื่อให้แบ่งไฟล์ตามช่วง ID)
-3. ทดสอบซ้ำจน level และ description ตรง
-4. restart manager
+**Steps**
+1. Open wazuh-logtest and paste a sample sshd line
+2. Write the rule in 110-ssh_rules.xml (not local_rules.xml, so files are split by ID range)
+3. Retest until the level and description are right
+4. Restart the manager
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 sudo /var/ossec/bin/wazuh-logtest
 ls -l /var/ossec/etc/rules/   # 100-tuning … 170-web
 sudo /var/ossec/bin/wazuh-analysisd -t && sudo systemctl restart wazuh-manager
 ```
 
-**แบบฝึกหัด**
-- เขียน rule 100150: login สำเร็จของ aod จาก IP ที่ไม่ใช่ 192.168.10.100 ให้ level 10
+**Exercises**
+- Write rule 100150: a successful login by aod from an IP other than 192.168.10.100 gets level 10
 
-**เกณฑ์ผ่าน**
-- [ ] wazuh-logtest แสดง rule id 100150 สำหรับบรรทัดทดสอบ
-- [ ] wazuh-analysisd -t ไม่มี error
+**Pass criteria**
+- [ ] wazuh-logtest shows rule id 100150 for the test line
+- [ ] wazuh-analysisd -t reports no errors
 
-**หลักฐาน:** XML ของ rule + ผล logtest
+**Evidence:** The rule XML + logtest output
 
-อ่านเพิ่ม: บทที่ 15 Rule, Tuning และ Active Response
+Further reading: Chapter 15 Rules, Tuning and Active Response
 
-### วันที่ 38 · บทที่ 15 — Tuning false positive และตรวจจับ brute-force
+### Day 38 · Chapter 15 — Tuning false positives and detecting brute-force
 
-**เป้าหมาย:** ลด alert รบกวนโดยไม่ทำให้พลาดเหตุการณ์จริง
+**Goal:** Reduce noisy alerts without missing real events
 
-**ทฤษฎี**
-- frequency + timeframe ใช้จับเหตุการณ์ซ้ำ
-- level 0 ปิด alert เฉพาะกรณี ดีกว่าปิดทั้ง rule
-- บันทึกเหตุผลของทุกการ tune ไว้ใน comment
+**Theory**
+- frequency + timeframe catch repeated events
+- level 0 silences a specific case, which is better than disabling the whole rule
+- Record the reason for every tuning change in a comment
 
-**ขั้นตอนปฏิบัติ**
-1. หา rule ที่ alert มากที่สุดใน dashboard
-2. เขียน rule ยกเว้นงาน automation ที่รู้จัก
-3. ทดสอบ brute-force rule 5712/5763 ด้วย login ผิดจาก lab-linux-02
-4. ตรวจว่ายังจับเหตุการณ์จริงได้
+**Steps**
+1. Find the rule with the most alerts in the dashboard
+2. Write a rule that exempts known automation
+3. Test the brute-force rules 5712/5763 with failed logins from lab-linux-02
+4. Check that real events are still caught
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
-sudo /var/ossec/bin/wazuh-logtest   # วาง Failed password 5 ครั้ง → 100100
+sudo /var/ossec/bin/wazuh-logtest   # paste Failed password 5 times → 100100
 sudo grep -c '"id":"100100"' /var/ossec/logs/alerts/alerts.json
-sudo systemctl stop crowdsec-firewall-bouncer   # บน lab-linux-01 ระหว่างทดสอบ แล้ว start คืน
+sudo systemctl stop crowdsec-firewall-bouncer   # on lab-linux-01 during the test, then start it again
 ```
 
-**แบบฝึกหัด**
-- เขียนบันทึก tuning 3 รายการ: rule เดิม, ปัญหา, การแก้, ความเสี่ยงที่ยอมรับ
+**Exercises**
+- Write 3 tuning records: original rule, problem, fix, accepted risk
 
-**เกณฑ์ผ่าน**
-- [ ] alert รบกวนลดลงอย่างน้อย 50%
-- [ ] brute-force ทดสอบยังเกิด alert
+**Pass criteria**
+- [ ] Noisy alerts drop by at least 50%
+- [ ] The brute-force test still produces an alert
 
-**หลักฐาน:** บันทึก tuning + ตัวเลขก่อน/หลัง
+**Evidence:** Tuning records + before/after numbers
 
-อ่านเพิ่ม: บทที่ 15 Rule, Tuning และ Active Response
+Further reading: Chapter 15 Rules, Tuning and Active Response
 
-### วันที่ 39 · บทที่ 15 — Active Response บล็อก IP และ dashboard ที่ถูกบล็อก
+### Day 39 · Chapter 15 — Active Response blocking IPs and a dashboard of blocked IPs
 
-**เป้าหมาย:** บล็อก IP อัตโนมัติแบบมีเวลาหมดอายุ และย้อนกลับได้
+**Goal:** Block IPs automatically with an expiry, in a way that can be undone
 
-**ทฤษฎี**
-- active response = คำสั่งที่ manager สั่ง agent รันเมื่อ rule ตรง
-- ต้องมี timeout เสมอ และ allowlist IP ของ admin
-- CrowdSec (บทที่ 9) กับ Wazuh AR ทำงานซ้อนกัน ต้องเลือกจุดบังคับให้ชัด
+**Theory**
+- Active response = a command the manager tells an agent to run when a rule matches
+- Always set a timeout and allowlist the admin IP
+- CrowdSec (chapter 9) and Wazuh AR overlap; choose clearly where enforcement happens
 
-**ขั้นตอนปฏิบัติ**
-1. เพิ่ม active-response firewall-drop ผูก rule 5763 timeout 600
-2. ใส่ white_list ของ 192.168.10.100
-3. ทดสอบจาก lab-linux-02 แล้วดู log ของ AR
-4. สร้าง visualization IP ที่ถูกบล็อก
+**Steps**
+1. Add active-response firewall-drop bound to rule 5763 with timeout 600
+2. Add 192.168.10.100 to white_list
+3. Test from lab-linux-02 and look at the AR log
+4. Create a visualization of blocked IPs
 5. snapshot ch15-rules
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 <active-response><command>firewall-drop</command><location>local</location><rules_id>100100,100101,5763,5712</rules_id><timeout>600</timeout></active-response>
-sudo tail -n 5 /var/ossec/logs/active-responses.log   # บน agent
-wazuh_rule_id:100651   # ค้นใน Graylog
+sudo tail -n 5 /var/ossec/logs/active-responses.log   # on the agent
+wazuh_rule_id:100651   # search in Graylog
 ```
 
-**แบบฝึกหัด**
-- เขียน runbook ครึ่งหน้า: ถ้า AR บล็อก IP ผิด จะปลดบล็อกอย่างไรและแจ้งใคร
+**Exercises**
+- Write a half-page runbook: if AR blocks the wrong IP, how to unblock it and whom to notify
 
-**เกณฑ์ผ่าน**
-- [ ] lab-linux-02 ถูกบล็อกแล้วปลดเองหลัง timeout
-- [ ] IP admin ไม่ถูกบล็อก
+**Pass criteria**
+- [ ] lab-linux-02 gets blocked and is unblocked automatically after the timeout
+- [ ] The admin IP is never blocked
 
-**หลักฐาน:** active-responses.log + ภาพ visualization
+**Evidence:** active-responses.log + screenshot of the visualization
 
-อ่านเพิ่ม: บทที่ 15 Rule, Tuning และ Active Response
+Further reading: Chapter 15 Rules, Tuning and Active Response
 
-### วันที่ 40 · บทที่ 16 — FIM: โหมด scan, whodata, report_changes และ nodiff (22.1–22.5, 22.10–22.13)
+### Day 40 · Chapter 16 — FIM: scan modes, whodata, report_changes and nodiff (22.1–22.5, 22.10–22.13)
 
-**เป้าหมาย:** เลือกโหมด FIM ให้เหมาะกับไฟล์แต่ละกลุ่ม และรู้ว่าใครแก้ไฟล์ด้วยโปรแกรมใดโดยไม่ทำให้ความลับรั่ว
+**Goal:** Choose the right FIM mode for each group of files, and know who changed a file with which program without leaking secrets
 
-**ทฤษฎี**
-- scheduled, realtime และ whodata ต่างกันที่ความเร็วและข้อมูล "ใคร/โปรแกรมใด"
-- whodata ใช้ auditd จึงต้องมี rule wazuh_fim
-- report_changes ส่ง diff ของไฟล์ ห้ามใช้กับ /etc/shadow ให้ใช้ nodiff
+**Theory**
+- scheduled, realtime and whodata differ in speed and in the "who/which program" data
+- whodata uses auditd, so the wazuh_fim rule must exist
+- report_changes sends a diff of the file; never use it on /etc/shadow, use nodiff
 
-**ขั้นตอนปฏิบัติ**
-1. ต่อยอด agent.conf ของกลุ่ม linux-base จากบทที่ 14 ด้วย directories ของ /etc/ssh และไฟล์บัญชี
-2. ใส่ nodiff ให้ /etc/shadow และ /etc/gshadow
-3. แก้ sshd_config ด้วย comment ทดสอบแล้วดู alert พร้อม audit.login_user
-4. ลบบรรทัดทดสอบและตรวจ alert ของการแก้กลับ
+**Steps**
+1. Extend the linux-base agent.conf from chapter 14 with directories for /etc/ssh and the account files
+2. Set nodiff on /etc/shadow and /etc/gshadow
+3. Edit sshd_config with a test comment and look at the alert with audit.login_user
+4. Remove the test line and check the alert for the revert
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 sudo /var/ossec/bin/verify-agent-conf -f /var/ossec/etc/shared/linux-base/agent.conf
-echo "# fim test" | sudo tee -a /etc/ssh/sshd_config >/dev/null   # บน lab-linux-01
-sudo sed -i '/# fim test/d' /etc/ssh/sshd_config   # บน lab-linux-01
+echo "# fim test" | sudo tee -a /etc/ssh/sshd_config >/dev/null   # on lab-linux-01
+sudo sed -i '/# fim test/d' /etc/ssh/sshd_config   # on lab-linux-01
 sudo jq -r 'select(.syscheck) | [.syscheck.path, .syscheck.audit.login_user.name] | @tsv' /var/ossec/logs/alerts/alerts.json | tail -3
 ```
 
-**แบบฝึกหัด**
-- ทำตาราง 3 แถว: ไฟล์กลุ่มใดใช้ scheduled, realtime หรือ whodata พร้อมเหตุผลด้านภาระและข้อมูลที่ได้
+**Exercises**
+- Make a 3-row table: which file groups use scheduled, realtime or whodata, with reasons based on load and the data you get
 
-**เกณฑ์ผ่าน**
-- [ ] alert ของ sshd_config ระบุผู้ใช้ที่ login จริงและโปรแกรมที่แก้
-- [ ] alert ของ /etc/shadow ไม่มีเนื้อหาหรือ hash ของรหัสผ่าน
+**Pass criteria**
+- [ ] The sshd_config alert names the user who really logged in and the program that made the change
+- [ ] The /etc/shadow alert contains no content or password hash
 
-**หลักฐาน:** alert JSON 2 รายการ (sshd_config และ shadow)
+**Evidence:** Two alert JSON records (sshd_config and shadow)
 
-อ่านเพิ่ม: บทที่ 16 File Integrity และ Identity Monitoring
+Further reading: Chapter 16 File Integrity and Identity Monitoring
 
-### วันที่ 41 · บทที่ 16 — Persistence path, SUID baseline และ identity (22.14–22.26, 22.3–22.8)
+### Day 41 · Chapter 16 — Persistence paths, the SUID baseline and identity (22.14–22.26, 22.3–22.8)
 
-**เป้าหมาย:** เห็นการฝังตัวผ่าน sudoers, authorized_keys, cron, systemd และไฟล์ SUID ใหม่ และการแก้บัญชีผู้ใช้
+**Goal:** See persistence through sudoers, authorized_keys, cron, systemd and new SUID files, and changes to user accounts
 
-**ทฤษฎี**
-- ผู้บุกรุกที่ได้ root มักทิ้งทางกลับไว้ที่ sudoers.d, authorized_keys, cron และ systemd unit
-- SUID baseline ทำให้ไฟล์ SUID ใหม่ทุกไฟล์เป็น alert
-- การแก้บัญชีจับได้ทั้ง FIM และ auditd (rule 100220–100222, 100300–100301)
+**Theory**
+- Intruders who get root usually leave a way back in sudoers.d, authorized_keys, cron and systemd units
+- A SUID baseline turns every new SUID file into an alert
+- Account changes are caught by both FIM and auditd (rules 100220–100222, 100300–100301)
 
-**ขั้นตอนปฏิบัติ**
-1. เฝ้า sudoers.d, authorized_keys, cron.d, systemd unit dir และ /boot ผ่าน linux-base
-2. ทำ SUID baseline ด้วย find แล้วเปิด rule ไฟล์ SUID ใหม่
-3. ทดสอบด้วยไฟล์ใน sudoers.d ที่มีแต่ comment และการเพิ่ม/ถอนสมาชิกกลุ่ม แล้วลบทันที
-4. ดู alert ระดับความเสี่ยงสูงใน Graylog
+**Steps**
+1. Watch sudoers.d, authorized_keys, cron.d, the systemd unit directory and /boot through linux-base
+2. Build a SUID baseline with find and enable the new-SUID-file rule
+3. Test with a sudoers.d file that contains only a comment, and with adding/removing a group member, then delete them immediately
+4. Look at the high-risk alerts in Graylog
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo find / -xdev -perm /6000 -type f 2>/dev/null | sort > ~/suid-baseline.txt
-sudo visudo -f /etc/sudoers.d/99-ch16-test   # ใส่ comment บรรทัดเดียว แล้วลบไฟล์
+sudo visudo -f /etc/sudoers.d/99-ch16-test   # add a single comment line, then delete the file
 sudo usermod -aG wheel somchai && sudo gpasswd -d somchai wheel
 sudo rm -f /etc/sudoers.d/99-ch16-test
 ```
 
-**แบบฝึกหัด**
-- เลือก persistence path มา 2 จุดที่ไม่ได้อยู่ในบท แล้วเสนอ directories ของ syscheck พร้อมระดับ alert
+**Exercises**
+- Pick 2 persistence paths not covered in the chapter and propose syscheck directories with alert levels
 
-**เกณฑ์ผ่าน**
-- [ ] การเพิ่ม somchai เข้า wheel ได้ alert ระดับสูงพร้อมผู้สั่ง
-- [ ] ไม่มีไฟล์ทดสอบค้างใน sudoers.d (ch16-check.sh)
+**Pass criteria**
+- [ ] Adding somchai to wheel raises a high-level alert that names who ran it
+- [ ] No test file is left in sudoers.d (ch16-check.sh)
 
-**หลักฐาน:** alert ของ identity + diff ของ SUID baseline
+**Evidence:** Identity alerts + the diff of the SUID baseline
 
-อ่านเพิ่ม: บทที่ 16 File Integrity และ Identity Monitoring
+Further reading: Chapter 16 File Integrity and Identity Monitoring
 
-### วันที่ 42 · บทที่ 16 — SMB share, การลบไฟล์จำนวนมาก และบล็อกต้นทาง (22.9, 22.30–22.34)
+### Day 42 · Chapter 16 — SMB shares, mass file deletion and blocking the source (22.9, 22.30–22.34)
 
-**เป้าหมาย:** ตรวจจับการลบหรือเปลี่ยนชื่อไฟล์จำนวนมากบน share และบล็อก IP ต้นทางอัตโนมัติ
+**Goal:** Detect mass deletion or renaming of files on a share and block the source IP automatically
 
-**ทฤษฎี**
-- vfs full_audit ของ Samba บันทึกทุก operation พร้อม user และ IP
-- rule 100423/100424 นับการลบและ rename ซ้ำในเวลาสั้น
-- Active Response บล็อกต้นทางแบบมีเวลาหมดอายุ และต้องยกเว้น IP ของ admin
+**Theory**
+- Samba vfs full_audit records every operation with the user and IP
+- Rules 100423/100424 count repeated deletes and renames in a short time
+- Active Response blocks the source with an expiry and must exempt the admin IP
 
-**ขั้นตอนปฏิบัติ**
-1. ตั้ง share บน lab-linux-02 ด้วยบัญชี smbuser1 (ไม่มี shell)
-2. ส่ง log ของ full_audit เข้า Wazuh
-3. จาก lab-linux-01 คัดลอกไฟล์ทดสอบ 30 ไฟล์แล้วลบทั้งหมด
-4. ดู alert 100423/100424 และกฎ DROP ชั่วคราว แล้วรอให้หมดเวลา
+**Steps**
+1. Set up a share on lab-linux-02 with the account smbuser1 (no shell)
+2. Send the full_audit log into Wazuh
+3. From lab-linux-01, copy 30 test files and then delete them all
+4. Look at alerts 100423/100424 and the temporary DROP rule, then wait for it to expire
 
-**คำสั่งหลัก** (lab-linux-02 · aod)
+**Key commands** (lab-linux-02 · aod)
 ```bash
 sudo useradd -M -s /sbin/nologin smbuser1 && sudo smbpasswd -a smbuser1
-for i in $(seq 1 30); do echo "test $i" > "doc$i.txt"; done   # lab-linux-01 ใน ~/smbtest
+for i in $(seq 1 30); do echo "test $i" > "doc$i.txt"; done   # lab-linux-01 in ~/smbtest
 smbclient //192.168.10.42/share -U smbuser1 -c 'prompt OFF; mput doc*.txt; mdel doc*.txt'
-sudo iptables -S INPUT | grep 192.168.10.41   # ระหว่างถูกบล็อก
+sudo iptables -S INPUT | grep 192.168.10.41   # while blocked
 ```
 
-**แบบฝึกหัด**
-- อธิบายว่าเกณฑ์ "ลบ 20 ไฟล์ใน 60 วินาที" จะพลาดหรือเตือนผิดในงานใดของผู้ใช้จริง และจะปรับอย่างไร
+**Exercises**
+- Explain where the threshold "20 files deleted in 60 seconds" would miss or misfire on real user work, and how you would adjust it
 
-**เกณฑ์ผ่าน**
-- [ ] เกิด alert 100423 หรือ 100424 พร้อม IP ของ lab-linux-01
-- [ ] หลังหมดเวลาไม่มีกฎ DROP ค้าง (ch16-check.sh)
+**Pass criteria**
+- [ ] Alert 100423 or 100424 fires with the IP of lab-linux-01
+- [ ] After expiry no DROP rule is left (ch16-check.sh)
 
-**หลักฐาน:** alert + log ของ active-responses.log
+**Evidence:** Alert + active-responses.log
 
-อ่านเพิ่ม: บทที่ 16 File Integrity และ Identity Monitoring
+Further reading: Chapter 16 File Integrity and Identity Monitoring
 
-### วันที่ 43 · บทที่ 17 — auditd พื้นฐาน, การต่อเข้า Wazuh และลด log ขยะ (23.1–23.4, 23.6)
+### Day 43 · Chapter 17 — auditd basics, sending to Wazuh and cutting noise (23.1–23.4, 23.6)
 
-**เป้าหมาย:** เขียน audit rule แบบ watch และ syscall ที่มี key และค้นย้อนหลังได้ด้วย ausearch/aureport
+**Goal:** Write watch and syscall audit rules with keys, and search them later with ausearch/aureport
 
-**ทฤษฎี**
-- rule แบบ watch (-w) กับ syscall (-a) และ key ที่ใช้ค้น
-- auid ไม่เปลี่ยนเมื่อ sudo/su จึงระบุคนจริงได้
-- ลด log ขยะด้วย exclude ตาม record type และ executable ก่อนส่งออก
+**Theory**
+- Watch rules (-w) vs syscall rules (-a), and the key used to search
+- auid does not change with sudo/su, so it identifies the real person
+- Cut noise with excludes by record type and executable before exporting
 
-**ขั้นตอนปฏิบัติ**
-1. ดู rule ปัจจุบันด้วย auditctl -l
-2. วางไฟล์ 10-base, 20-exclude, 25-identity และ 30-soc ใน /etc/audit/rules.d/
-3. โหลดด้วย augenrules แล้วทดสอบ chmod ไฟล์ทดสอบ (key perm_mod)
-4. ส่ง audit log เข้า Wazuh และดู alert 1003xx
+**Steps**
+1. Look at the current rules with auditctl -l
+2. Put the files 10-base, 20-exclude, 25-identity and 30-soc in /etc/audit/rules.d/
+3. Load with augenrules and test by running chmod on a test file (key perm_mod)
+4. Send the audit log to Wazuh and look at the 1003xx alerts
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo auditctl -l | head
 sudo augenrules --check && sudo augenrules --load
@@ -1480,33 +1482,33 @@ touch /tmp/ch17 && chmod 600 /tmp/ch17 && sudo ausearch -k perm_mod -ts recent -
 sudo aureport -k --summary | head
 ```
 
-**แบบฝึกหัด**
-- เขียน rule ที่บันทึกการแก้ /etc/hosts แล้วอธิบายว่าทำไม watch เหมาะกว่า syscall rule ในกรณีนี้
+**Exercises**
+- Write a rule that records changes to /etc/hosts and explain why a watch suits this case better than a syscall rule
 
-**เกณฑ์ผ่าน**
-- [ ] ausearch -k perm_mod พบ event ที่มี auid ของ aod
-- [ ] auditctl -s แสดง lost 0
+**Pass criteria**
+- [ ] ausearch -k perm_mod finds an event with the auid of aod
+- [ ] auditctl -s shows lost 0
 
-**หลักฐาน:** ผล ausearch + aureport
+**Evidence:** ausearch + aureport output
 
-อ่านเพิ่ม: บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
+Further reading: Chapter 17 Linux Audit (auditd) for Investigation
 
-### วันที่ 44 · บทที่ 17 — ไฟล์ rule ตามหมวดแนว CIS และการล็อก rule (23.10–23.29)
+### Day 44 · Chapter 17 — Rule files by CIS-style category and locking the rules (23.10–23.29)
 
-**เป้าหมาย:** จัด audit rule เป็นไฟล์ตามหมวด และตั้ง -e 2 โดยไม่ทำให้ whodata ของ Wazuh เสีย
+**Goal:** Organize audit rules into files by category and set -e 2 without breaking Wazuh whodata
 
-**ทฤษฎี**
-- ลำดับไฟล์ใน rules.d มีผล: exclude ต้องมาก่อน rule ที่จะยกเว้น
-- -e 2 ทำให้แก้ rule ได้ด้วยการ reboot เท่านั้น
-- Wazuh ต้องเพิ่ม rule wazuh_fim ก่อนล็อก
+**Theory**
+- File order in rules.d matters: excludes must come before the rules they exempt
+- -e 2 means rules can only be changed by rebooting
+- Wazuh needs the wazuh_fim rule added before locking
 
-**ขั้นตอนปฏิบัติ**
-1. เขียน 40-cis.rules ทีละหมวดพร้อม trigger ที่ไม่เป็นอันตราย
-2. สร้าง rule privileged จาก SUID baseline วันที่ 41
-3. ใส่ -e 2 ใน 99-finalize.rules หลังทดสอบเสร็จ แล้ว reboot
-4. ตรวจ enabled 2, lost 0 และ rule wazuh_fim
+**Steps**
+1. Write 40-cis.rules one category at a time, with a harmless trigger for each
+2. Create privileged rules from the day 41 SUID baseline
+3. Put -e 2 in 99-finalize.rules after testing is done, then reboot
+4. Check enabled 2, lost 0 and the wazuh_fim rule
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 -a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k time-change
 -a always,exit -F arch=b64 -S unlink,unlinkat,rename,renameat -F auid>=1000 -F auid!=unset -k delete
@@ -1514,133 +1516,133 @@ sudo aureport -k --summary | head
 sudo auditctl -s | grep -E "enabled|lost|backlog"
 ```
 
-**แบบฝึกหัด**
-- อธิบายขั้นตอนแก้ rule หลังตั้ง -e 2 ไปแล้วแบบไม่ปิด auditd และไม่เสีย log ระหว่างนั้น
+**Exercises**
+- Explain how to change rules after -e 2 is set, without stopping auditd and without losing logs in between
 
-**เกณฑ์ผ่าน**
-- [ ] auditctl -s แสดง enabled 2 และ lost 0
-- [ ] ch17-check.sh ผ่านข้อ wazuh_fim
+**Pass criteria**
+- [ ] auditctl -s shows enabled 2 and lost 0
+- [ ] ch17-check.sh passes the wazuh_fim item
 
-**หลักฐาน:** ไฟล์ rules.d + ผล auditctl -s
+**Evidence:** The rules.d files + auditctl -s output
 
-อ่านเพิ่ม: บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
+Further reading: Chapter 17 Linux Audit (auditd) for Investigation
 
-### วันที่ 45 · บทที่ 17 — ตรวจจับระดับ syscall และ proctitle ใน Graylog (23.5, 23.7–23.9, 23.30–23.35)
+### Day 45 · Chapter 17 — Syscall-level detection and proctitle in Graylog (23.5, 23.7–23.9, 23.30–23.35)
 
-**เป้าหมาย:** ตรวจจับ shell จาก web server, การโหลด kernel module, การใช้บัญชี nobody, process injection และ LD_PRELOAD ด้วยเหตุการณ์จำลองที่ไม่เป็นอันตราย
+**Goal:** Detect a shell from a web server, kernel module loading, use of the nobody account, process injection and LD_PRELOAD using harmless simulated events
 
-**ทฤษฎี**
-- key webshell_exec, modules, nobody_exec, process_injection, ld_preload
-- trigger ใช้คำสั่งปกติของระบบ เช่น modprobe โมดูล dummy ที่มากับ kernel
-- proctitle เป็น hex ต้องถอดรหัสก่อนอ่านใน Graylog
+**Theory**
+- Keys webshell_exec, modules, nobody_exec, process_injection, ld_preload
+- Triggers use normal system commands, such as modprobe of the dummy module that ships with the kernel
+- proctitle is hex and must be decoded before it can be read in Graylog
 
-**ขั้นตอนปฏิบัติ**
-1. ทดสอบทีละ key ตามส่วน B ของบทแล้วดู alert ใน Wazuh
-2. ถอดรหัส proctitle ผ่าน pipeline ของ Graylog
-3. สร้าง dashboard SOC Critical
-4. ลบบัญชีและ module ทดสอบ แล้ว snapshot ch17-auditd
+**Steps**
+1. Test one key at a time per section B of the chapter and look at the alerts in Wazuh
+2. Decode proctitle in a Graylog pipeline
+3. Create the SOC Critical dashboard
+4. Remove the test account and module, then snapshot ch17-auditd
 
-**คำสั่งหลัก** (lab-linux-01 · aod)
+**Key commands** (lab-linux-01 · aod)
 ```bash
 sudo modprobe dummy && sudo modprobe -r dummy
 sudo ausearch -k modules -ts recent -i | grep -E "type=(SYSCALL|KERN_MODULE)" | tail -4
 sudo ausearch -k ld_preload -ts recent -i | tail -2
-bash pve-snapshot.sh ch17-auditd   # บน pve-01
+bash pve-snapshot.sh ch17-auditd   # on pve-01
 ```
 
-**แบบฝึกหัด**
-- เปรียบเทียบ alert ของการโหลด module จาก auditd กับสิ่งที่ Tetragon (บทที่ 19) จะเห็น เขียนเป็นตาราง 3 แถว
+**Exercises**
+- Compare the auditd alert for a module load with what Tetragon (chapter 19) will see, as a 3-row table
 
-**เกณฑ์ผ่าน**
-- [ ] ทุก key ในส่วน B มี alert อย่างน้อย 1 ครั้ง
-- [ ] Graylog แสดง proctitle เป็นข้อความอ่านได้
+**Pass criteria**
+- [ ] Every key in section B has at least 1 alert
+- [ ] Graylog shows proctitle as readable text
 
-**หลักฐาน:** ภาพ dashboard SOC Critical + ผล ch17-check.sh
+**Evidence:** Screenshot of the SOC Critical dashboard + ch17-check.sh output
 
-อ่านเพิ่ม: บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
+Further reading: Chapter 17 Linux Audit (auditd) for Investigation
 
-### ◆ วันที่ 46 — Checkpoint 4: ภาค 5 Detection & Response
+### ◆ Day 46 — Checkpoint 4: Part 5 Detection & Response
 
-**เป้าหมาย:** ตรวจจับและตอบสนองเหตุการณ์ persistence จำลองครบวงจร
+**Goal:** Detect and respond end to end to a simulated persistence incident
 
-**ทฤษฎี**
-- ทบทวนคำถามท้ายบทที่ 14–17
+**Theory**
+- Review the end-of-chapter questions for chapters 14–17
 
-**ขั้นตอนปฏิบัติ**
-1. Scenario: บัญชีถูกยึด ผู้บุกรุกเพิ่ม authorized_keys, สร้าง cron และเพิ่มตัวเองเข้า wheel (ผู้สอนทำด้วยคำสั่งปกติ)
-2. ผู้เรียนต้องเห็น alert ทั้ง 3 เรื่อง ระบุ timeline จาก Wazuh + ausearch
-3. ย้อนสถานะให้สะอาด และพิสูจน์ด้วย FIM ว่ากลับเป็น baseline
+**Steps**
+1. Scenario: an account is compromised; the intruder adds authorized_keys, creates a cron job and adds themselves to wheel (the instructor does this with normal commands)
+2. You must see alerts for all 3 actions and build the timeline from Wazuh + ausearch
+3. Restore a clean state and prove with FIM that it is back to baseline
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 # Wazuh Dashboard → Threat Hunting: rule.groups:syscheck AND agent.name:lab-linux-01
 sudo ausearch -k identity -k scope -k cron -i --start today
 ```
 
-**แบบฝึกหัด**
-- สอบย่อย 10 ข้อจากคำถามทบทวนบทที่ 14–17
+**Exercises**
+- A 10-question quiz from the review questions of chapters 14–17
 
-**เกณฑ์ผ่าน**
-- [ ] พบ alert ครบ 3 เรื่องภายใน 30 นาที
-- [ ] รายงานมี MITRE technique ID ถูกต้อง
-- [ ] Rubric ระดับ 3 ขึ้นไป
+**Pass criteria**
+- [ ] All 3 alerts found within 30 minutes
+- [ ] The report has correct MITRE technique IDs
+- [ ] Rubric level 3 or above
 
-**หลักฐาน:** รายงานเหตุการณ์ + หลักฐาน
+**Evidence:** Incident report + evidence
 
 
 
-## ภาค 6 Container และ eBPF
+## Part 6 Containers and eBPF
 
-### วันที่ 47 · บทที่ 18 — Docker Engine ที่ปลอดภัยและการมองเห็นชั้น Docker API (24-A, 24-B)
+### Day 47 · Chapter 18 — A secure Docker Engine and visibility at the Docker API layer (24-A, 24-B)
 
-**เป้าหมาย:** ติดตั้ง Docker แบบใช้ SELinux และ seccomp ไม่มีสมาชิกในกลุ่ม docker และส่ง event ของ Docker API เข้า Wazuh
+**Goal:** Install Docker with SELinux and seccomp, with no members in the docker group, and send Docker API events to Wazuh
 
-**ทฤษฎี**
-- container ใช้ kernel ร่วมกับ host: namespace, cgroup v2, capability, seccomp, SELinux
-- ใครสั่ง Docker ได้เทียบเท่า root จึงใช้ sudo docker แทนกลุ่ม docker
-- docker-listener เห็น exec, kill, commit, cp ผ่าน Docker API
+**Theory**
+- Containers share the kernel with the host: namespaces, cgroup v2, capabilities, seccomp, SELinux
+- Anyone who can drive Docker is effectively root, so use sudo docker instead of the docker group
+- docker-listener sees exec, kill, commit and cp through the Docker API
 
-**ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Docker CE บน node-01 และตรวจ SecurityOptions
-2. สร้าง network lab-net และ container web-01, app-01, tools-01 (label soc.autoresponse=off)
-3. เพิ่ม audit rule ของ docker runtime
-4. เปิด docker-listener และทดสอบ docker exec
+**Steps**
+1. Install Docker CE on node-01 and check SecurityOptions
+2. Create the network lab-net and the containers web-01, app-01, tools-01 (label soc.autoresponse=off)
+3. Add the audit rules for the docker runtime
+4. Enable docker-listener and test docker exec
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 sudo docker info --format '{{.CgroupVersion}} {{.SecurityOptions}}'
-getent group docker   # ต้องไม่มีสมาชิก
+getent group docker   # must have no members
 sudo docker run -d --name app-01 --network lab-net alpine:3.20 sleep infinity
-sudo docker exec tools-01 id   # สร้าง alert ของ Docker API
+sudo docker exec tools-01 id   # creates a Docker API alert
 ```
 
-**แบบฝึกหัด**
-- รัน web-01 ใหม่แบบ --read-only, --cap-drop ALL และเพิ่มเฉพาะ capability ที่ nginx ต้องใช้ แล้วยืนยันว่ายังให้บริการได้
+**Exercises**
+- Run web-01 again with --read-only, --cap-drop ALL and only the capabilities nginx needs, and confirm it still serves
 
-**เกณฑ์ผ่าน**
-- [ ] docker info แสดง selinux และ seccomp
-- [ ] alert ของ docker exec มีชื่อ container และผู้สั่งจาก auditd
+**Pass criteria**
+- [ ] docker info shows selinux and seccomp
+- [ ] The docker exec alert has the container name and, from auditd, who ran it
 
-**หลักฐาน:** ผล docker info + alert
+**Evidence:** docker info output + alert
 
-อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
+Further reading: Chapter 18 Docker Runtime Security
 
-### วันที่ 48 · บทที่ 18 — rule ของ container และ Active Response แบบไล่ระดับ (24-B, 24-C)
+### Day 48 · Chapter 18 — Container rules and graduated Active Response (24-B, 24-C)
 
-**เป้าหมาย:** ตรวจจับ terminal hijacking, DoS และการนำข้อมูลออกใน container แล้วตอบสนองด้วย pause/stop/kill พร้อม whitelist
+**Goal:** Detect terminal hijacking, DoS and data exfiltration in containers, and respond with pause/stop/kill and a whitelist
 
-**ทฤษฎี**
-- rule 1007xx ใน 160-container_rules.xml
-- pause แช่แข็งโดยไม่ทำลายหลักฐานในหน่วยความจำ
-- label soc.autoresponse=off ทำให้ยังเกิด alert แต่ไม่ถูกตอบโต้
+**Theory**
+- Rules 1007xx in 160-container_rules.xml
+- pause freezes the container without destroying the evidence in memory
+- The label soc.autoresponse=off still raises alerts but is not acted on
 
-**ขั้นตอนปฏิบัติ**
-1. วาง rule และ decoder ของ container บน wazuh-01
-2. ติดตั้ง container-response.sh (root:wazuh 750) และทดสอบด้วยมือก่อนผูก rule
-3. ทดสอบทั้ง 3 โหมดและ whitelist ตามขั้นตอนที่ 5 ของ 24-C
-4. เก็บหลักฐานจาก container ที่ถูก pause แล้ว unpause
+**Steps**
+1. Install the container rules and decoders on wazuh-01
+2. Install container-response.sh (root:wazuh 750) and test it by hand before binding rules
+3. Test all 3 modes and the whitelist per step 5 of 24-C
+4. Collect evidence from the paused container, then unpause it
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 sudo tail -n 3 /var/ossec/logs/active-responses.log
 sudo docker ps -a --format 'table {{.Names}}\t{{.Status}}'
@@ -1648,68 +1650,68 @@ sudo docker unpause app-01
 sudo docker inspect -f '{{.Name}} {{.HostConfig.Privileged}}' $(sudo docker ps -q)
 ```
 
-**แบบฝึกหัด**
-- กรอกแบบฟอร์มรายงานผลทดสอบ 4 ขั้น (24.13) ของ 1 สถานการณ์
+**Exercises**
+- Fill in the 4-step test report form (24.13) for one scenario
 
-**เกณฑ์ผ่าน**
-- [ ] เห็นผล pause, kill และ skip ตาม label ใน active-responses.log
-- [ ] ไม่มี container privileged หรือ mount docker.sock ค้าง
+**Pass criteria**
+- [ ] active-responses.log shows pause, kill and skip according to the label
+- [ ] No privileged container or docker.sock mount is left behind
 
-**หลักฐาน:** log ของ Active Response + แบบฟอร์ม 4 ขั้น
+**Evidence:** Active Response log + the 4-step form
 
-อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
+Further reading: Chapter 18 Docker Runtime Security
 
-### วันที่ 49 · บทที่ 18 — Falco แบบ modern eBPF และ SOC Command Center (24-D, 24-F)
+### Day 49 · Chapter 18 — Falco with modern eBPF, and the SOC Command Center (24-D, 24-F)
 
-**เป้าหมาย:** ตรวจจับพฤติกรรมใน container ระดับ syscall ด้วย Falco ลด false positive และรวมภาพใน dashboard
+**Goal:** Detect behavior inside containers at the syscall level with Falco, reduce false positives, and bring it together in a dashboard
 
-**ทฤษฎี**
-- Falco ใช้ driver modern_ebpf บน Rocky 10
-- rule ของตัวเองอยู่ใน rules.d และ override ได้โดยไม่แก้ rule หลัก
-- access log ของ nginx ใน web-01 ใช้ตรวจ scan และบล็อก IP
+**Theory**
+- Falco uses the modern_ebpf driver on Rocky 10
+- Your own rules go in rules.d and can override without editing the main rules
+- The nginx access log of web-01 is used to detect scans and block IPs
 
-**ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Falco และเปิด JSON output
-2. เขียน rule ของตัวเองและส่งเข้า Wazuh
-3. ลด false positive ของ tools-01
-4. ส่ง access log ของ web-01 เข้า Wazuh และสร้าง dashboard SOC Command Center
-5. รัน ch18-check.sh แล้ว snapshot ch18-docker
+**Steps**
+1. Install Falco and enable JSON output
+2. Write your own rules and send them to Wazuh
+3. Reduce false positives from tools-01
+4. Send the web-01 access log to Wazuh and build the SOC Command Center dashboard
+5. Run ch18-check.sh, then snapshot ch18-docker
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 systemctl is-active falco-modern-bpf.service
 sudo docker exec -it app-01 sh -c exit
 sudo jq -r 'select(.rule=="Terminal shell in container") | .output' /var/log/falco/falco.json | tail -1
-bash pve-snapshot.sh ch18-docker   # บน pve-01
+bash pve-snapshot.sh ch18-docker   # on pve-01
 ```
 
-**แบบฝึกหัด**
-- เขียน Falco rule ที่เตือนเมื่อ container เขียนไฟล์ใน /etc และยกเว้น container ที่ตั้งใจเขียน
+**Exercises**
+- Write a Falco rule that warns when a container writes a file under /etc, exempting containers that write there on purpose
 
-**เกณฑ์ผ่าน**
-- [ ] Falco alert ของ shell ใน app-01 ไปถึง Wazuh
-- [ ] ch18-check.sh ผ่านทุกข้อ
+**Pass criteria**
+- [ ] The Falco alert for a shell in app-01 reaches Wazuh
+- [ ] ch18-check.sh passes every item
 
-**หลักฐาน:** alert ของ Falco + ภาพ SOC Command Center
+**Evidence:** Falco alert + screenshot of the SOC Command Center
 
-อ่านเพิ่ม: บทที่ 18 Docker Runtime Security
+Further reading: Chapter 18 Docker Runtime Security
 
-### วันที่ 50 · บทที่ 19 — ติดตั้ง Tetragon และ eBPF Shield ของ container (Lab 33, 24-E, 35)
+### Day 50 · Chapter 19 — Install Tetragon and the container eBPF Shield (Lab 33, 24-E, 35)
 
-**เป้าหมาย:** หยุด process ใน container ที่ละเมิด policy ทันทีในระดับ kernel และส่ง event เข้า Wazuh
+**Goal:** Stop a container process that violates policy instantly at the kernel level, and send the event to Wazuh
 
-**ทฤษฎี**
-- Tetragon = eBPF ที่ทั้งสังเกตและบังคับ (Sigkill) ใน kernel
-- TracingPolicy: kprobe + selector + action; host_ns NotIn = เฉพาะ container
-- Sigkill ไม่ยับยั้ง operation ที่กำลังทำ ต้องใช้ Override หรือ no-new-privileges เป็นชั้นสำรอง
+**Theory**
+- Tetragon = eBPF that both observes and enforces (Sigkill) in the kernel
+- TracingPolicy: kprobe + selector + action; host_ns NotIn = containers only
+- Sigkill does not stop an operation already in progress; use Override or no-new-privileges as a backup layer
 
-**ขั้นตอนปฏิบัติ**
-1. ติดตั้ง Tetragon 1.7.1 จาก tarball และจำกัด export เฉพาะ PROCESS_KPROBE
-2. smoke-test แล้วต่อ tetragon.log เข้า Wazuh (rule 100800–100802)
-3. โหลด block-tmp-exec, guillotine, protect-shadow ด้วย tetra tracingpolicy add แล้วทดสอบใน ebpf-01
-4. โหลด 50-suid-guard.yaml: chmod u+s ใน container ถูก kill ส่วนบน host แค่บันทึก
+**Steps**
+1. Install Tetragon 1.7.1 from the tarball and limit export to PROCESS_KPROBE
+2. Smoke-test, then send tetragon.log to Wazuh (rules 100800–100802)
+3. Load block-tmp-exec, guillotine and protect-shadow with tetra tracingpolicy add and test in ebpf-01
+4. Load 50-suid-guard.yaml: chmod u+s in a container is killed, while on the host it is only recorded
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 tar -xf tetragon-v1.7.1-amd64.tar.gz && cd tetragon-v1.7.1-amd64 && sudo ./install.sh
 sudo tetra tracingpolicy add ~/tp/50-suid-guard.yaml
@@ -1717,34 +1719,34 @@ sudo docker exec ebpf-01 chmod u+s /root/suid-test; echo "exit=$?"
 sudo docker exec ebpf-01 ls -l /root/suid-test
 ```
 
-**แบบฝึกหัด**
-- ตรวจ kernel ด้วย grep BPF_KPROBE_OVERRIDE /boot/config-$(uname -r) แล้วอธิบายว่า suid-guard ของ lab ป้องกันได้ระดับใด
+**Exercises**
+- Check the kernel with grep BPF_KPROBE_OVERRIDE /boot/config-$(uname -r) and explain how much the lab suid-guard can prevent
 
-**เกณฑ์ผ่าน**
-- [ ] chmod u+s ใน container ได้ exit 137 และ bit ไม่ค้าง (หรือแก้คืนแล้ว)
-- [ ] chmod g+s บน host ได้ exit 0 และ alert 100813
+**Pass criteria**
+- [ ] chmod u+s in the container gets exit 137 and the bit does not stick (or has been reverted)
+- [ ] chmod g+s on the host gets exit 0 and alert 100813
 
-**หลักฐาน:** exit code + alert 100802/100811/100813
+**Evidence:** Exit codes + alerts 100802/100811/100813
 
-อ่านเพิ่ม: บทที่ 19 Tetragon: มองเห็นและหยุดภัยระดับ Kernel
+Further reading: Chapter 19 Tetragon: Seeing and Stopping Threats at the Kernel Level
 
-### วันที่ 51 · บทที่ 19 — keyguard, sensitive file และ Account Activity Tracker (Lab 36–37)
+### Day 51 · Chapter 19 — keyguard, sensitive files and the Account Activity Tracker (Lab 36–37)
 
-**เป้าหมาย:** ปกป้อง SSH host key แบบสังเกตก่อนบังคับ และรู้ว่าใครอ่านไฟล์ลับหรือแก้บัญชี
+**Goal:** Protect SSH host keys by observing before enforcing, and know who read secret files or changed accounts
 
-**ทฤษฎี**
-- policy ฝั่ง host: Post + rateLimit ก่อน แล้วจึง Sigkill
-- matchBinaries NotIn ยกเว้น binary ที่อ่านตามหน้าที่ (sshd, sshd-session, sudo)
-- auid ระบุคนที่ login จริงแม้ใช้ sudo
+**Theory**
+- Host-side policies: Post + rateLimit first, then Sigkill
+- matchBinaries NotIn exempts binaries that read these files as part of their job (sshd, sshd-session, sudo)
+- auid identifies the person who really logged in, even through sudo
 
-**ขั้นตอนปฏิบัติ**
-1. เปิด SSH session สำรองและ Console ของ Proxmox
-2. keyguard ระยะสังเกต → นับ binary ด้วย jq → ระยะบังคับ แล้วทดสอบ SSH ใหม่
-3. โหลด sensitive-files และ account-tracker ทดสอบด้วย tester1 แล้วรัน acct-activity.sh
-4. เพิ่ม rule ราย policy และ 100805 → quarantine แล้วติดตั้งถาวรใน tetragon.tp.d
-5. รัน ch19-check.sh แล้ว snapshot ch19-ebpf
+**Steps**
+1. Open a backup SSH session and the Proxmox console
+2. keyguard observe phase → count binaries with jq → enforce phase, then test a new SSH login
+3. Load sensitive-files and account-tracker, test with tester1, then run acct-activity.sh
+4. Add per-policy rules and 100805 → quarantine, then install permanently in tetragon.tp.d
+5. Run ch19-check.sh, then snapshot ch19-ebpf
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 sudo jq -r 'select(.process_kprobe.policy_name=="keyguard") | .process_kprobe.process.binary' /var/log/tetragon/tetragon.log | sort | uniq -c
 sudo /usr/local/sbin/acct-activity.sh | tail -5
@@ -1752,140 +1754,140 @@ sudo install -m 600 -o root -g root ~/tp/*.yaml /etc/tetragon/tetragon.tp.d/
 sudo systemctl restart tetragon && sudo tetra tracingpolicy list
 ```
 
-**แบบฝึกหัด**
-- เปรียบเทียบสิ่งที่ auditd (บทที่ 17) กับ Tetragon เห็นจากเหตุการณ์ cat /etc/shadow เดียวกัน เป็นตาราง 5 แถว
+**Exercises**
+- Compare what auditd (chapter 17) and Tetragon see for the same cat /etc/shadow event, as a 5-row table
 
-**เกณฑ์ผ่าน**
-- [ ] หลังบังคับ keyguard SSH ใหม่ยังเข้าได้
-- [ ] policy 9 ตัวโหลดหลัง restart
-- [ ] ch19-check.sh ผ่านทุกข้อ
+**Pass criteria**
+- [ ] After enforcing keyguard, new SSH logins still work
+- [ ] All 9 policies load after restart
+- [ ] ch19-check.sh passes every item
 
-**หลักฐาน:** ผล ch19-check.sh + ตารางเปรียบเทียบ
+**Evidence:** ch19-check.sh output + comparison table
 
-อ่านเพิ่ม: บทที่ 19 Tetragon: มองเห็นและหยุดภัยระดับ Kernel
+Further reading: Chapter 19 Tetragon: Seeing and Stopping Threats at the Kernel Level
 
-## ภาค 7 SOC Operations ขั้นสูง
+## Part 7 Advanced SOC operations
 
-### วันที่ 52 · บทที่ 20 — SOC Analyst login Graylog ด้วย FreeIPA และ Sudo Violation Dashboard (Lab 25–26)
+### Day 52 · Chapter 20 — SOC analysts log in to Graylog with FreeIPA, and the Sudo Violation Dashboard (Lab 25–26)
 
-**เป้าหมาย:** analyst เข้า Graylog ด้วยบัญชี FreeIPA ตามกลุ่ม และเห็นการใช้ sudo ที่ละเมิดนโยบายใน dashboard
+**Goal:** Analysts log in to Graylog with their FreeIPA account by group, and policy-violating sudo use shows up in a dashboard
 
-**ทฤษฎี**
-- LDAPS 636 ต้องให้ JVM ของ Graylog เชื่อ CA ของ IPA
-- filter ตามกลุ่ม soc-analysts ทำให้ intern1 เข้าไม่ได้
-- rule 100213 นับการละเมิด sudo ซ้ำของผู้ใช้เดียวกัน
+**Theory**
+- LDAPS on 636 requires the Graylog JVM to trust the IPA CA
+- Filtering on the soc-analysts group keeps intern1 out
+- Rule 100213 counts repeated sudo violations by the same user
 
-**ขั้นตอนปฏิบัติ**
-1. สร้างกลุ่ม soc-analysts และผู้ใช้ analyst1, intern1 ใน IPA
-2. ทดสอบ LDAPS จาก graylog-01 ก่อนตั้ง Authentication Service
-3. ให้ role แบบ SOC Analyst แล้วทดสอบ login ทั้งสองบัญชี
-4. สร้างข้อมูลทดสอบด้วย su - anan / chai แล้วสร้าง dashboard และ event definition
+**Steps**
+1. Create the soc-analysts group and the users analyst1 and intern1 in IPA
+2. Test LDAPS from graylog-01 before setting up the Authentication Service
+3. Give a SOC Analyst role and test logging in with both accounts
+4. Create test data with su - anan / chai, then build the dashboard and the event definition
 5. snapshot ch20-soc
 
-**คำสั่งหลัก** (graylog-01 · aod)
+**Key commands** (graylog-01 · aod)
 ```bash
-ipa group-add soc-analysts --desc="Graylog SOC analysts"   # บน ipa-01
+ipa group-add soc-analysts --desc="Graylog SOC analysts"   # on ipa-01
 LDAPTLS_CACERT=/opt/graylog/ipa-ca.crt ldapsearch -LLL -H ldaps://ipa-01.lab.internal:636 -D "uid=graylog-bind,cn=sysaccounts,cn=etc,dc=lab,dc=internal" -W -b "cn=users,cn=accounts,dc=lab,dc=internal" "(&(uid=analyst1)(memberOf=cn=soc-analysts,cn=groups,cn=accounts,dc=lab,dc=internal))" uid
-su - anan   # บน lab-linux-01 แล้ว sudo cat /etc/shadow 3 ครั้ง
-wazuh_rule_id:100213   # ค้นใน Graylog
+su - anan   # on lab-linux-01, then sudo cat /etc/shadow 3 times
+wazuh_rule_id:100213   # search in Graylog
 ```
 
-**แบบฝึกหัด**
-- เขียนขั้นตอนตอบสนองเมื่อ dashboard แสดง 100213 ของบัญชีหนึ่ง: ตรวจ auid, ถามเจ้าของ, ล็อกบัญชีใน IPA
+**Exercises**
+- Write the response steps when the dashboard shows 100213 for an account: check the auid, ask the owner, lock the account in IPA
 
-**เกณฑ์ผ่าน**
-- [ ] analyst1 login ได้ และ intern1 ถูกปฏิเสธ
-- [ ] dashboard แสดง 100213 ของ anan
+**Pass criteria**
+- [ ] analyst1 can log in and intern1 is refused
+- [ ] The dashboard shows 100213 for anan
 
-**หลักฐาน:** ภาพ dashboard + ผล ldapsearch
+**Evidence:** Screenshot of the dashboard + ldapsearch output
 
-อ่านเพิ่ม: บทที่ 20 SOC Analyst Access และ Sudo Violation Dashboard
+Further reading: Chapter 20 SOC Analyst Access and a Sudo Violation Dashboard
 
-### วันที่ 53 · บทที่ 21 — ติดตามและบล็อกคำสั่ง Git แบบ real-time (Lab 27)
+### Day 53 · Chapter 21 — Tracking and blocking Git commands in real time (Lab 27)
 
-**เป้าหมาย:** push ไป remote ที่ไม่อนุมัติหรือ force push ถูกหยุด และการพยายามข้าม hook กลายเป็น alert
+**Goal:** A push to an unapproved remote or a force push is stopped, and attempts to bypass the hook become alerts
 
-**ทฤษฎี**
-- 4 ชั้น: Track (audit), Guard (pre-push hook), Kernel block (Tetragon git-egress), Server (กฎของ repository)
-- hook ฝั่ง client ข้ามได้ด้วย --no-verify จึงเป็นราวกันตก ไม่ใช่กำแพง
-- rule 100370–100378 แยกตามชั้น
+**Theory**
+- 4 layers: Track (audit), Guard (pre-push hook), Kernel block (Tetragon git-egress), Server (repository rules)
+- A client-side hook can be skipped with --no-verify, so it is a guard rail, not a wall
+- Rules 100370–100378, split by layer
 
-**ขั้นตอนปฏิบัติ**
-1. สร้าง repository ที่อนุมัติบน lab-linux-01 (git.lab.internal) และ remote ทดสอบบน lab-linux-02
-2. audit rule และ Wazuh rule ของ git
-3. ติดตั้ง system-wide pre-push hook และ policy git-egress
-4. ทดสอบ 6 กรณีตามตารางในบท
+**Steps**
+1. Create the approved repository on lab-linux-01 (git.lab.internal) and a test remote on lab-linux-02
+2. Audit rules and Wazuh rules for git
+3. Install the system-wide pre-push hook and the git-egress policy
+4. Test the 6 cases in the chapter table
 5. snapshot ch21-git
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
-git init --bare -b main /srv/git/demo.git   # บน lab-linux-01
-git push --force origin main   # ต้องถูก git-guard หยุด
-git push --no-verify evil main   # ต้องถูก Tetragon ตัด
-wazuh_rule_id:[100370 TO 100378]   # ค้นใน Graylog
+git init --bare -b main /srv/git/demo.git   # on lab-linux-01
+git push --force origin main   # must be stopped by git-guard
+git push --no-verify evil main   # must be cut off by Tetragon
+wazuh_rule_id:[100370 TO 100378]   # search in Graylog
 ```
 
-**แบบฝึกหัด**
-- อธิบายว่าถ้าไม่มีชั้น Kernel block ผู้ใช้จะนำ code ออกได้ด้วยวิธีใดบ้าง (ระดับแนวคิด) และชั้นใดจะยังเห็น
+**Exercises**
+- Explain, at the concept level, how a user could take code out if there were no kernel block layer, and which layers would still see it
 
-**เกณฑ์ผ่าน**
-- [ ] ผลทั้ง 6 กรณีตรงกับตารางในบท
-- [ ] ch21-check.sh ผ่านทุกข้อ
+**Pass criteria**
+- [ ] All 6 cases match the chapter table
+- [ ] ch21-check.sh passes every item
 
-**หลักฐาน:** ตารางผลทดสอบ 6 กรณี + alert
+**Evidence:** Table of the 6 test cases + alerts
 
-อ่านเพิ่ม: บทที่ 21 ติดตามและบล็อกคำสั่ง Git แบบ Real-time
+Further reading: Chapter 21 Tracking and Blocking Git Commands in Real Time
 
-### วันที่ 54 · บทที่ 22 — App log เข้า Graylog, WordPress stack และ Web logging (Lab 28, 30, 31)
+### Day 54 · Chapter 22 — App logs into Graylog, the WordPress stack and web logging (Lab 28, 30, 31)
 
-**เป้าหมาย:** ส่ง log ของ application 3 วิธี แยก log ของ Nginx กับ WordPress และเร่ง WordPress ด้วย Redis
+**Goal:** Send application logs in 3 ways, separate the Nginx and WordPress logs, and speed WordPress up with Redis
 
-**ทฤษฎี**
-- GELF จาก application, Docker gelf driver และไฟล์ผ่าน rsyslog
-- log_format แบบ JSON ทำให้ Graylog ไม่ต้อง parse ด้วย regex
-- Redis object cache วัดผลด้วย keyspace_hits/misses
+**Theory**
+- GELF from the application, the Docker gelf driver, and files through rsyslog
+- A JSON log_format means Graylog does not need regex parsing
+- Measure the Redis object cache with keyspace_hits/misses
 
-**ขั้นตอนปฏิบัติ**
-1. ทำ Lab 28 วิธี A และ B แล้วสร้าง stream และ pipeline
-2. start WordPress stack ใน /opt/wordpress และติดตั้ง WordPress
-3. สร้าง stream และ pipeline Web แยก nginx กับ WordPress แล้วทำ dashboard Web Overview
-4. วัด baseline ด้วย ab แล้วเปิด Redis และวัดซ้ำ
+**Steps**
+1. Do Lab 28 methods A and B, then create the stream and pipeline
+2. Start the WordPress stack in /opt/wordpress and install WordPress
+3. Create the Web stream and pipeline that separate nginx and WordPress, then build the Web Overview dashboard
+4. Measure a baseline with ab, then enable Redis and measure again
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 cd /opt/wordpress && sudo docker compose up -d && sudo docker compose ps
 ab -n 300 -c 10 http://192.168.10.50:8081/ | grep -E "Requests per second|Time per request"
-rcli info stats | grep -E 'keyspace_(hits|misses)'   # rcli ตามขั้นตอนที่ 4 ของ Lab 31
-log_type:nginx_access AND http_status:>=400   # ค้นใน Graylog
+rcli info stats | grep -E 'keyspace_(hits|misses)'   # rcli as in step 4 of Lab 31
+log_type:nginx_access AND http_status:>=400   # search in Graylog
 ```
 
-**แบบฝึกหัด**
-- เทียบตัวเลขก่อนและหลังเปิด Redis และอธิบายว่าทำไมหน้าที่ login แล้วได้ประโยชน์จาก cache น้อยกว่า
+**Exercises**
+- Compare the numbers before and after enabling Redis, and explain why logged-in pages benefit less from the cache
 
-**เกณฑ์ผ่าน**
-- [ ] Graylog แยก log_type ของ nginx และ WordPress
-- [ ] keyspace_hits มากกว่า misses หลังเรียกหน้าซ้ำ
+**Pass criteria**
+- [ ] Graylog separates the log_type of nginx and WordPress
+- [ ] keyspace_hits exceed misses after repeated page loads
 
-**หลักฐาน:** ผล ab ก่อน/หลัง + ภาพ Web Overview
+**Evidence:** ab results before/after + screenshot of Web Overview
 
-อ่านเพิ่ม: บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
+Further reading: Chapter 22 Application and Web Logging: Nginx, WordPress, Redis and WAF
 
-### วันที่ 55 · บทที่ 22 — ตรวจจับและหยุด shell execution ใน WordPress (Lab 29)
+### Day 55 · Chapter 22 — Detecting and stopping shell execution in WordPress (Lab 29)
 
-**เป้าหมาย:** ไฟล์ PHP ทดสอบที่เรียก shell ถูกตรวจจับ, IP ถูกบล็อก, shell ถูกฆ่าใน kernel และปิดทางที่ configuration
+**Goal:** A test PHP file that calls a shell is detected, the IP is blocked, the shell is killed in the kernel, and the path is closed in configuration
 
-**ทฤษฎี**
-- 3 รอบ: ตรวจจับและ block IP → ฆ่า shell ใน kernel (Tetragon wp-no-shell, rule 100903) → hardening
-- ไฟล์ทดสอบเรียกแค่ id และลบทันทีหลังทดสอบ
-- disable_functions และการห้ามรัน PHP ใน uploads ปิดทางตั้งแต่ต้นทาง
+**Theory**
+- 3 rounds: detect and block the IP → kill the shell in the kernel (Tetragon wp-no-shell, rule 100903) → hardening
+- The test file only calls id and is deleted right after testing
+- disable_functions and blocking PHP execution in uploads close the path at the source
 
-**ขั้นตอนปฏิบัติ**
-1. ให้ Wazuh เห็นไฟล์และ log ของ WordPress แล้ววาง rule 1009xx
-2. วางไฟล์ทดสอบ lab-shelltest.php ตามขั้นตอนที่ 3 แล้วดู alert 100901
-3. โหลด policy wp-no-shell แล้วทดสอบซ้ำ
-4. เปิด LAB29-HARDENING ใน nginx และลบไฟล์ทดสอบ
+**Steps**
+1. Let Wazuh see the WordPress files and logs, then install rules 1009xx
+2. Place the test file lab-shelltest.php per step 3 and look at alert 100901
+3. Load the wp-no-shell policy and test again
+4. Enable LAB29-HARDENING in nginx and delete the test file
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 curl -s http://192.168.10.50:8081/wp-content/uploads/lab-shelltest.php
 sudo tetra tracingpolicy list | grep wp-no-shell
@@ -1893,71 +1895,71 @@ sudo docker compose exec -T nginx nginx -t && sudo docker compose exec -T nginx 
 sudo docker compose exec -T wordpress rm -f /var/www/html/wp-content/uploads/lab-shelltest.php
 ```
 
-**แบบฝึกหัด**
-- อธิบายว่ารอบที่ 3 (hardening) ทำให้รอบที่ 1–2 ยังจำเป็นอยู่หรือไม่ เพราะอะไร
+**Exercises**
+- Explain whether round 3 (hardening) still leaves rounds 1–2 necessary, and why
 
-**เกณฑ์ผ่าน**
-- [ ] รอบที่ 2 ไม่มีผลลัพธ์ของ id และมี alert 100903
-- [ ] หลัง hardening เรียกไฟล์ PHP ใน uploads ได้ 403
+**Pass criteria**
+- [ ] Round 2 produces no id output and raises alert 100903
+- [ ] After hardening, requesting a PHP file in uploads returns 403
 
-**หลักฐาน:** alert 100901 + 100903 + ผล curl ทั้ง 3 รอบ
+**Evidence:** Alerts 100901 + 100903 + curl output for all 3 rounds
 
-อ่านเพิ่ม: บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
+Further reading: Chapter 22 Application and Web Logging: Nginx, WordPress, Redis and WAF
 
-### วันที่ 56 · บทที่ 22 — WAF: ModSecurity + OWASP CRS หน้า WordPress (Lab 32)
+### Day 56 · Chapter 22 — WAF: ModSecurity + OWASP CRS in front of WordPress (Lab 32)
 
-**เป้าหมาย:** WAF ทำงานโหมด DetectionOnly ก่อน tune false positive แล้วจึงบล็อก และปิดทางเข้าอ้อม
+**Goal:** The WAF runs in DetectionOnly first, false positives are tuned, then it blocks, and the side doors are closed
 
-**ทฤษฎี**
-- DetectionOnly บันทึกแต่ไม่บล็อก ใช้เก็บ false positive ก่อน
-- exclusion ของ WordPress admin ทำเฉพาะ path และ rule ที่จำเป็น
-- ถ้า port 8081 ของ nginx ยังเปิด ผู้ใช้เลี่ยง WAF ได้
+**Theory**
+- DetectionOnly logs without blocking; use it to collect false positives first
+- WordPress admin exclusions cover only the paths and rules that are needed
+- If nginx port 8081 is still open, users can go around the WAF
 
-**ขั้นตอนปฏิบัติ**
-1. เพิ่ม service waf ใน compose โหมด DetectionOnly
-2. ส่งคำขอทดสอบ 5 แบบแล้วนับ ruleId
-3. tune false positive ของ wp-admin
-4. เปลี่ยนเป็น On ปิด port 8081 และย้าย URL ไป 8080
-5. ส่ง log ของ WAF เข้า Wazuh/Graylog แล้ว snapshot ch22-web
+**Steps**
+1. Add the waf service to compose in DetectionOnly mode
+2. Send 5 kinds of test requests and count the ruleIds
+3. Tune the wp-admin false positives
+4. Switch to On, close port 8081 and move the URL to 8080
+5. Send the WAF log to Wazuh/Graylog, then snapshot ch22-web
 
-**คำสั่งหลัก** (node-01 · aod)
+**Key commands** (node-01 · aod)
 ```bash
 cd /opt/wordpress && sudo docker compose up -d waf
-curl -s -o /dev/null -w "%{http_code}\n" "$W/?id=1%27%20OR%20%271%27=%271"   # 403 หลังเปิด On
+curl -s -o /dev/null -w "%{http_code}\n" "$W/?id=1%27%20OR%20%271%27=%271"   # 403 after switching to On
 sudo docker compose logs --since 5m waf | grep -o '"ruleId":"[0-9]*"' | sort | uniq -c | sort -rn | head
-curl -s -o /dev/null -w "%{http_code}\n" --max-time 3 http://192.168.10.50:8081/ || echo "8081 ปิดแล้ว"
+curl -s -o /dev/null -w "%{http_code}\n" --max-time 3 http://192.168.10.50:8081/ || echo "8081 is closed"
 ```
 
-**แบบฝึกหัด**
-- เลือก ruleId ที่ชน wp-admin มา 1 ตัว อธิบายว่ายกเว้นแคบที่สุดได้อย่างไร
+**Exercises**
+- Pick one ruleId that collides with wp-admin and explain the narrowest possible exclusion
 
-**เกณฑ์ผ่าน**
-- [ ] คำขอปกติได้ 200 และคำขอทดสอบได้ 403
-- [ ] port 8081 เข้าตรงไม่ได้
+**Pass criteria**
+- [ ] Normal requests get 200 and test requests get 403
+- [ ] Port 8081 cannot be reached directly
 
-**หลักฐาน:** ตารางผล curl + ไฟล์ exclusion
+**Evidence:** Table of curl results + the exclusion file
 
-อ่านเพิ่ม: บทที่ 22 Application และ Web Logging: Nginx, WordPress, Redis และ WAF
+Further reading: Chapter 22 Application and Web Logging: Nginx, WordPress, Redis and WAF
 
-## ภาค 8 แจ้งเตือน และ Capstone
+## Part 8 Alerting and capstone
 
-### วันที่ 57 · บทที่ 23 — Alert ไป LINE Messaging API และ Telegram (Lab 38)
+### Day 57 · Chapter 23 — Alerts to the LINE Messaging API and Telegram (Lab 38)
 
-**เป้าหมาย:** alert level 12 ขึ้นไปถึง LINE รายคน level 10 ขึ้นไปถึงกลุ่ม Telegram ไม่ส่งซ้ำใน 5 นาที และ token ไม่อยู่ใน ossec.conf
+**Goal:** Alerts of level 12+ reach individuals on LINE, level 10+ reach a Telegram group, nothing repeats within 5 minutes, and no token is in ossec.conf
 
-**ทฤษฎี**
-- LINE Notify ปิดบริการแล้ว ใช้ Messaging API ที่ต้องระบุผู้รับและมีโควตา
-- integration ชื่อ custom-* อ่าน token จาก notify.env (640 root:wazuh)
-- ส่งเฉพาะ field ที่จำเป็น ไม่ส่ง full_log
+**Theory**
+- LINE Notify has shut down; the Messaging API needs explicit recipients and has a quota
+- Integrations named custom-* read the token from notify.env (640 root:wazuh)
+- Send only the fields that are needed, never full_log
 
-**ขั้นตอนปฏิบัติ**
-1. ออก Channel access token และหา user ID ของผู้รับ
-2. สร้าง Telegram bot และหา chat ID ของกลุ่ม
-3. ทดสอบ token ด้วย curl โดยรับค่าด้วย read -s
-4. ติดตั้ง custom-line / custom-telegram และ notify.env แล้วทดสอบ script ด้วยมือก่อนผูก
-5. ผูก <integration> ตามเกณฑ์ level
+**Steps**
+1. Issue a Channel access token and find the recipient user IDs
+2. Create a Telegram bot and find the group chat ID
+3. Test the token with curl, reading it with read -s
+4. Install custom-line / custom-telegram and notify.env, then test the scripts by hand before binding
+5. Bind <integration> by level threshold
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 read -rs LINE_TOKEN; export LINE_TOKEN
 curl -s -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/message/quota; echo
@@ -1965,109 +1967,111 @@ sudo stat -c "%U:%G %a" /var/ossec/etc/notify.env   # root:wazuh 640
 sudo tail -n 5 /var/ossec/logs/integrations.log
 ```
 
-**แบบฝึกหัด**
-- ออกแบบเกณฑ์ส่งของทีมคุณ: alert ใดไป dashboard อย่างเดียว ไปกลุ่ม หรือถึงรายคน พร้อมเหตุผล
+**Exercises**
+- Design your team's routing: which alerts go only to the dashboard, to a group, or to individuals, with reasons
 
-**เกณฑ์ผ่าน**
-- [ ] alert ทดสอบ level 12 ถึง LINE และ level 10 ถึง Telegram
-- [ ] alert เดิมซ้ำใน 5 นาทีไม่ถูกส่งซ้ำ
+**Pass criteria**
+- [ ] A test level 12 alert reaches LINE and a level 10 alert reaches Telegram
+- [ ] The same alert repeated within 5 minutes is not sent again
 
-**หลักฐาน:** ภาพข้อความบนมือถือ (ปิด token/ID) + integrations.log
+**Evidence:** Screenshot of the phone message (token/IDs hidden) + integrations.log
 
-อ่านเพิ่ม: บทที่ 23 Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh
+Further reading: Chapter 23 Alerts to LINE, Telegram and Gmail; Changing Wazuh Ports
 
-### วันที่ 58 · บทที่ 23 — Gmail ผ่าน Postfix relay, ย้าย port ของ Wazuh และย้าย config เข้ากลุ่ม (Lab 39–40, 34)
+### Day 58 · Chapter 23 — Gmail through a Postfix relay, moving Wazuh ports and moving config into groups (Lab 39–40, 34)
 
-**เป้าหมาย:** alert ถึงอีเมลผ่าน relay ที่ใช้ App Password, agent ย้ายจาก 1514 ไป 1614 โดยไม่มีเครื่องใดหลุด และ config ของบริการอยู่ในกลุ่ม
+**Goal:** Alerts reach email through a relay that uses an App Password, agents move from 1514 to 1614 without any machine dropping, and service config lives in groups
 
-**ทฤษฎี**
-- App Password เก็บใน sasl_passwd สิทธิ์ 600 เท่านั้น
-- manager ต้องฟังสอง port ชั่วคราวก่อนย้าย agent
-- การเปลี่ยน port ไม่ใช่มาตรการความปลอดภัย ต้องจำกัดต้นทางด้วย rich rule
+**Theory**
+- The App Password is stored only in sasl_passwd with mode 600
+- The manager must listen on both ports temporarily before agents move
+- Changing ports is not a security control; restrict sources with a rich rule
 
-**ขั้นตอนปฏิบัติ**
-1. ตั้ง Postfix relay และทดสอบด้วย mail ก่อนเปิด email_notification
-2. ย้าย dashboard ไป 8443 แล้วปิด 443
-3. เพิ่ม <remote> 1614 ย้าย agent ทีละเครื่องด้วย agent-port.sh แล้วลบ 1514
-4. จำกัดต้นทางด้วย rich rule และย้าย config ของ Docker/Samba เข้ากลุ่ม
-5. รัน ch23-check.sh แล้ว snapshot ch23-final
+**Steps**
+1. Set up the Postfix relay and test with mail before enabling email_notification
+2. Move the dashboard to 8443, then close 443
+3. Add <remote> 1614, move agents one at a time with agent-port.sh, then remove 1514
+4. Restrict sources with a rich rule and move the Docker/Samba config into groups
+5. Run ch23-check.sh, then snapshot ch23-final
 
-**คำสั่งหลัก** (wazuh-01 · aod)
+**Key commands** (wazuh-01 · aod)
 ```bash
 sudo postconf -e "relayhost = [smtp.gmail.com]:587" "smtp_sasl_auth_enable = yes" "smtp_tls_security_level = encrypt"
 sudo chmod 600 /etc/postfix/sasl_passwd && sudo postmap /etc/postfix/sasl_passwd
-.\Invoke-SocLabScript.ps1 -Script ..\..\ch23-alerting\guest\agent-port.sh -Name lab-linux-02   # บน Windows
+.\Invoke-SocLabScript.ps1 -Script ..\..\ch23-alerting\guest\agent-port.sh -Name lab-linux-02   # on Windows
 sudo /var/ossec/bin/agent_control -l | grep -c Active
 ```
 
-**แบบฝึกหัด**
-- เขียน runbook ย้อนกลับ (rollback) ถ้า agent ครึ่งหนึ่งหลุดหลังเปลี่ยน port
+**Exercises**
+- Write a rollback runbook for when half the agents drop after the port change
 
-**เกณฑ์ผ่าน**
-- [ ] อีเมล alert ทดสอบถึง Gmail
-- [ ] agent ทั้ง 5 ตัว Active ที่ 1614 และ ch23-check.sh ผ่าน
+**Pass criteria**
+- [ ] A test alert email reaches Gmail
+- [ ] All 5 agents are Active on 1614 and ch23-check.sh passes
 
-**หลักฐาน:** header ของอีเมล (ปิดข้อมูลส่วนตัว) + ผล agent_control -l
+**Evidence:** Email headers (personal data hidden) + agent_control -l output
 
-อ่านเพิ่ม: บทที่ 23 Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh
+Further reading: Chapter 23 Alerts to LINE, Telegram and Gmail; Changing Wazuh Ports
 
-### ◆ วันที่ 59 — Capstone: เหตุการณ์จำลองครบวงจร
+### ◆ Day 59 — Capstone: an end-to-end simulated incident
 
-**เป้าหมาย:** ใช้ทุกเครื่องมือในเล่มรับมือเหตุการณ์เดียวตั้งแต่ตรวจพบถึงปิดเหตุ
+**Goal:** Use every tool in the book to handle one incident from detection to closure
 
-**ทฤษฎี**
-- วงจร Incident Response: Detect → Triage → Contain → Eradicate → Recover → Lessons learned
+**Theory**
+- The incident response cycle: Detect → Triage → Contain → Eradicate → Recover → Lessons learned
+- Use the chapter 24 detection validation approach: simulate only the signal with benign steps, never a real exploit
 
-**ขั้นตอนปฏิบัติ**
-1. ผู้สอนรันเหตุการณ์จำลอง (ไม่เป็นอันตราย): login ผิดจาก lab-linux-02 → login สำเร็จด้วยบัญชีทดสอบ → เพิ่ม authorized_keys → วางไฟล์ทดสอบ PHP → ลบไฟล์ dummy ใน share
-2. ผู้เรียนรับ alert ทางมือถือ แล้วสืบด้วย Graylog, Wazuh, ausearch และ Tetragon
-3. Contain: ปิดบัญชีใน IPA, บล็อก IP, ลบ key และไฟล์
-4. ยืนยันกลับ baseline ด้วย FIM และ check script
+**Steps**
+1. Do detection validation per chapter 24: run ch24-check.sh so every layer is ready, then simulate the signal of the chosen CVE
+2. The instructor runs a harmless simulated incident: failed logins from lab-linux-02 → a successful login with a test account → authorized_keys added → a test PHP file placed → dummy files deleted from the share
+3. Receive the alerts on your phone, then investigate with Graylog, Wazuh, ausearch and Tetragon
+4. Contain: disable the account in IPA, block the IP, remove the key and the files
+5. Confirm the return to baseline with FIM and the check scripts
 
-**คำสั่งหลัก** (Windows · PowerShell)
+**Key commands** (Windows · PowerShell)
 ```bash
-# ใช้ทุกคำสั่งจากวันที่ 16, 24, 30–31, 39–46, 55
+# use all the commands from days 16, 24, 30–31, 39–46, 55
 ```
 
-**แบบฝึกหัด**
-- เขียนรายงานเหตุการณ์ (template ในภาคผนวกของคู่มือ) ไม่เกิน 3 หน้า
+**Exercises**
+- Write an incident report (template in the guide appendix) of no more than 3 pages
 
-**เกณฑ์ผ่าน**
-- [ ] ตรวจพบครบ 5 ขั้นของเหตุการณ์
-- [ ] containment เสร็จภายใน 60 นาทีจาก alert แรก
-- [ ] รายงานมี timeline, MITRE ID, หลักฐาน และข้อเสนอปรับปรุง
+**Pass criteria**
+- [ ] All 5 stages of the incident are detected
+- [ ] Containment is complete within 60 minutes of the first alert
+- [ ] The report has a timeline, MITRE IDs, evidence and improvement proposals
 
-**หลักฐาน:** รายงานเหตุการณ์ + หลักฐาน
+**Evidence:** Incident report + evidence
 
 
 
-### ◆ วันที่ 60 — ประเมินผลสุดท้ายและ Portfolio
+### ◆ Day 60 — Final assessment and portfolio
 
-**เป้าหมาย:** สรุปผลงานทั้งหมดเป็น portfolio ที่นำไปใช้สมัครงานได้
+**Goal:** Turn all your work into a portfolio you can use when applying for jobs
 
-**ทฤษฎี**
-- Portfolio ที่ดีแสดงทั้งการตั้งค่า, หลักฐาน และการตัดสินใจ
+**Theory**
+- A good portfolio shows the configuration, the evidence and the decisions
 
-**ขั้นตอนปฏิบัติ**
-1. รวมหลักฐานของ checkpoint 1–4 และ capstone
-2. นำเสนอ 15 นาที: สถาปัตยกรรม lab, detection 3 ตัวที่ภูมิใจที่สุด, บทเรียน
-3. ตอบคำถามเชิงเทคนิค 10 นาที
-4. ลบ secret ทั้งหมดออกจาก portfolio ก่อนส่ง
+**Steps**
+1. Gather the evidence from checkpoints 1–4 and the capstone
+2. Present for 15 minutes: lab architecture, the 3 detections you are proudest of, lessons learned
+3. Answer technical questions for 10 minutes
+4. Remove every secret from the portfolio before submitting
 
-**คำสั่งหลัก** (Windows · PowerShell)
+**Key commands** (Windows · PowerShell)
 ```bash
 git -C D:\soclab\my-portfolio log --oneline | Select-Object -First 20
 Select-String -Path D:\soclab\my-portfolio\* -Pattern "BEGIN .*PRIVATE KEY|password\s*=" -List
 ```
 
-**แบบฝึกหัด**
-- ประเมินตัวเองด้วย Rubric รวม แล้วเทียบกับผลประเมินของผู้สอน
+**Exercises**
+- Assess yourself with the overall rubric and compare with the instructor's assessment
 
-**เกณฑ์ผ่าน**
-- [ ] คะแนนรวม Rubric ≥ 75%
-- [ ] ไม่มี secret ใน portfolio
-- [ ] นำเสนอครบเวลา
+**Pass criteria**
+- [ ] Overall rubric score ≥ 75%
+- [ ] No secrets in the portfolio
+- [ ] The presentation uses the full time
 
-**หลักฐาน:** Portfolio + slide นำเสนอ
+**Evidence:** Portfolio + presentation slides
 
 

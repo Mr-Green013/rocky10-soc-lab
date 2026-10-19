@@ -1,3 +1,4 @@
+# EN: 70-account-tracker.yaml : from chapter 19 (test with tetra tracingpolicy add before placing it in this directory)
 # 70-account-tracker.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy
@@ -5,7 +6,7 @@ metadata:
   name: "account-tracker"
 spec:
   kprobes:
-  - call: "security_bprm_check"          # ใครรันเครื่องมือจัดการบัญชี
+  - call: "security_bprm_check"          # ใครรันเครื่องมือจัดการบัญชี (EN: who runs account management tools)
     syscall: false
     args:
     - index: 0
@@ -29,7 +30,7 @@ spec:
         - "/usr/bin/su"
       matchActions:
       - action: Post
-  - call: "security_file_permission"     # ใคร write ไฟล์บัญชีตรง ๆ
+  - call: "security_file_permission"     # ใคร write ไฟล์บัญชีตรง ๆ (EN: who writes account files directly)
     syscall: false
     args:
     - index: 0

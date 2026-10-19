@@ -1,4 +1,6 @@
+# EN: The SOC-SSH pipeline of chapter 11 (Lab 16.25)
 # Pipeline SOC-SSH ของบทที่ 11 (Lab 16.25)
+# EN: Paste one rule at a time at System → Pipelines → Manage rules → Create Rule, then assign them to stages per the table
 # วางทีละ rule ที่ System → Pipelines → Manage rules → Create Rule แล้วจัดเข้า stage ตามตาราง
 # Stage 0: Rule1, Rule2A, Rule2B, Rule3, Rule4 | Stage 1: Rule5–7 | Stage 2: Rule8 | Stage 3: Rule9–10 | Stage 4: Rule11
 

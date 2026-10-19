@@ -1,10 +1,14 @@
 ﻿<#
 .SYNOPSIS
+  EN: Chapter 1 verification: check every lab machine from Windows and summarize as a table
   บทที่ 1 วิธีตรวจสอบ: ตรวจทุกเครื่องใน lab จาก Windows แล้วสรุปเป็นตาราง
 
 .DESCRIPTION
+  EN: Checks the Proxmox Web UI (192.168.10.1:8006), then SSHes into every machine to run soclab-check
   ตรวจ Proxmox Web UI (192.168.10.1:8006) แล้ว SSH เข้าทุกเครื่องเพื่อรัน soclab-check
+  EN: A machine that passes must show: X86_64_V3=yes, SELINUX=Enforcing, FIREWALLD=active, CLOUDINIT=disabled,
   เครื่องที่ผ่านต้องได้: X86_64_V3=yes, SELINUX=Enforcing, FIREWALLD=active, CLOUDINIT=disabled,
+  EN: GATEWAY/DNS/INTERNET=ok, and a MACHINE_ID that no other machine has
   GATEWAY/DNS/INTERNET=ok และ MACHINE_ID ไม่ซ้ำกัน
 
 .EXAMPLE
@@ -16,7 +20,7 @@ param(
     [string] $User     = 'aod',
     [string] $KeyPath  = (Join-Path $env:USERPROFILE '.ssh\id_ed25519'),
     [string] $HostsCsv = (Join-Path $PSScriptRoot '..\..\lab-hosts.csv'),
-    [switch] $Detail      # แสดงทุกค่า (KERNEL, FQDN, X86_64_V3, ...) ของทุกเครื่อง
+    [switch] $Detail      # แสดงทุกค่า (KERNEL, FQDN, X86_64_V3, ...) ของทุกเครื่อง (EN: show every value (KERNEL, FQDN, X86_64_V3, ...) for every machine)
 )
 $ErrorActionPreference = 'Stop'
 

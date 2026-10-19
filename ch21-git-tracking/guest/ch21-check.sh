@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 21 verification: git tracking and blocking (sudo bash ch21-check.sh on node-01 or lab-linux-01)
 # บทที่ 21 วิธีตรวจสอบ: git tracking และ blocking  (sudo bash ch21-check.sh บน node-01 หรือ lab-linux-01)
 set -uo pipefail
 F=0

@@ -1,57 +1,59 @@
-# Template ของแต่ละบท
+**English** · [ภาษาไทย](chapter-template.th.md)
 
-ทุกบทใช้โครงเดียวกัน ผู้อ่านจึงรู้เสมอว่ากำลังอยู่ตรงไหนของงาน
+# Chapter template
+
+Every chapter uses the same structure, so readers always know where they are in the work.
 
 ```
-บทที่ N  <ชื่อบท>
-  กล่องสรุปบท        เป้าหมาย 3–5 ข้อ, Lab ในหลักสูตร, เครื่องที่ใช้, เวลาโดยประมาณ, snapshot เริ่มต้น/จบ
-  N.1 ทฤษฎี           แนวคิดที่ต้องเข้าใจก่อนลงมือ + diagram + กล่อง "มุมมอง Security"
-  N.2 สิ่งที่ต้องเตรียม   hardware/software, บทที่ต้องทำมาก่อน, ไฟล์ Lab ที่ใช้ (ตาราง path ใน repo)
-  N.3 ขั้นตอนลงมือทำ    ขั้นที่ 1..n แต่ละขั้น: ทำอะไร ทำไม คำสั่ง (ระบุเครื่อง) ภาพหน้าจอ
-  N.4 ผลลัพธ์ที่คาดหวัง  สภาพระบบเมื่อทำเสร็จ + ตัวอย่าง output ที่ถูกต้อง
-  N.5 วิธีตรวจสอบ      script ตรวจอัตโนมัติ + คำสั่งตรวจทีละข้อพร้อมค่าที่ควรเห็น
-  N.6 วิธีแก้ปัญหา      ตาราง อาการ | สาเหตุ | วิธีแก้ เรียงตามขั้นที่มักเจอ
-  N.7 สรุปและทบทวน     สิ่งที่ได้เรียน, คำถามทบทวน, แบบฝึกหัดเพิ่ม, Cleanup/rollback, บทต่อไป
+Chapter N  <title>
+  Chapter summary box   3–5 goals, course labs, machines used, estimated time, start/end snapshot
+  N.1 Theory             Concepts to understand before starting + diagram + "Security view" box
+  N.2 Prerequisites      hardware/software, chapters to finish first, lab files used (table of repo paths)
+  N.3 Hands-on steps     steps 1..n, each with: what, why, the commands (with the machine), screen illustration
+  N.4 Expected result    State of the system when finished + examples of correct output
+  N.5 Verification       Automatic check script + one-by-one check commands with the values you should see
+  N.6 Troubleshooting    Table of symptom | cause | fix, ordered by the step where it usually happens
+  N.7 Summary and review What you learned, review questions, extra exercises, cleanup/rollback, next chapter
 ```
 
-## ข้อตกลงในเล่ม
+## Conventions used in the book
 
-### บอกเครื่องทุกครั้ง
+### Always say which machine
 
-ทุก code block มีป้ายบอกว่ารันที่ไหนและในฐานะใคร
+Every code block has a label saying where it runs and as whom
 
-| ป้าย | ความหมาย |
+| Label | Meaning |
 | --- | --- |
-| `[Windows · PowerShell (Admin)]` | PowerShell แบบ Run as administrator บนเครื่อง Windows |
-| `[Windows · PowerShell]` | PowerShell ปกติ |
-| `[pve-01 · root]` | shell ของ Proxmox (SSH `root@192.168.10.1` หรือ Shell ใน Web UI) |
-| `[ipa-01 · aod]` | SSH เข้าเครื่องนั้นด้วยผู้ใช้ `aod`; คำสั่งที่ต้องใช้สิทธิ์จะขึ้นต้นด้วย `sudo` |
-| `[console · VM 9000]` | หน้าจอ console ของ VM ใน Proxmox Web UI (ใช้ตอนที่ยังไม่มี network) |
+| `[Windows · PowerShell (Admin)]` | PowerShell started with Run as administrator on the Windows machine |
+| `[Windows · PowerShell]` | Normal PowerShell |
+| `[pve-01 · root]` | The Proxmox shell (SSH `root@192.168.10.1` or Shell in the Web UI) |
+| `[ipa-01 · aod]` | SSH into that machine as the user `aod`; commands that need privileges start with `sudo` |
+| `[console · VM 9000]` | The VM console in the Proxmox Web UI (used while there is no network yet) |
 
-### ค่าที่ต้องแทน
+### Values to replace
 
-`<ชื่อ>` ในคำสั่งคือค่าที่ผู้อ่านต้องแทนเอง เช่น `<iso-file>` ส่วนค่าที่ไม่มีวงเล็บมุมให้พิมพ์ตามนั้น
+`<name>` in a command is a value readers replace themselves, such as `<iso-file>`. Values without angle brackets are typed as shown
 
-### กล่องข้อความ
+### Callout boxes
 
-| กล่อง | ใช้เมื่อ |
+| Box | Used for |
 | --- | --- |
-| **หมายเหตุ** | ข้อมูลเสริม อ่านข้ามได้ |
-| **คำเตือน** | ทำผิดแล้วเสียเวลาหรือข้อมูลหาย |
-| **มุมมอง Security** | เชื่อมเรื่องที่ทำกับงาน SOC: โจมตีอย่างไร ตรวจจับอย่างไร |
-| **Admin Fast Track** | สำหรับผู้มีพื้นฐาน: ทางลัดหรือสิ่งที่ข้ามได้ |
+| **Note** | Extra information, safe to skip |
+| **Warning** | Getting it wrong costs time or data |
+| **Security view** | Links the task to SOC work: how it is attacked and how it is detected |
+| **Admin Fast Track** | For readers with experience: shortcuts or what can be skipped |
 
-### ภาพประกอบ
+### Figures
 
-- **Diagram** วาดไว้แล้ว ต้นฉบับ SVG อยู่ที่ `assets/diagrams/chNN/`
-- **Screenshot** เป็นกรอบสีเหลือง `[SCREENSHOT]` ในต้นฉบับ Word บอกว่าจับภาพหน้าจอไหน ตอนไหน และชื่อไฟล์ เช่น `ch01-fig05-hyperv-switches.png`
-- ภาพเลขต่อเนื่องทั้งบท: ภาพที่ 1-1, 1-2, … ไม่แยกเลข diagram กับ screenshot
-- จับภาพที่ความกว้าง 1600 px ขึ้นไป, ตัดเฉพาะส่วนที่เกี่ยวข้อง, ปิดบัง public IP, token และ email ก่อนใส่เล่ม
+- **Diagrams** are already drawn. The SVG sources are in `assets/diagrams/chNN/` (the English set is in `assets/diagrams/chNN/en/`)
+- **Screen illustrations** (GUI and terminal) are drawn and embedded in the book, marked "ภาพจำลอง" (illustration) in the top-right corner. File names follow the pattern `ch01-fig05-hyperv-switches.png`
+- Figures are numbered continuously through a chapter: Figure 1-1, 1-2, … with no separate numbering for diagrams and illustrations
+- To replace an illustration with a real screenshot, capture at 1600 px wide or more, crop to the relevant part, hide public IPs, tokens and email addresses before putting it in the book, and keep the same file name and caption
 
-### Snapshot
+### Snapshots
 
-จบบทที่มี snapshot ให้รัน `pve-snapshot.sh chNN-<ชื่อ>` บน pve-01 ทุกบทถัดไปเริ่มได้จาก snapshot ของบทก่อนหน้า ถ้า lab พังให้ `qm rollback <vmid> <snapshot>`
+At the end of a chapter that has a snapshot, run `pve-snapshot.sh chNN-<name>` on pve-01. Every following chapter can start from the previous chapter's snapshot. If the lab breaks, `qm rollback <vmid> <snapshot>`
 
-### ความลับ
+### Secrets
 
-ไม่มี password หรือ token ใน repo ทุก script ที่ต้องใช้ความลับจะถามด้วย `read -s` (bash) หรือ `Read-Host -AsSecureString` (PowerShell) หรืออ่านจากไฟล์ `.env` ที่อยู่ใน `.gitignore`
+There are no passwords or tokens in the repo. Every script that needs a secret asks for it with `read -s` (bash) or `Read-Host -AsSecureString` (PowerShell), or reads it from a `.env` file listed in `.gitignore`

@@ -1,4 +1,5 @@
 #!/bin/bash
+# EN: git-guard pre-push hook: enforces approved remotes and blocks force pushes / deleting protected branches
 # git-guard pre-push hook: บังคับ remote ที่อนุมัติ และกัน force push / ลบ protected branch
 remote="$1"; url="$2"
 ALLOWED_RE='^(ssh://)?([A-Za-z0-9._-]+@)?git\.lab\.internal[:/]|^https://git\.lab\.internal/'

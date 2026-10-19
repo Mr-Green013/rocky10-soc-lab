@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="920" viewBox="0 0 1400 920" font-family="Sarabun, 'Leelawadee UI', Tahoma, sans-serif">
+  <title>Figure 1-2 The lab network</title>
+  <defs>
+    <marker id="arrO" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#E76F51"/></marker>
+  </defs>
+  <rect width="1400" height="920" fill="#FFFFFF"/>
+
+  <!-- Internet + router -->
+  <ellipse cx="135" cy="95" rx="95" ry="50" fill="#FDF0EC" stroke="#E76F51" stroke-width="2"/>
+  <text x="135" y="103" font-size="22" font-weight="700" fill="#1F3A5F" text-anchor="middle">Internet</text>
+  <rect x="60" y="196" width="150" height="70" rx="8" fill="#FFFFFF" stroke="#5B6770" stroke-width="2"/>
+  <text x="135" y="225" font-size="18" font-weight="700" fill="#1F3A5F" text-anchor="middle">Home router</text>
+  <text x="135" y="251" font-size="15" fill="#5B6770" text-anchor="middle">e.g. 192.168.1.1</text>
+
+  <!-- Windows container -->
+  <rect x="270" y="24" width="1110" height="290" rx="14" fill="#F1F1F4" stroke="#5B6770" stroke-width="2.5"/>
+  <text x="290" y="56" font-size="20" font-weight="700" fill="#1F3A5F">Windows 11 Pro (L0)</text>
+
+  <rect x="300" y="74" width="330" height="84" rx="8" fill="#FFFFFF" stroke="#E76F51" stroke-width="2"/>
+  <text x="315" y="106" font-size="18" font-weight="700" fill="#1F3A5F">WinNAT: PVE-Uplink-NAT</text>
+  <text x="315" y="136" font-size="16" fill="#33475B">172.31.255.0/24 → NAT layer 2</text>
+
+  <rect x="300" y="200" width="250" height="84" rx="8" fill="#FFFFFF" stroke="#5B6770" stroke-width="2"/>
+  <text x="315" y="232" font-size="18" font-weight="700" fill="#1F3A5F">Wi-Fi / Ethernet</text>
+  <text x="315" y="262" font-size="16" fill="#33475B">IP from the home router</text>
+
+  <rect x="660" y="200" width="300" height="84" rx="8" fill="#FFFFFF" stroke="#E76F51" stroke-width="2"/>
+  <text x="675" y="232" font-size="18" font-weight="700" fill="#1F3A5F">vEthernet (PVE-Uplink)</text>
+  <text x="675" y="262" font-size="16" fill="#33475B">172.31.255.1/24</text>
+
+  <rect x="1000" y="200" width="360" height="84" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+  <text x="1015" y="232" font-size="18" font-weight="700" fill="#1F3A5F">vEthernet (SOC-Lab)</text>
+  <text x="1015" y="262" font-size="16" fill="#33475B">192.168.10.100/24 · no gateway</text>
+
+  <text x="1015" y="100" font-size="17" font-weight="700" fill="#2A9D8F">admin workstation</text>
+  <text x="1015" y="126" font-size="16" fill="#33475B">SSH, scp, browser → every VM</text>
+  <text x="1015" y="150" font-size="16" fill="#33475B">directly, not through NAT</text>
+
+  <!-- internet path (orange) -->
+  <g stroke="#E76F51" stroke-width="3.5" fill="none">
+    <line x1="135" y1="145" x2="135" y2="196"/>
+    <line x1="210" y1="240" x2="300" y2="240"/>
+    <line x1="420" y1="200" x2="420" y2="158"/>
+    <polyline points="630,116 810,116 810,200"/>
+    <line x1="810" y1="284" x2="810" y2="372"/>
+    <line x1="810" y1="418" x2="810" y2="512"/>
+  </g>
+
+  <!-- Hyper-V switches -->
+  <rect x="650" y="372" width="320" height="46" rx="6" fill="#FDF0EC" stroke="#E76F51" stroke-width="2"/>
+  <text x="810" y="402" font-size="16" font-weight="700" fill="#1F3A5F" text-anchor="middle">Hyper-V switch: PVE-Uplink (Internal)</text>
+  <rect x="1000" y="372" width="360" height="46" rx="6" fill="#E8F5F3" stroke="#2A9D8F" stroke-width="2"/>
+  <text x="1180" y="402" font-size="16" font-weight="700" fill="#1F3A5F" text-anchor="middle">Hyper-V switch: SOC-Lab (Internal)</text>
+
+  <!-- lab path (teal) -->
+  <g stroke="#2A9D8F" stroke-width="3.5" fill="none">
+    <line x1="1180" y1="284" x2="1180" y2="372"/>
+    <line x1="1180" y1="418" x2="1180" y2="512"/>
+    <line x1="1180" y1="602" x2="1180" y2="712"/>
+    <line x1="160" y1="712" x2="1260" y2="712"/>
+    <line x1="160" y1="712" x2="160" y2="752"/>
+    <line x1="380" y1="712" x2="380" y2="752"/>
+    <line x1="600" y1="712" x2="600" y2="752"/>
+    <line x1="820" y1="712" x2="820" y2="752"/>
+    <line x1="1040" y1="712" x2="1040" y2="752"/>
+    <line x1="1260" y1="712" x2="1260" y2="752"/>
+  </g>
+
+  <!-- pve-01 -->
+  <rect x="560" y="462" width="820" height="200" rx="14" fill="#EAF0F8" stroke="#1F3A5F" stroke-width="2.5"/>
+  <text x="580" y="494" font-size="20" font-weight="700" fill="#1F3A5F">pve-01 · Proxmox VE (L1)</text>
+  <rect x="660" y="512" width="300" height="90" rx="8" fill="#FFFFFF" stroke="#E76F51" stroke-width="2"/>
+  <text x="675" y="546" font-size="18" font-weight="700" fill="#1F3A5F">vmbr0  (first NIC)</text>
+  <text x="675" y="578" font-size="16" fill="#33475B">172.31.255.2/24 · gw 172.31.255.1</text>
+  <rect x="1060" y="512" width="300" height="90" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+  <text x="1075" y="546" font-size="18" font-weight="700" fill="#1F3A5F">vmbr1  (second NIC)</text>
+  <text x="1075" y="578" font-size="16" fill="#33475B">192.168.10.1/24 · lab gateway</text>
+  <line x1="1058" y1="557" x2="968" y2="557" stroke="#E76F51" stroke-width="3.5" marker-end="url(#arrO)"/>
+  <text x="1010" y="642" font-size="16" fill="#E76F51" text-anchor="middle" font-weight="700">iptables MASQUERADE = NAT layer 1</text>
+
+  <text x="60" y="700" font-size="16" fill="#2A9D8F" font-weight="700">vmbr1 · 192.168.10.0/24 · gateway of every VM = 192.168.10.1 · DNS 1.1.1.1 (until chapter 7)</text>
+
+  <!-- VMs -->
+  <g font-size="17" fill="#1F3A5F" text-anchor="middle">
+    <rect x="60" y="752" width="200" height="76" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="160" y="784" font-weight="700">ipa-01 · 110</text><text x="160" y="810">192.168.10.10</text>
+    <rect x="280" y="752" width="200" height="76" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="380" y="784" font-weight="700">graylog-01 · 120</text><text x="380" y="810">192.168.10.20</text>
+    <rect x="500" y="752" width="200" height="76" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="600" y="784" font-weight="700">wazuh-01 · 130</text><text x="600" y="810">192.168.10.30</text>
+    <rect x="720" y="752" width="200" height="76" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="820" y="784" font-weight="700">lab-linux-01 · 141</text><text x="820" y="810">192.168.10.41</text>
+    <rect x="940" y="752" width="200" height="76" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="1040" y="784" font-weight="700">lab-linux-02 · 142</text><text x="1040" y="810">192.168.10.42</text>
+    <rect x="1160" y="752" width="200" height="76" rx="8" fill="#FFFFFF" stroke="#2A9D8F" stroke-width="2"/>
+    <text x="1260" y="784" font-weight="700">node-01 · 150</text><text x="1260" y="810">192.168.10.50</text>
+  </g>
+
+  <!-- legend -->
+  <line x1="60" y1="868" x2="110" y2="868" stroke="#E76F51" stroke-width="4"/>
+  <text x="122" y="874" font-size="16" fill="#33475B">Way out: VM → vmbr1 → NAT layer 1 → vmbr0 → PVE-Uplink → WinNAT (NAT layer 2) → Wi-Fi/Ethernet → Internet</text>
+  <line x1="60" y1="898" x2="110" y2="898" stroke="#2A9D8F" stroke-width="4"/>
+  <text x="122" y="904" font-size="16" fill="#33475B">Lab network (one L2): Windows .100, pve-01 .1 and every VM talk to each other directly</text>
+</svg>

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# EN: Create / list / roll back a snapshot of every lab machine at once
 # สร้าง / ดู / rollback snapshot ของทุกเครื่องใน lab พร้อมกัน
+# EN: Run on pve-01 as root:
 # รันบน pve-01 ในฐานะ root:
-#   bash pve-snapshot.sh ch01-base            # snapshot ทุกเครื่อง
+#   bash pve-snapshot.sh ch01-base            # snapshot ทุกเครื่อง (EN: snapshot every machine)
 #   bash pve-snapshot.sh --list
-#   bash pve-snapshot.sh --rollback ch01-base # กลับไปที่ snapshot (เครื่องจะถูก stop ก่อน)
+#   bash pve-snapshot.sh --rollback ch01-base # กลับไปที่ snapshot (เครื่องจะถูก stop ก่อน) (EN: go back to the snapshot (machines are stopped first))
 set -euo pipefail
 
 HERE=$(cd "$(dirname "$0")" && pwd)

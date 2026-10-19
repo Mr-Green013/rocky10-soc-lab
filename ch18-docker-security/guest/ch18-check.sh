@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 18 verification: Docker runtime security on node-01 and the rules on wazuh-01 (sudo bash ch18-check.sh)
 # บทที่ 18 วิธีตรวจสอบ: Docker runtime security บน node-01 และ rule บน wazuh-01  (sudo bash ch18-check.sh)
 set -uo pipefail
 F=0

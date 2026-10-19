@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# EN: Start / stop / show the status of the lab machines in the right order (ipa-01 up first, down last)
 # เปิด / ปิด / ดูสถานะเครื่องใน lab ตามลำดับที่ถูกต้อง (ipa-01 ขึ้นก่อน ลงทีหลัง)
+# EN: Run on pve-01 as root:
 # รันบน pve-01 ในฐานะ root:
 #   bash pve-lab-power.sh status
-#   bash pve-lab-power.sh start [ชื่อเครื่อง...]
-#   bash pve-lab-power.sh stop  [ชื่อเครื่อง...]
+#   bash pve-lab-power.sh start [ชื่อเครื่อง...] (EN: machine names)
+#   bash pve-lab-power.sh stop  [ชื่อเครื่อง...] (EN: machine names)
 set -euo pipefail
 
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -11,9 +13,11 @@ HOSTS_CSV=${HOSTS_CSV:-$HERE/../../lab-hosts.csv}
 ACTION=${1:-status}; shift || true
 NAMES=("$@")
 
+# EN: vmid name order, sorted by startup_order
 # vmid name order  เรียงตาม startup_order
 mapfile -t rows < <(tr -d '\r' < "$HOSTS_CSV" | awk -F, 'NR>1 && $1!="" {print $7" "$1" "$2}' | sort -n)
 
+# EN: Print "vmid name" of the selected machines (no names = all machines) in startup_order
 # พิมพ์ "vmid name" ของเครื่องที่เลือก (ไม่ระบุชื่อ = ทุกเครื่อง) ตามลำดับ startup_order
 select_rows() {
   local r id name n
@@ -37,9 +41,10 @@ case "$ACTION" in
     while read -r id name; do
       [ "$(qm status "$id" 2>/dev/null | awk '{print $2}')" = running ] && { echo "running  $name"; continue; }
       qm start "$id" && echo "started  $name"
-      [ "$name" = ipa-01 ] && sleep 20      # ให้ DNS/LDAP ของ FreeIPA พร้อมก่อน (ตั้งแต่บทที่ 7)
+      [ "$name" = ipa-01 ] && sleep 20      # ให้ DNS/LDAP ของ FreeIPA พร้อมก่อน (ตั้งแต่บทที่ 7) (EN: let FreeIPA DNS/LDAP come up first (from chapter 7 on))
     done < <(select_rows) ;;
   stop)
+    # EN: Stop in reverse order: the other machines first, ipa-01 last
     # ปิดย้อนลำดับ: เครื่องอื่นก่อน ipa-01 ทีหลัง
     while read -r id name; do
       [ "$(qm status "$id" 2>/dev/null | awk '{print $2}')" = running ] || continue

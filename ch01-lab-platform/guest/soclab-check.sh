@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Checks the basic state of a lab machine and prints KEY=VALUE (read by Test-SocLab.ps1)
 # ตรวจสถานะพื้นฐานของเครื่องใน lab พิมพ์เป็น KEY=VALUE (Test-SocLab.ps1 อ่านค่านี้)
+# EN: Run: sudo soclab-check
 # รัน: sudo soclab-check
 set -u
 v3=yes

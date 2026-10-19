@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 5 verification: tools, logs, the chapter's work and cleanup (sudo bash ch05-check.sh)
 # บทที่ 5 วิธีตรวจสอบ: เครื่องมือ, log, ผลงานของบท และ cleanup  (sudo bash ch05-check.sh)
 set -uo pipefail
 F=0

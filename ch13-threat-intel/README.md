@@ -1,13 +1,15 @@
-# บทที่ 13 Threat Intelligence: CrowdSec, GeoIP และ Global Dashboard
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 18, 19, 20
+# Chapter 13 Threat Intelligence: CrowdSec, GeoIP and a Global Dashboard
 
-นำ decision ของ CrowdSec เข้า Graylog, เพิ่ม GeoIP ให้ IP, ทดสอบ SSH จาก IP ต่างประเทศด้วย event จำลอง และสร้าง dashboard แผนที่ภัยคุกคาม
+Course labs: 18, 19, 20
 
-สิ่งที่ได้เมื่อจบบท:
+Bring CrowdSec decisions into Graylog, add GeoIP to IP addresses, test SSH from foreign IPs with simulated events, and build a threat map dashboard.
 
-- dashboard ภัยคุกคามที่มีตำแหน่งทางภูมิศาสตร์
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch13-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- A threat dashboard with geographic locations
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch13-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

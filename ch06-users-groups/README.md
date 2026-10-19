@@ -1,14 +1,16 @@
-# บทที่ 6 ผู้ใช้ กลุ่ม และนโยบายรหัสผ่าน
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 10.1–10.13
+# Chapter 6 Users, Groups and Password Policy
 
-โครงสร้าง /etc/passwd และ /etc/shadow, script สร้างผู้ใช้หลายคน, password history และ aging, สิทธิ์ super user, การล็อกและปิดบัญชี (offboarding) และการจัดการกลุ่ม รวมถึงตรวจสิทธิ์ NOPASSWD ที่ cloud-init ให้ไว้ในบทที่ 1
+Course labs: 10.1–10.13
 
-สิ่งที่ได้เมื่อจบบท:
+The structure of /etc/passwd and /etc/shadow, a script that creates many users, password history and aging, super user rights, locking and disabling accounts (offboarding) and managing groups, including checking the NOPASSWD rights that cloud-init granted in chapter 1.
 
-- นโยบายรหัสผ่านที่บังคับใช้จริงด้วย PAM
-- รู้จุดที่ผู้โจมตีใช้ยกระดับสิทธิ์ผ่านบัญชีและกลุ่ม
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch06-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- A password policy that is really enforced through PAM
+- You know where attackers escalate privileges through accounts and groups
 
-หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)
+Status: chapter fully written. Lab files: `guest/ch06-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+For the newly added subtopics see [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Chapter 20 verification: Graylog + FreeIPA (LDAPS) and Sudo Violation (run on graylog-01)
 # บทที่ 20 วิธีตรวจสอบ: Graylog + FreeIPA (LDAPS) และ Sudo Violation  (รันบน graylog-01)
+# EN: Usage: read -rs GL_TOKEN && export GL_TOKEN && sudo --preserve-env=GL_TOKEN bash ch20-check.sh; unset GL_TOKEN
 # ใช้: read -rs GL_TOKEN && export GL_TOKEN && sudo --preserve-env=GL_TOKEN bash ch20-check.sh; unset GL_TOKEN
 set -uo pipefail
 F=0

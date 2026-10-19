@@ -1,9 +1,11 @@
-# ไฟล์ config ของบทที่ 10
+**English** · [ภาษาไทย](README.th.md)
 
-สำเนาของไฟล์ที่บทที่ 10 สร้างด้วย `sudo tee FILE <<'EOF'` จัดตาม path จริงบนเครื่อง ใช้เทียบเมื่อพิมพ์ผิด หรือคัดลอกไปวางแทนการพิมพ์ (ตรวจค่าเฉพาะเครื่อง เช่น IP และชื่อโดเมนก่อนใช้)
+# Chapter 10 config files
 
-| ไฟล์ใน repo | ตำแหน่งบนเครื่อง | หมายเหตุ |
+Copies of the files that chapter 10 creates with `sudo tee FILE <<'EOF'`, laid out by their real path on the machine. Use them to compare against what you typed, or copy them instead of typing (check machine-specific values such as IP addresses and the domain name first). Comment lines that start with `EN:` are English translations of the Thai comment on the next line; they do not change how the file works.
+
+| File in repo | Location on the machine | Note |
 | --- | --- | --- |
 | `files/opt/graylog/nginx/conf.d/graylog.conf` | `/opt/graylog/nginx/conf.d/graylog.conf` | |
-| `files/opt/graylog/docker-compose.yml` | `/opt/graylog/docker-compose.yml` | ไฟล์สมบูรณ์หลังจบบท |
-| `files/opt/graylog/example.env` | `/opt/graylog/example.env` | ไฟล์สมบูรณ์หลังจบบท |
+| `files/opt/graylog/docker-compose.yml` | `/opt/graylog/docker-compose.yml` | complete file as of the end of the chapter |
+| `files/opt/graylog/example.env` | `/opt/graylog/example.env` | complete file as of the end of the chapter |

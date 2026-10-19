@@ -1,14 +1,16 @@
-# บทที่ 15 Rule, Tuning และ Active Response
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 21
+# Chapter 15 Rules, Tuning and Active Response
 
-decoder และ rule แบบ custom (ช่วง ID 100000–100999), ลด false positive, ตรวจจับ brute-force, active response บล็อก IP อัตโนมัติ และ dashboard ของ IP ที่ถูกบล็อก
+Course lab: 21
 
-สิ่งที่ได้เมื่อจบบท:
+Custom decoders and rules (ID range 100000–100999), reducing false positives, detecting brute-force, active response that blocks IPs automatically, and a dashboard of blocked IPs.
 
-- rule ที่ tune แล้วพร้อม test ด้วย wazuh-logtest
-- ตอบสนองอัตโนมัติที่ย้อนกลับได้
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch15-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Tuned rules, tested with wazuh-logtest
+- Automatic responses that can be undone
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch15-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

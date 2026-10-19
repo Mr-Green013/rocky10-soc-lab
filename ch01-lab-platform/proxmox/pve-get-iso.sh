@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 step 8: download the ISO to the Proxmox "local" storage and verify its SHA-256
 # บทที่ 1 ขั้นที่ 8: ดาวน์โหลด ISO ลง storage "local" ของ Proxmox พร้อมตรวจ SHA-256
+# EN: Run on pve-01 as root:
 # รันบน pve-01 ในฐานะ root:
 #   bash pve-get-iso.sh https://download.rockylinux.org/pub/rocky/10/isos/x86_64/Rocky-10.2-x86_64-minimal.iso
+# EN: The script downloads the CHECKSUM file from the same directory to compare against (the Rocky Linux layout)
 # script ดาวน์โหลดไฟล์ CHECKSUM จาก directory เดียวกันมาเทียบ (รูปแบบของ Rocky Linux)
 set -euo pipefail
 

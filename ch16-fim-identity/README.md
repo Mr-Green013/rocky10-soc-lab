@@ -1,14 +1,16 @@
-# บทที่ 16 File Integrity และ Identity Monitoring
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 22
+# Chapter 16 File Integrity and Identity Monitoring
 
-syscheck แบบ scheduled, realtime และ whodata ติดตามไฟล์สำคัญ เก็บ diff ของ config โดยไม่ให้ความลับรั่ว เฝ้า sudoers, authorized_keys, cron, /boot และ baseline ของไฟล์ SUID ตรวจการแก้กลุ่มและการสวมรอยด้วย usermod เฝ้า SMB share และแจ้งเตือนการลบไฟล์จำนวนมาก
+Course lab: 22
 
-สิ่งที่ได้เมื่อจบบท:
+Scheduled, realtime and whodata syscheck to watch important files; keeping diffs of config files without leaking secrets; watching sudoers, authorized_keys, cron, /boot and a baseline of SUID files; detecting group changes and impersonation with usermod; watching an SMB share and alerting on mass file deletion.
 
-- รู้ว่าใครแก้ไฟล์ไหนเมื่อไร
-- alert การลบไฟล์จำนวนมาก
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch16-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- You know who changed which file and when
+- Alerts on mass file deletion
 
-หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)
+Status: chapter fully written. Lab files: `guest/ch16-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+For the newly added subtopics see [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

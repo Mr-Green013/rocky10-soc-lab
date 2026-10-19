@@ -1,10 +1,12 @@
-# ไฟล์ config ของบทที่ 11
+**English** · [ภาษาไทย](README.th.md)
 
-สำเนาของไฟล์ที่บทที่ 11 สร้างด้วย `sudo tee FILE <<'EOF'` จัดตาม path จริงบนเครื่อง ใช้เทียบเมื่อพิมพ์ผิด หรือคัดลอกไปวางแทนการพิมพ์ (ตรวจค่าเฉพาะเครื่อง เช่น IP และชื่อโดเมนก่อนใช้)
+# Chapter 11 config files
 
-| ไฟล์ใน repo | ตำแหน่งบนเครื่อง | หมายเหตุ |
+Copies of the files that chapter 11 creates with `sudo tee FILE <<'EOF'`, laid out by their real path on the machine. Use them to compare against what you typed, or copy them instead of typing (check machine-specific values such as IP addresses and the domain name first). Comment lines that start with `EN:` are English translations of the Thai comment on the next line; they do not change how the file works.
+
+| File in repo | Location on the machine | Note |
 | --- | --- | --- |
 | `files/etc/systemd/system/docker-user-lab.service` | `/etc/systemd/system/docker-user-lab.service` | |
 | `files/etc/rsyslog.d/90-graylog.conf` | `/etc/rsyslog.d/90-graylog.conf` | |
 | `files/etc/rsyslog.d/10-audit-local.conf` | `/etc/rsyslog.d/10-audit-local.conf` | |
-| `files/graylog/SOC-SSH-pipeline.rules` | `/graylog/SOC-SSH-pipeline.rules` | ไฟล์สมบูรณ์หลังจบบท |
+| `files/graylog/SOC-SSH-pipeline.rules` | Graylog Web UI (System → Pipelines → Manage rules), paste in | complete file as of the end of the chapter |

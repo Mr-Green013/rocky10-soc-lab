@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 19 verification: Tetragon, the 9 TracingPolicies and the Wazuh-side rules (sudo bash ch19-check.sh)
 # บทที่ 19 วิธีตรวจสอบ: Tetragon, TracingPolicy 9 ตัว และ rule ฝั่ง Wazuh  (sudo bash ch19-check.sh)
 set -uo pipefail
 F=0

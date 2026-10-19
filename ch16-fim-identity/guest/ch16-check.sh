@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 16 verification: FIM whodata, identity rules and SMB monitoring (sudo bash ch16-check.sh)
 # บทที่ 16 วิธีตรวจสอบ: FIM whodata, identity rules และ SMB monitoring  (sudo bash ch16-check.sh)
 set -uo pipefail
 F=0

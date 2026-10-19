@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="360" viewBox="0 0 1400 360" font-family="Sarabun, 'Leelawadee UI', Tahoma, sans-serif">
+  <title>Figure 3-2 Reading the kernel version number</title>
+  <rect width="1400" height="360" fill="#fff"/>
+  <g font-family="monospace" font-size="44" font-weight="700" text-anchor="middle">
+    <rect x="60" y="50" width="230" height="90" rx="10" fill="#1F3A5F"/><text x="175" y="112" fill="#fff">6.12.0</text>
+    <text x="315" y="112" fill="#1F3A5F">-</text>
+    <rect x="340" y="50" width="300" height="90" rx="10" fill="#E76F51"/><text x="490" y="112" fill="#fff">124.8.1</text>
+    <text x="665" y="112" fill="#1F3A5F">.</text>
+    <rect x="690" y="50" width="250" height="90" rx="10" fill="#2A9D8F"/><text x="815" y="112" fill="#fff">el10_1</text>
+    <text x="965" y="112" fill="#1F3A5F">.</text>
+    <rect x="990" y="50" width="250" height="90" rx="10" fill="#5B6770"/><text x="1115" y="112" fill="#fff">x86_64</text>
+  </g>
+  <g font-size="17" fill="#33475B" text-anchor="middle">
+    <text x="175" y="180" font-weight="700" fill="#1F3A5F">Upstream</text><text x="175" y="206">base LTS kernel</text><text x="175" y="230">fixed for the life of Rocky 10</text>
+    <text x="490" y="180" font-weight="700" fill="#1F3A5F">Release</text><text x="490" y="206">RHEL/Rocky patch round</text><text x="490" y="230">goes up with each security fix</text>
+    <text x="815" y="180" font-weight="700" fill="#1F3A5F">Dist tag</text><text x="815" y="206">build for EL 10.1</text><text x="815" y="230">(10.2 is el10_2)</text>
+    <text x="1115" y="180" font-weight="700" fill="#1F3A5F">Architecture</text><text x="1115" y="206">CPU architecture</text>
+  </g>
+  <rect x="60" y="260" width="1180" height="70" rx="10" fill="#FDF0EC" stroke="#E76F51" stroke-width="2"/>
+  <text x="80" y="292" font-size="17" font-weight="700" fill="#1F3A5F">Security view:</text>
+  <text x="240" y="292" font-size="17" fill="#33475B">check vulnerabilities by the Release, not 6.12.0: patches are backported without changing the upstream number</text>
+  <text x="240" y="318" font-size="15" fill="#5B6770">Example numbers from Rocky 10.1 at release; yours will be newer after dnf upgrade</text>
+</svg>

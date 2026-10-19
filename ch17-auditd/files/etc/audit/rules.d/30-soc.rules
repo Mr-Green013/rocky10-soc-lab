@@ -1,7 +1,9 @@
+## EN: A real user acting as nobody (23.8) - must come before user_exec
 ## ผู้ใช้จริงทำงานในชื่อ nobody (23.8) - ต้องมาก่อน user_exec
 -a always,exit -F arch=b64 -S execve -F uid=65534 -F auid>=1000 -F auid!=unset -k nobody_exec
 -a always,exit -F arch=b64 -S setuid,setreuid,setresuid -F a0=65534 -F auid>=1000 -F auid!=unset -k priv_drop_nobody
 
+## EN: Changes to file permissions and ownership (23.4)
 ## การเปลี่ยนสิทธิ์และเจ้าของไฟล์ (23.4)
 -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=unset -k perm_mod
 -a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F auid!=unset -k perm_mod
@@ -23,5 +25,6 @@
 -a always,exit -F path=/etc/ld.so.conf -F perm=wa -k ld_preload
 -a always,exit -F dir=/etc/ld.so.conf.d -F perm=wa -k ld_preload
 
+## EN: Every command from a user who really logged in - the broadest rule, must be last
 ## คำสั่งทุกคำสั่งที่มาจากผู้ใช้ที่ login จริง - rule กว้างที่สุด ต้องอยู่ท้ายสุด
 -a always,exit -F arch=b64 -S execve,execveat -F auid>=1000 -F auid!=unset -k user_exec

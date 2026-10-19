@@ -1,3 +1,4 @@
+# EN: 50-suid-guard.yaml : from chapter 19 (test with tetra tracingpolicy add before placing it in this directory)
 # 50-suid-guard.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy
@@ -13,7 +14,7 @@ spec:
     - index: 1
       type: "int"
     selectors:
-    - matchArgs:                 # container: ฆ่า
+    - matchArgs:                 # container: ฆ่า (EN: container: kill)
       - index: 1
         operator: "Mask"
         values:
@@ -25,7 +26,7 @@ spec:
         - "host_ns"
       matchActions:
       - action: Sigkill
-    - matchArgs:                 # host: บันทึกอย่างเดียว
+    - matchArgs:                 # host: บันทึกอย่างเดียว (EN: host: record only)
       - index: 1
         operator: "Mask"
         values:

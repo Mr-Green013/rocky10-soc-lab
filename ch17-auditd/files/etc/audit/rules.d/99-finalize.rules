@@ -1,2 +1,3 @@
+## EN: Must always be the last line: after this, rules can only be changed by rebooting
 ## ต้องเป็นบรรทัดสุดท้ายเสมอ: หลังจากนี้แก้ rule ได้ด้วยการ reboot เท่านั้น
 -e 2

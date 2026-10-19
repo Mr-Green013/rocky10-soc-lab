@@ -1,52 +1,54 @@
-# เทียบสารบัญหลักสูตรกับเนื้อหาที่มี
+**English** · [ภาษาไทย](curriculum-coverage.th.md)
 
-ตรวจหัวข้อในสารบัญหลักสูตร 40 Lab เทียบกับเอกสาร 8 หมวดและบทในหนังสือ (ตรวจเมื่อ 11 ต.ค. 2026)
+# Course outline vs. available content
 
-สถานะ: **ครบ** = มีเนื้อหาครบทุกหัวข้อย่อย · **ขาดบางส่วน** = มีหัวข้อย่อยที่ยังไม่มีเนื้อหา · **ต้องยืนยัน** = ต้องดูชื่อหัวข้อจากสารบัญต้นฉบับ
+Each topic in the 40-lab course outline checked against the 8 section documents and the book chapters (checked 11 Oct 2026)
 
-| Lab | หัวข้อในสารบัญ | เอกสารหมวด | บทในหนังสือ | สถานะ | หมายเหตุ |
+Status: **Complete** = every subtopic has content · **Partly missing** = some subtopics have no content yet · **To confirm** = the topic title must be checked against the original outline
+
+| Lab | Topic in the outline | Section doc | Book chapter | Status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Install Rocky Linux 10.1 | 1 | 1 | ครบ | บทที่ 1 เขียนแล้ว |
-| 2 | Config Network | 1 | 2 | ครบ | ต้องปรับให้เข้ากับ lab ที่ cloud-init ตั้ง IP ให้แล้ว (NIC `eth0`, connection ของ cloud-init) |
-| 3 | Install SSH | 1 | 2 | ครบ | ต้องอธิบาย drop-in `50-cloud-init.conf` ที่ cloud-init สร้าง |
-| 4 | Checking the Linux Kernel Version | 1 | 3 | ครบ | |
-| 5 | Config Hostname | 1 | 2 | ครบ | ต้องแก้ `/etc/hosts` ที่ cloud-init ใส่ FQDN ไว้กับ 127.0.0.1 |
-| 6 | Timezone และ NTP | 1 | 3 | ครบ | เพิ่ม: pve-01 เป็น NTP ของ lab |
-| 7 | Check Rocky Linux Version | 1 | 1, 3 | ครบ | |
-| 8 | Understanding SELinux and Systemctl | 1 | 4 | ครบ | |
-| 9 | Command Line Fundamentals 9.1–9.15 | 2 | 5 | ครบ | มีครบ 15 หัวข้อ |
-| 10 | Manage local users and groups 10.1–10.13 | 2 | 6 | เติมแล้ว | 10.10 ล็อก ปลดล็อก และปิดบัญชีผู้ใช้ (หัวข้อใหม่) |
-| 11 | LAB IPA | 2 | 7 | ครบ | Install, join, password policy, HBAC, sudo, SSH keys, LDAP |
-| 12 | SSH Key Authentication | 2 | 8 | ครบ | |
-| 13 | Limit session SSH | 2 | 8 | ครบ | |
-| 14 | CrowdSec Ban IP ssh Brute-force | 3 | 9 | ครบ | |
-| 15 | Block Anonymous Proxies / Tor | 3 | 9 | ครบ | |
-| 16 | Project-Graylog 16.1–16.25 | 4 | 10, 11 | เติมแล้ว | 16.16 เชื่อม cloudflared เข้ากับ Nginx (หัวข้อใหม่) |
-| 17 | การค้นหา | 4 | 12 | ครบ | |
-| 18 | CrowdSec บน Graylog | 4 | 13 | ครบ | |
-| 19 | SSH GeoIP จาก IP ต่างประเทศ | 4 | 13 | ครบ | |
-| 20 | Global Threat Intelligence Dashboard | 4 | 13 | ครบ | |
-| 21 | Project Wazuh 21.1–21.26 | 5 | 14, 15 | ครบ | แบ่งเป็นส่วน A–E ครบ 26 หัวข้อ |
-| 22 | Syscheck (FIM) & Identity Monitoring | 5 | 16 | เติมแล้ว | 22.10–22.26 FIM เชิงลึก 17 หัวข้อ (หัวข้อใหม่) |
-| 23 | Auditd File 23.1–23.35 | 5 | 17 | เติมแล้ว | 23.10–23.29 หมวดหมู่ audit rule 20 หัวข้อ (หัวข้อใหม่) |
-| 24 | Docker Lab 24.1–24.49 | 6 | 18 | ครบ | แบ่งเป็นส่วน A–F ครบ 49 หัวข้อ |
-| 25 | SOC Analyst Mode ผ่าน FreeIPA | 7 | 20 | ครบ | |
-| 26 | Dashboard Sudo Access Violation | 7 | 20 | ครบ | |
-| 27 | Git Command Tracking and Blocking | 7 | 21 | ครบ | |
-| 28 | Config App log to Graylog | 7 | 22 | ครบ | |
-| 29 | Block Shell Execution ใน WordPress | 7 | 22 | ครบ | |
-| 30 | Centralized Web Logging | 7 | 22 | ครบ | |
-| 31 | WordPress + Redis Cache | 7 | 22 | ครบ | |
-| 32 | Web Application Firewall หน้า WordPress (ModSecurity + OWASP CRS) | – | 22 | เติมแล้ว | หัวข้อใหม่ ทางเลือก B |
-| 33 | Install Tetragon | 6 | 19 | ครบ | |
-| 34 | Group Agent on Wazuh | 8 | 14 | ครบ | |
-| 35 | Kill คำสั่งสร้าง SUID/SGID | 6 | 19 | ครบ | |
-| 36 | Monitor sensitive file access | 6 | 19 | ครบ | |
-| 37 | Account Activity Tracker | 6 | 19 | ครบ | |
-| 38 | Wazuh Alert ไป LINE / Telegram | 8 | 23 | ครบ | ใช้ LINE Messaging API แทน LINE Notify ที่ปิดบริการแล้ว |
-| 39 | Wazuh แจ้งเตือนผ่าน Gmail | 8 | 23 | ครบ | |
-| 40 | Change port wazuh | 8 | 23 | ครบ | |
+| 1 | Install Rocky Linux 10.1 | 1 | 1 | Complete | Chapter 1 written |
+| 2 | Config Network | 1 | 2 | Complete | Must be adapted to a lab where cloud-init has already set the IP (NIC `eth0`, the cloud-init connection) |
+| 3 | Install SSH | 1 | 2 | Complete | Must explain the `50-cloud-init.conf` drop-in that cloud-init creates |
+| 4 | Checking the Linux Kernel Version | 1 | 3 | Complete | |
+| 5 | Config Hostname | 1 | 2 | Complete | Must fix the `/etc/hosts` entry where cloud-init maps the FQDN to 127.0.0.1 |
+| 6 | Timezone and NTP | 1 | 3 | Complete | Added: pve-01 is the lab's NTP server |
+| 7 | Check Rocky Linux Version | 1 | 1, 3 | Complete | |
+| 8 | Understanding SELinux and Systemctl | 1 | 4 | Complete | |
+| 9 | Command Line Fundamentals 9.1–9.15 | 2 | 5 | Complete | All 15 topics present |
+| 10 | Manage local users and groups 10.1–10.13 | 2 | 6 | Filled in | 10.10 Locking, unlocking and disabling user accounts (new topic) |
+| 11 | LAB IPA | 2 | 7 | Complete | Install, join, password policy, HBAC, sudo, SSH keys, LDAP |
+| 12 | SSH Key Authentication | 2 | 8 | Complete | |
+| 13 | Limit session SSH | 2 | 8 | Complete | |
+| 14 | CrowdSec Ban IP ssh Brute-force | 3 | 9 | Complete | |
+| 15 | Block Anonymous Proxies / Tor | 3 | 9 | Complete | |
+| 16 | Project-Graylog 16.1–16.25 | 4 | 10, 11 | Filled in | 16.16 Connecting cloudflared to Nginx (new topic) |
+| 17 | Searching | 4 | 12 | Complete | |
+| 18 | CrowdSec on Graylog | 4 | 13 | Complete | |
+| 19 | SSH GeoIP from foreign IPs | 4 | 13 | Complete | |
+| 20 | Global Threat Intelligence Dashboard | 4 | 13 | Complete | |
+| 21 | Project Wazuh 21.1–21.26 | 5 | 14, 15 | Complete | Split into parts A–E, all 26 topics |
+| 22 | Syscheck (FIM) & Identity Monitoring | 5 | 16 | Filled in | 22.10–22.26 in-depth FIM, 17 topics (new topics) |
+| 23 | Auditd File 23.1–23.35 | 5 | 17 | Filled in | 23.10–23.29 audit rule categories, 20 topics (new topics) |
+| 24 | Docker Lab 24.1–24.49 | 6 | 18 | Complete | Split into parts A–F, all 49 topics |
+| 25 | SOC Analyst Mode through FreeIPA | 7 | 20 | Complete | |
+| 26 | Dashboard Sudo Access Violation | 7 | 20 | Complete | |
+| 27 | Git Command Tracking and Blocking | 7 | 21 | Complete | |
+| 28 | Config App log to Graylog | 7 | 22 | Complete | |
+| 29 | Block Shell Execution in WordPress | 7 | 22 | Complete | |
+| 30 | Centralized Web Logging | 7 | 22 | Complete | |
+| 31 | WordPress + Redis Cache | 7 | 22 | Complete | |
+| 32 | Web Application Firewall in front of WordPress (ModSecurity + OWASP CRS) | – | 22 | Filled in | New topic, option B |
+| 33 | Install Tetragon | 6 | 19 | Complete | |
+| 34 | Group Agent on Wazuh | 8 | 14 | Complete | |
+| 35 | Kill SUID/SGID creation commands | 6 | 19 | Complete | |
+| 36 | Monitor sensitive file access | 6 | 19 | Complete | |
+| 37 | Account Activity Tracker | 6 | 19 | Complete | |
+| 38 | Wazuh Alert to LINE / Telegram | 8 | 23 | Complete | Uses the LINE Messaging API instead of LINE Notify, which has shut down |
+| 39 | Wazuh notifications through Gmail | 8 | 23 | Complete | |
+| 40 | Change port wazuh | 8 | 23 | Complete | |
 
-## สรุป
+## Summary
 
-ทุกหัวข้อในสารบัญมีเนื้อหาหรือมีชื่อหัวข้อที่อนุมัติแล้ว รายละเอียดของหัวข้อที่เติมใหม่อยู่ใน [proposed-subtopics.md](proposed-subtopics.md)
+Every topic in the outline has content or an approved topic title. Details of the newly added topics are in [proposed-subtopics.md](proposed-subtopics.md)

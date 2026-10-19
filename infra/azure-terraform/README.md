@@ -1,70 +1,72 @@
-# SOC Lab บน Azure ด้วย Terraform
+**English** · [ภาษาไทย](README.th.md)
 
-สร้างเครื่องทั้งหมดของหลักสูตร Lab 1–40 บน Azure ด้วยคำสั่งเดียว พร้อม base config ที่แทน Lab 1–8 ได้ (hostname, FQDN, timezone, `/etc/hosts`, firewalld, SELinux enforcing, ผู้ใช้ `aod` + SSH key) IP ทุกเครื่องตรงกับเอกสารหลักสูตร จึงใช้คำสั่งในเอกสารต่อได้เลย
+# SOC Lab on Azure with Terraform
 
-## สิ่งที่ถูกสร้าง
+Build every machine of course Labs 1–40 on Azure with one command, with a base config that can replace Labs 1–8 (hostname, FQDN, timezone, `/etc/hosts`, firewalld, SELinux enforcing, user `aod` + SSH key). Every machine's IP matches the course documents, so you can keep following the commands in them.
 
-| Resource | ชื่อ | หมายเหตุ |
+## What gets created
+
+| Resource | Name | Notes |
 | --- | --- | --- |
-| Resource group | `rg-soclab` | ลบทั้งหมดด้วย `terraform destroy` |
-| VNet / subnet | `vnet-soclab` 192.168.0.0/16, `snet-lab` 192.168.10.0/24 | gateway .1 เป็นของ Azure |
-| NSG | `nsg-soclab-lab` | เปิดเฉพาะ SSH จาก `admin_source_cidrs` ไปที่ admin-01 |
-| NAT Gateway + public IP | `ng-soclab` | ทุกเครื่องออก internet ทางนี้ทางเดียว |
-| VM 7 เครื่อง | ตามตารางล่าง | Rocky Linux 10.1, ไม่มี password, SSH key เท่านั้น |
-| Auto-shutdown | ทุก VM | deallocate ทุกวัน 22:00 (เวลาไทย) |
+| Resource group | `rg-soclab` | Delete everything with `terraform destroy` |
+| VNet / subnet | `vnet-soclab` 192.168.0.0/16, `snet-lab` 192.168.10.0/24 | Gateway .1 belongs to Azure |
+| NSG | `nsg-soclab-lab` | Only SSH from `admin_source_cidrs` to admin-01 is open |
+| NAT Gateway + public IP | `ng-soclab` | The single way out to the internet for every machine |
+| 7 VMs | per the table below | Rocky Linux 10.1, no password, SSH key only |
+| Auto-shutdown | every VM | Deallocates every day at 22:00 (Thailand time) |
 
-| เครื่อง | IP | ขนาด default | Disk | หน้าที่ |
+| Machine | IP | Default size | Disk | Role |
 | --- | --- | --- | --- | --- |
-| admin-01 | 192.168.10.100 (+ public IP) | Standard_B2s | 32 GB | jump host แทน admin workstation |
+| admin-01 | 192.168.10.100 (+ public IP) | Standard_B2s | 32 GB | Jump host in place of the admin workstation |
 | ipa-01 | 192.168.10.10 | Standard_B2ms | 64 GB | FreeIPA |
 | graylog-01 | 192.168.10.20 | Standard_B4ms | 128 GB | Graylog 7.1 (Docker Compose) |
 | wazuh-01 | 192.168.10.30 | Standard_B4ms | 128 GB | Wazuh all-in-one |
 | lab-linux-01 | 192.168.10.41 | Standard_B2s | 32 GB | Linux server, git server |
-| lab-linux-02 | 192.168.10.42 | Standard_B2s | 32 GB | เครื่องโจมตีจำลอง, Samba |
+| lab-linux-02 | 192.168.10.42 | Standard_B2s | 32 GB | Attack simulation machine, Samba |
 | node-01 | 192.168.10.50 | Standard_B2ms | 64 GB | Docker, Falco, Tetragon, WordPress |
 
-รวม 18 vCPU ตระกูล B-series
+18 vCPUs in total, all B-series
 
-## สิ่งที่ต้องมีก่อน
+## Prerequisites
 
-1. Azure CLI login แล้ว (`az login`, `az account set -s <subscription>`)
-2. Terraform 1.6 ขึ้นไป
-3. SSH key: `ssh-keygen -t ed25519` ถ้ายังไม่มี
-4. Quota ของ B-series ใน region ที่ใช้ต้องพอ 18 vCPU (subscription ใหม่มักได้น้อยกว่านี้)
+1. Azure CLI logged in (`az login`, `az account set -s <subscription>`)
+2. Terraform 1.6 or later
+3. An SSH key: `ssh-keygen -t ed25519` if you do not have one yet
+4. Enough B-series quota in your region for 18 vCPUs (new subscriptions often get less than this)
 
 ```bash
 az vm list-usage -l southeastasia -o table | grep -E "Total Regional vCPUs|Standard BS Family"
 ```
 
-ถ้าไม่พอ ขอเพิ่มที่ portal: **Quotas → Compute** หรือลดขนาดผ่าน `vm_sizes`
+If it is not enough, request more in the portal under **Quotas → Compute**, or reduce the sizes with `vm_sizes`
 
-## ขั้นตอน
+## Steps
 
-### 1. หา image ของ Rocky Linux 10.1
+### 1. Find the Rocky Linux 10.1 image
 
-ชื่อ SKU ของ Rocky 10 บน Marketplace และการมีหรือไม่มี plan ต่างกันตาม region ให้ตรวจก่อนทุกครั้ง
+The Marketplace SKU name of Rocky 10, and whether it has a plan, differ by region. Check every time
 
 ```bash
 ./scripts/find-rocky-image.sh southeastasia
 ```
 
-script จะพิมพ์บล็อก `image = { ... }` ให้คัดลอกไปใส่ใน `terraform.tfvars` ถ้าไม่พบ Rocky 10 ใน region นั้น ให้เปลี่ยน region หรือใช้ `image.source = "image_id"` กับ image จาก Community Gallery หรือ Azure Compute Gallery ของตัวเอง
+The script prints an `image = { ... }` block to copy into `terraform.tfvars`. If Rocky 10 is not found in that region, change the region or use `image.source = "image_id"` with an image from the Community Gallery or your own Azure Compute Gallery
 
-ถ้า image มี plan ต้องยอมรับ terms 1 ครั้งต่อ subscription
+If the image has a plan, accept the terms once per subscription
 
 ```bash
 az vm image terms accept --urn resf:rockylinux-x86_64:<sku>:latest
 ```
 
-### 2. ตั้งค่า
+### 2. Configure
 
 ```bash
 cp terraform.tfvars.example terraform.tfvars
-curl -s https://api.ipify.org; echo        # public IP ของคุณ ใส่ใน admin_source_cidrs เป็น x.x.x.x/32
+curl -s https://api.ipify.org; echo        # your public IP; put it in admin_source_cidrs as x.x.x.x/32
 vi terraform.tfvars
 ```
 
-### 3. สร้าง
+### 3. Create
 
 ```bash
 terraform init
@@ -72,81 +74,81 @@ terraform plan -out lab.tfplan
 terraform apply lab.tfplan
 ```
 
-### 4. เชื่อมต่อ
+### 4. Connect
 
 ```bash
 terraform output -raw ssh_config >> ~/.ssh/config
-ssh ipa-01                     # ผ่าน admin-01 อัตโนมัติด้วย ProxyJump
-./scripts/check-lab.sh         # ตรวจ cloud-init, FQDN, SELinux, firewalld, timezone, DNS, internet
+ssh ipa-01                     # goes through admin-01 automatically with ProxyJump
+./scripts/check-lab.sh         # checks cloud-init, FQDN, SELinux, firewalld, timezone, DNS, internet
 ```
 
-ผลที่ควรได้จาก `check-lab.sh`: ทุกเครื่อง `CLOUDINIT=done`, `SELINUX=Enforcing`, `FIREWALL=active`, `TZ=Asia/Bangkok` และ node-01 resolve ชื่อ `*.lab.internal` ได้ครบ
+What `check-lab.sh` should show: every machine `CLOUDINIT=done`, `SELINUX=Enforcing`, `FIREWALL=active`, `TZ=Asia/Bangkok`, and node-01 resolves every `*.lab.internal` name
 
-เปิด Web UI ผ่าน SSH tunnel (คำสั่งเต็มอยู่ใน `terraform output web_ui_tunnels`)
+Open the Web UIs through an SSH tunnel (the full commands are in `terraform output web_ui_tunnels`)
 
-| UI | URL บนเครื่องตัวเอง |
+| UI | URL on your own machine |
 | --- | --- |
 | Graylog | http://localhost:9000 |
-| Wazuh dashboard | https://localhost:8443 (หลัง Lab 40 ให้เปลี่ยนปลายทางเป็น 192.168.10.30:8443) |
+| Wazuh dashboard | https://localhost:8443 (after Lab 40, change the destination to 192.168.10.30:8443) |
 | WordPress | http://localhost:8081 |
 
-### 5. เปลี่ยน DNS ไปใช้ FreeIPA (หลัง Lab 11)
+### 5. Switch DNS to FreeIPA (after Lab 11)
 
-FreeIPA ที่มี DNS ในตัวต้องเป็น DNS ของทุกเครื่อง จึงแบ่งเป็น 2 รอบ
+FreeIPA with its built-in DNS has to be the DNS server of every machine, so this is done in 2 rounds
 
-1. ติดตั้ง IPA บน ipa-01 ตาม Lab 11 โดยตั้ง forwarder เป็น Azure DNS
+1. Install IPA on ipa-01 as in Lab 11, with the Azure DNS as forwarder
 
     ```bash
     sudo ipa-server-install --setup-dns --forwarder=168.63.129.16 \
       --realm LAB.INTERNAL --domain lab.internal --no-ntp
     ```
 
-    `--no-ntp` ให้เครื่องใช้นาฬิกาจาก Hyper-V (PTP) ของ Azure ต่อไป
+    `--no-ntp` keeps the machine on the Hyper-V clock (PTP) provided by Azure
 
-2. แก้ `use_ipa_dns = true` แล้ว `terraform apply`
-3. ให้ทุกเครื่องรับ DNS ใหม่: `sudo systemctl restart NetworkManager` หรือ reboot แล้วตรวจด้วย `resolvectl status` หรือ `cat /etc/resolv.conf`
+2. Set `use_ipa_dns = true`, then `terraform apply`
+3. Make every machine pick up the new DNS: `sudo systemctl restart NetworkManager` or reboot, then check with `resolvectl status` or `cat /etc/resolv.conf`
 
-หลังรอบนี้ ipa-01 ต้อง start ก่อนเครื่องอื่นทุกครั้ง มิฉะนั้นเครื่องอื่นจะ resolve ชื่อไม่ได้
+After this round, ipa-01 must always start before the other machines, otherwise they cannot resolve names
 
-## Lab ที่ต้องปรับเมื่อรันบน Azure
+## Labs that change when running on Azure
 
-| Lab | ในเอกสาร | บน Azure |
+| Lab | In the documents | On Azure |
 | --- | --- | --- |
-| 1 Install Rocky | ติดตั้งจาก ISO | ได้เครื่องจาก image แล้ว ใช้ lab นี้ทบทวน `hostnamectl`, `lsblk`, `rpm -qa` แทน |
-| 2 Config Network | ตั้ง static IP ด้วย `nmcli` บน `ens160` | NIC ชื่อ `eth0` และ IP ถูกกำหนดที่ NIC ของ Azure **ห้ามตั้ง static IP ในเครื่อง** จะทำให้เครื่องหลุดจาก network ให้ฝึก `nmcli` ด้วยการอ่านค่า, ตั้ง DNS search หรือสร้าง connection บน dummy interface แทน |
-| 6 NTP | ตั้ง chrony ชี้ NTP server | ดู `chronyc sources` ก่อน ถ้ามี refclock `PHC0` (`/dev/ptp_hyperv`) แปลว่าใช้นาฬิกาของ Hyper-V อยู่แล้ว ให้เพิ่ม NTP server ได้แต่อย่าลบ refclock |
-| 11 FreeIPA | DNS ของ lab | ใช้ขั้นตอนที่ 5 ด้านบน |
-| 14 CrowdSec | โจมตีจาก lab-linux-02 | เหมือนเดิม; เครื่อง lab ไม่มี public IP จึงไม่มี brute force จริงจาก internet |
-| 16 Graylog | Cloudflare Tunnel | ใช้ได้เหมือนเดิม (เป็น outbound ผ่าน NAT Gateway) |
-| 19 GeoIP | ข้อมูลจาก IP ต่างประเทศ | ใช้วิธีฉีด event ด้วย `logger` ตามเอกสาร |
-| 39 Gmail | Postfix relay port 587 | Azure บล็อก outbound port 25 แต่ 587 ใช้ได้ |
-| 40 Change port | rich rule ให้ 192.168.10.100 เข้า dashboard | 192.168.10.100 คือ admin-01 ใช้ตามเอกสารได้เลย |
-| ทุกหมวด | snapshot `m0X-...-done` | `./scripts/snapshot.sh m05-done` (incremental snapshot ของ OS disk ทุกเครื่อง) |
+| 1 Install Rocky | Install from the ISO | The machines come from an image; use this lab to review `hostnamectl`, `lsblk`, `rpm -qa` instead |
+| 2 Config Network | Set a static IP with `nmcli` on `ens160` | The NIC is named `eth0` and the IP is set on the Azure NIC. **Never set a static IP inside the machine** — it will drop off the network. Practice `nmcli` by reading values, setting the DNS search domain, or creating a connection on a dummy interface instead |
+| 6 NTP | Point chrony at an NTP server | Look at `chronyc sources` first. If there is a `PHC0` refclock (`/dev/ptp_hyperv`), the Hyper-V clock is already in use. You may add NTP servers, but do not remove the refclock |
+| 11 FreeIPA | The lab DNS | Use step 5 above |
+| 14 CrowdSec | Attack from lab-linux-02 | Same as before; the lab machines have no public IP, so there is no real brute force from the internet |
+| 16 Graylog | Cloudflare Tunnel | Works as before (it is outbound through the NAT Gateway) |
+| 19 GeoIP | Data from foreign IPs | Inject events with `logger` as in the documents |
+| 39 Gmail | Postfix relay on port 587 | Azure blocks outbound port 25, but 587 works |
+| 40 Change port | A rich rule letting 192.168.10.100 reach the dashboard | 192.168.10.100 is admin-01, so follow the documents as written |
+| every section | snapshot `m0X-...-done` | `./scripts/snapshot.sh m05-done` (incremental snapshot of every machine's OS disk) |
 
-## ค่าใช้จ่ายและการเปิดปิด
+## Cost and starting/stopping
 
-ส่วนที่คิดเงินแม้ VM ปิดอยู่: managed disk (รวม 480 GB), NAT Gateway, public IP 2 ตัว และ snapshot ส่วน VM คิดเงินเฉพาะตอนรัน ประมาณราคาจริงด้วย Azure Pricing Calculator ตาม region ที่เลือก
+Charged even while the VMs are off: managed disks (480 GB in total), the NAT Gateway, 2 public IPs and snapshots. VMs are charged only while running. Estimate the real price with the Azure Pricing Calculator for your region
 
 ```bash
 RG=rg-soclab
-# เปิด: ipa-01 ก่อน แล้วค่อยเครื่องอื่น
+# Start: ipa-01 first, then the other machines
 az vm start -g $RG -n vm-ipa-01
 az vm start --ids $(az vm list -g $RG --query "[?name!='vm-ipa-01'].id" -o tsv)
-# ปิดและหยุดคิดเงินค่า compute
+# Stop and stop paying for compute
 az vm deallocate --ids $(az vm list -g $RG --query "[].id" -o tsv)
-# ลบทั้ง lab (snapshot ใน RG เดียวกันถูกลบด้วย)
+# Delete the whole lab (snapshots in the same RG are deleted too)
 terraform destroy
 ```
 
-## ความปลอดภัยของ lab
+## Lab security
 
-- เข้าจาก internet ได้ทางเดียวคือ SSH ไป admin-01 จาก IP ที่ระบุ ถ้า IP บ้านเปลี่ยนให้แก้ `admin_source_cidrs` แล้ว apply
-- ไม่มี password ในไฟล์ใด ๆ state มีเพียง IP และ SSH public key แต่ยังควรเก็บ state ไว้ในที่ปลอดภัย หรือย้ายไป remote backend (`azurerm` backend บน Storage Account)
-- หลังทำ Lab 29 (web shell จำลอง) และ Lab 24 (การโจมตี container) ให้ลบไฟล์ทดสอบตาม Cleanup ของแต่ละ lab ก่อนเปิด tunnel ให้ผู้อื่น
+- The only way in from the internet is SSH to admin-01 from the IPs you list. If your home IP changes, update `admin_source_cidrs` and apply
+- There are no passwords in any file. The state only holds IPs and SSH public keys, but you should still keep the state somewhere safe or move it to a remote backend (the `azurerm` backend on a Storage Account)
+- After Lab 29 (simulated web shell) and Lab 24 (container attacks), delete the test files per each lab's cleanup before opening a tunnel to anyone else
 
-## ข้อจำกัดและสิ่งที่ต้องตรวจเอง
+## Limitations and things to check yourself
 
-- ไฟล์ชุดนี้ยังไม่ได้รัน `terraform validate` หรือ `apply` จริง (sandbox ที่เขียนไม่มีสิทธิ์ดาวน์โหลด provider) ตรวจแล้ว 3 อย่าง: syntax HCL ทุกไฟล์, argument ทั้ง 102 ตัวมีอยู่ในเอกสาร azurerm v4.81.0, และ cloud-init ที่ render แล้วผ่าน schema checker ของ cloud-init
-- SKU ของ Rocky 10 บน Marketplace (`10-base` เป็นค่าตั้งต้น) และการต้องมี plan ยังไม่ได้ยืนยัน ให้ใช้ค่าจาก `find-rocky-image.sh`
-- ถ้า restore OS disk จาก snapshot ด้วยการสลับ disk ใน portal Terraform จะเห็นว่า `os_disk` เปลี่ยนและเสนอให้สร้าง VM ใหม่ ให้ใช้ snapshot เป็น backup และ restore เฉพาะเมื่อจำเป็น
-- B-series เป็น burstable ถ้า Graylog หรือ Wazuh ใช้ CPU ต่อเนื่องจน credit หมด จะช้าลงมาก ให้เปลี่ยนเป็น `Standard_D4as_v5` ผ่าน `vm_sizes`
+- These files have not been through a real `terraform validate` or `apply` (the sandbox they were written in could not download the provider). Three things were checked: the HCL syntax of every file, that all 102 arguments exist in the azurerm v4.81.0 documentation, and that the rendered cloud-init passes the cloud-init schema checker
+- The Marketplace SKU of Rocky 10 (`10-base` is the default) and whether it needs a plan have not been confirmed. Use the values from `find-rocky-image.sh`
+- If you restore an OS disk from a snapshot by swapping the disk in the portal, Terraform will see `os_disk` change and propose recreating the VM. Treat snapshots as backups and restore only when necessary
+- B-series VMs are burstable. If Graylog or Wazuh uses CPU continuously until the credits run out, they slow down a lot; switch to `Standard_D4as_v5` through `vm_sizes`

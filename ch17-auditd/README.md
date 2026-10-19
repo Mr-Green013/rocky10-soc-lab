@@ -1,13 +1,15 @@
-# บทที่ 17 Linux Audit (auditd) สำหรับการสืบสวน
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 23
+# Chapter 17 Linux Audit (auditd) for Investigation
 
-เขียน audit rule ตามหมวดหมู่มาตรฐาน (time-change, identity, logins, privileged, mounts, delete, sudoers, software, export และอื่น ๆ) ใช้ ausearch และ aureport วัดและปรับภาระของ auditd และเขียน rule ตรวจจับเทคนิคระดับ syscall
+Course lab: 23
 
-สิ่งที่ได้เมื่อจบบท:
+Write audit rules by standard category (time-change, identity, logins, privileged, mounts, delete, sudoers, software, export and more), use ausearch and aureport, measure and tune the load of auditd, and write rules that detect techniques at the syscall level.
 
-- audit rule ที่ใช้ตรวจเทคนิคการโจมตีระดับ syscall
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch17-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Audit rules that detect attack techniques at the syscall level
 
-หัวข้อที่เติมใหม่ดู [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)
+Status: chapter fully written. Lab files: `guest/ch17-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+For the newly added subtopics see [docs/proposed-subtopics.md](../docs/proposed-subtopics.md)

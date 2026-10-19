@@ -1,25 +1,27 @@
-# บทที่ 4 SELinux และ systemd
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 8
+# Chapter 4 SELinux and systemd
 
-โหมดและ context ของ SELinux, boolean, semanage port, อ่าน AVC denial ด้วย ausearch และ audit2why จัดการ service ด้วย systemctl, unit drop-in และ target
+Course lab: 8
 
-สิ่งที่ได้เมื่อจบบท:
+SELinux modes and contexts, booleans, semanage port, reading AVC denials with ausearch and audit2why, and managing services with systemctl, unit drop-ins and targets.
 
-- แก้ปัญหา SELinux โดยไม่ปิด SELinux
-- เขียน unit drop-in เพื่อปรับ service อย่างปลอดภัย
+What you get at the end of the chapter:
 
-สถานะ: ต้นฉบับเขียนแล้ว รอทดสอบบนเครื่องจริง
+- You fix SELinux problems without disabling SELinux
+- You write unit drop-ins to adjust services safely
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: draft written, waiting to be tested on real machines
 
-## ไฟล์
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)
 
-| ไฟล์ | รันที่ | หน้าที่ |
+## Files
+
+| File | Runs on | Purpose |
 | --- | --- | --- |
-| `guest/ch04-check.sh` | ทุก VM | ตรวจ SELinux, systemd และ cleanup ของ mini-lab |
+| `guest/ch04-check.sh` | every VM | Checks SELinux, systemd and the mini-lab cleanup |
 
-รัน script ฝั่ง guest กับทุกเครื่องจาก Windows:
+Run the guest-side script on every machine from Windows:
 
 ```powershell
 cd tools\windows

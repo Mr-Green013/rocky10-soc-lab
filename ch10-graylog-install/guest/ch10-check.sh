@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 10 verification: Graylog on Docker, Nginx + TLS from IPA, and port 9000 closed (sudo bash ch10-check.sh)
 # บทที่ 10 วิธีตรวจสอบ: Graylog บน Docker, Nginx + TLS จาก IPA และการปิด port 9000  (sudo bash ch10-check.sh)
 set -uo pipefail
 F=0

@@ -1,4 +1,5 @@
 #!/bin/bash
+# EN: Account Activity Tracker: summarizes events from the account-tracker policy
 # Account Activity Tracker: สรุป event จาก policy account-tracker
 LOG=${1:-/var/log/tetragon/tetragon.log}
 jq -r 'select(.process_kprobe.policy_name == "account-tracker")

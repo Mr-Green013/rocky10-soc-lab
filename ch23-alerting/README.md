@@ -1,13 +1,15 @@
-# บทที่ 23 Alert ไป LINE, Telegram และ Gmail; ปรับ Port ของ Wazuh
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 38, 39, 40
+# Chapter 23 Alerts to LINE, Telegram and Gmail; Changing Wazuh Ports
 
-integration ของ Wazuh ส่ง alert ไป LINE Messaging API (แทน LINE Notify ที่ปิดบริการ), Telegram bot และ Gmail ผ่าน SMTP relay และย้าย port ของ Wazuh dashboard พร้อม firewall rule
+Course labs: 38, 39, 40
 
-สิ่งที่ได้เมื่อจบบท:
+Wazuh integrations that send alerts to the LINE Messaging API (replacing LINE Notify, which has shut down), a Telegram bot and Gmail through an SMTP relay, plus moving the Wazuh dashboard port with matching firewall rules.
 
-- alert ระดับสำคัญถึงมือถือภายในไม่กี่วินาที
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch23-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Important alerts reach your phone within seconds
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch23-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

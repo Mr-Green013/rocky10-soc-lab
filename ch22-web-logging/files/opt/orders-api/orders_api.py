@@ -26,7 +26,7 @@ def log(level, message, **fields):
     try:
         SOCK.sendto(json.dumps(doc).encode("utf-8"), (GELF_HOST, GELF_PORT))
     except OSError:
-        pass                      # การ log ต้องไม่ทำให้แอปล้ม
+        pass                      # การ log ต้องไม่ทำให้แอปล้ม (EN: logging must never crash the app)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -52,7 +52,7 @@ class Handler(BaseHTTPRequestHandler):
             request_id=rid, user=user, http_method=self.command, http_path=self.path,
             http_status=status, took_ms=took, client_ip=self.client_address[0])
 
-    def log_message(self, *args):   # ปิด log แบบ text ของ http.server
+    def log_message(self, *args):   # ปิด log แบบ text ของ http.server (EN: silence http.server's plain-text log)
         pass
 
 

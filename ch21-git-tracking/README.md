@@ -1,13 +1,15 @@
-# บทที่ 21 ติดตามและบล็อกคำสั่ง Git แบบ Real-time
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 27
+# Chapter 21 Tracking and Blocking Git Commands in Real Time
 
-ติดตามคำสั่ง git ด้วย audit และ log ส่ง event เข้า SIEM และบล็อกการ push ที่ผิดนโยบายด้วย hook
+Course lab: 27
 
-สิ่งที่ได้เมื่อจบบท:
+Track git commands with audit and logs, send the events to the SIEM, and block pushes that break policy with a hook.
 
-- มองเห็นและควบคุมการเปลี่ยนแปลง source code
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch21-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Visibility and control over source code changes
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch21-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

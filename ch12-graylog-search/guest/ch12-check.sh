@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Chapter 12 verification: Saved Searches and log completeness
 # บทที่ 12 วิธีตรวจสอบ: Saved Search และความครบของ log
+# EN: Usage: read -rs GL_TOKEN && export GL_TOKEN && sudo --preserve-env=GL_TOKEN bash ch12-check.sh; unset GL_TOKEN
 # ใช้: read -rs GL_TOKEN && export GL_TOKEN && sudo --preserve-env=GL_TOKEN bash ch12-check.sh; unset GL_TOKEN
 set -uo pipefail
 F=0

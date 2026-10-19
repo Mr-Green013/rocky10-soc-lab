@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 8 verification: SSH key authentication and session limits (sudo bash ch08-check.sh)
 # บทที่ 8 วิธีตรวจสอบ: SSH key authentication และ session limit  (sudo bash ch08-check.sh)
 set -uo pipefail
 F=0

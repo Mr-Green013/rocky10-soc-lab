@@ -10,6 +10,7 @@ resource "azurerm_virtual_network" "lab" {
   resource_group_name = azurerm_resource_group.lab.name
   address_space       = [var.vnet_cidr]
 
+  # EN: [] = Azure-provided DNS; after Lab 11 set use_ipa_dns = true, then reboot or renew DHCP on every machine
   # [] = Azure-provided DNS; หลัง Lab 11 ตั้ง use_ipa_dns = true แล้ว reboot หรือ renew DHCP ทุกเครื่อง
   dns_servers = var.use_ipa_dns ? [local.ipa_ip] : []
 
@@ -22,12 +23,15 @@ resource "azurerm_subnet" "lab" {
   virtual_network_name = azurerm_virtual_network.lab.name
   address_prefixes     = [var.lab_subnet_cidr]
 
+  # EN: Internet access only through the NAT Gateway (no reliance on default outbound access, which Azure is retiring)
   # ออก internet ผ่าน NAT Gateway เท่านั้น (ไม่พึ่ง default outbound access ที่ Azure กำลังเลิกใช้)
   default_outbound_access_enabled = false
 }
 
 #
+# EN: NSG: the only way in from the internet is SSH to admin-01 from the listed IPs
 # NSG: เข้าจาก internet ได้ทางเดียวคือ SSH เข้า admin-01 จาก IP ที่ระบุ
+# EN: Inside the VNet everything can talk through the default rule AllowVnetInBound (firewalld on each machine controls it from there)
 # ภายใน VNet คุยกันได้ทั้งหมดผ่าน default rule AllowVnetInBound (firewalld ในเครื่องเป็นตัวคุมต่อ)
 #
 resource "azurerm_network_security_group" "lab" {
@@ -56,6 +60,7 @@ resource "azurerm_subnet_network_security_group_association" "lab" {
 }
 
 #
+# EN: NAT Gateway for outbound traffic (dnf, docker pull, Cloudflare Tunnel, LINE/Telegram API, Gmail 587)
 # NAT Gateway สำหรับ outbound (dnf, docker pull, Cloudflare Tunnel, LINE/Telegram API, Gmail 587)
 #
 resource "azurerm_public_ip" "nat" {

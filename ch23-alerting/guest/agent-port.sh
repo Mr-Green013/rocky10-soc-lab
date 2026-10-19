@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Chapter 23 Lab 40 step 2.2: move the Wazuh agent to the manager's new port, and revert automatically if it cannot connect
 # บทที่ 23 Lab 40 ขั้น 2.2: ย้าย Wazuh agent ไปต่อ manager ที่ port ใหม่ แล้วคืนค่าเองถ้าต่อไม่ได้
+# EN: Usage: sudo bash agent-port.sh [NEW_PORT] [OLD_PORT] (defaults 1614 1514)
 # ใช้: sudo bash agent-port.sh [NEW_PORT] [OLD_PORT]   (ค่าเริ่มต้น 1614 1514)
 set -uo pipefail
 NEW=${1:-1614}; OLD=${2:-1514}

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 verification: check that pve-01 is fully ready, in one run
 # บทที่ 1 วิธีตรวจสอบ: ตรวจความพร้อมของ pve-01 ทั้งหมดในครั้งเดียว
+# EN: Run on pve-01 as root: bash pve-check.sh
 # รันบน pve-01 ในฐานะ root:  bash pve-check.sh
+# EN: exit code = number of FAILed checks
 # exit code = จำนวนข้อที่ FAIL
 set -uo pipefail
 

@@ -1,13 +1,15 @@
-# บทที่ 19 Tetragon: มองเห็นและหยุดภัยระดับ Kernel
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 33, 35, 36, 37
+# Chapter 19 Tetragon: Seeing and Stopping Threats at the Kernel Level
 
-ติดตั้ง Tetragon บน node-01 เขียน TracingPolicy เพื่อ kill คำสั่งสร้าง SUID/SGID เฝ้าดูการเข้าถึงไฟล์สำคัญ และติดตามกิจกรรมของบัญชีผู้ใช้
+Course labs: 33, 35, 36, 37
 
-สิ่งที่ได้เมื่อจบบท:
+Install Tetragon on node-01 and write TracingPolicies that kill commands creating SUID/SGID files, watch access to sensitive files, and track user account activity.
 
-- หยุด process อันตรายได้ทันทีในระดับ kernel
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch19-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Stop a dangerous process instantly at the kernel level
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch19-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

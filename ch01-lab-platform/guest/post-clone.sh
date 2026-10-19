@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 step 11: first-boot tasks after cloning each machine (called by Initialize-SocLab.ps1)
 # บทที่ 1 ขั้นที่ 11: งานหลัง clone ครั้งแรกของแต่ละเครื่อง (Initialize-SocLab.ps1 เรียกให้)
+# EN: 1) Wait for cloud-init to finish
 #   1) รอ cloud-init ทำงานเสร็จ
+# EN: 2) Grow the root filesystem to fill the resized disk (LVM: partition -> PV -> LV -> XFS)
 #   2) ขยาย root filesystem ให้เต็ม disk ที่ resize ไว้ (LVM: partition -> PV -> LV -> XFS)
+# EN: 3) Disable cloud-init so settings made in later chapters (nmcli, hostnamectl) are not overwritten
 #   3) ปิด cloud-init เพื่อให้การตั้งค่าในบทต่อไป (nmcli, hostnamectl) ไม่ถูกเขียนทับ
+# EN: 4) Install soclab-check in /usr/local/sbin
 #   4) ติดตั้ง soclab-check ไว้ที่ /usr/local/sbin
+# EN: Run as root: sudo bash post-clone.sh
 # รันในฐานะ root: sudo bash post-clone.sh
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || { echo "ต้องรันด้วย sudo" >&2; exit 1; }
@@ -11,6 +17,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 
 echo "==> รอ cloud-init"
 rc=0; cloud-init status --wait >/dev/null || rc=$?
+# EN: 0 = done, 2 = done with warnings (e.g. a deprecated key); both count as success
 # 0 = done, 2 = done แต่มี warning (เช่น deprecated key) ถือว่าผ่าน
 case $rc in 0|2) echo "    cloud-init: $(cloud-init status | awk '/status:/{print $2}')";; *) echo "    cloud-init ผิดพลาด (rc=$rc) ดู /var/log/cloud-init.log" >&2; exit 1;; esac
 
@@ -22,7 +29,7 @@ if lvs "$root_src" >/dev/null 2>&1; then
   part=$(basename "$(readlink -f "$pv")")
   disk=/dev/$(lsblk -no PKNAME "/dev/$part" | head -1)
   num=$(cat "/sys/class/block/$part/partition")
-  growpart "$disk" "$num" || true          # exit 1 = NOCHANGE (โตเต็มแล้ว)
+  growpart "$disk" "$num" || true          # exit 1 = NOCHANGE (โตเต็มแล้ว) (EN: exit 1 = NOCHANGE (already full size))
   pvresize "$pv" >/dev/null
   free=$(vgs --noheadings --units b --nosuffix -o vg_free "$vg" | tr -d ' ')
   if [ "${free:-0}" -gt 0 ]; then

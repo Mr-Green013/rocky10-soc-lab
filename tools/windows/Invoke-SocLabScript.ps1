@@ -1,10 +1,14 @@
 ﻿<#
 .SYNOPSIS
+  EN: Runs any chapter's script on several lab machines at once from Windows
   รัน script ของบทใดก็ได้บนเครื่องใน lab หลายเครื่องพร้อมกันจาก Windows
 
 .DESCRIPTION
+  EN: Copies the script (and the extra files in -Files) to /tmp/soclab/ on each machine, then runs it with sudo
   คัดลอก script (และไฟล์ประกอบใน -Files) ไปที่ /tmp/soclab/ ของแต่ละเครื่อง แล้วรันด้วย sudo
+  EN: Uses the Windows ssh/scp with the key in ssh-agent, like Initialize-SocLab.ps1 in chapter 1
   ใช้ ssh/scp ของ Windows กับ key ใน ssh-agent เหมือน Initialize-SocLab.ps1 ของบทที่ 1
+  EN: Copied files are always converted from CRLF to LF before running
   ไฟล์ที่คัดลอกถูกแปลง CRLF เป็น LF ก่อนรันเสมอ
 
 .EXAMPLE

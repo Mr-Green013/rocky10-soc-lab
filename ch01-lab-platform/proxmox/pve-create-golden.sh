@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+# EN: Chapter 1 step 8: create VM 9000 "rocky10-golden" for installing Rocky Linux 10 from the ISO
 # บทที่ 1 ขั้นที่ 8: สร้าง VM 9000 "rocky10-golden" สำหรับติดตั้ง Rocky Linux 10 จาก ISO
+# EN: Run on pve-01 as root:
 # รันบน pve-01 ในฐานะ root:
-#   bash pve-create-golden.sh                         # ใช้ Rocky ISO ตัวเดียวที่มีใน local:iso
+#   bash pve-create-golden.sh                         # ใช้ Rocky ISO ตัวเดียวที่มีใน local:iso (EN: uses the only Rocky ISO in local:iso)
 #   bash pve-create-golden.sh Rocky-10.2-x86_64-minimal.iso
 set -euo pipefail
 
@@ -19,6 +21,7 @@ fi
 [ -f "$ISO_DIR/$ISO" ] || { echo "ไม่พบ $ISO_DIR/$ISO" >&2; exit 1; }
 if qm status "$VMID" >/dev/null 2>&1; then echo "มี VM $VMID อยู่แล้ว" >&2; exit 1; fi
 
+# EN: cpu host: Rocky 10 needs x86-64-v3; the default (x86-64-v2-AES) will not boot
 # cpu host: Rocky 10 ต้องการ x86-64-v3 ค่า default (x86-64-v2-AES) จะบูตไม่ขึ้น
 qm create "$VMID" \
   --name rocky10-golden \

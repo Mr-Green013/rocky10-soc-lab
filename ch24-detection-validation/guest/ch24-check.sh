@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Chapter 24: check detection readiness before doing detection validation
 # บทที่ 24 ตรวจความพร้อมของการตรวจจับ (detection readiness) ก่อนทำ detection validation
+# EN: This script "runs no attacks at all"; it only checks that the 3 detection layers the chapter relies on are running
 # สคริปต์นี้ "ไม่รันการโจมตีใด ๆ" แค่ตรวจว่าตัวตรวจจับทั้ง 3 ชั้นที่บทอ้างถึงทำงานอยู่
 #   sudo bash ch24-check.sh
 set -uo pipefail

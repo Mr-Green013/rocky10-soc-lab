@@ -1,3 +1,4 @@
+# EN: /etc/tetragon/tetragon.tp.d/85-git-egress.yaml (test from ~/tp/ first, per chapter 21)
 # /etc/tetragon/tetragon.tp.d/85-git-egress.yaml (ทดสอบจาก ~/tp/ ก่อนตามบทที่ 21)
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy
@@ -21,7 +22,7 @@ spec:
         operator: "NotDAddr"
         values:
         - "192.168.10.41/32"      # git.lab.internal
-        - "192.168.10.10/32"      # ipa-01 (Kerberos ของ ssh)
+        - "192.168.10.10/32"      # ipa-01 (Kerberos ของ ssh) (EN: ipa-01 (Kerberos for ssh))
         - "127.0.0.0/8"
       matchActions:
       - action: Sigkill

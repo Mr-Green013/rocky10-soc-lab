@@ -1,14 +1,17 @@
+# EN: Copy to terraform.tfvars and edit the values (terraform.tfvars is in .gitignore)
 # คัดลอกเป็น terraform.tfvars แล้วแก้ค่า (terraform.tfvars อยู่ใน .gitignore)
 
 # subscription_id = "00000000-0000-0000-0000-000000000000"
 location = "southeastasia"
 prefix   = "soclab"
 
+# EN: Your public IP, from: curl -s https://api.ipify.org
 # Public IP ของคุณ ดูได้จาก: curl -s https://api.ipify.org
 admin_source_cidrs = ["203.0.113.10/32"]
 
 admin_ssh_public_key_path = "~/.ssh/id_ed25519.pub"
 
+# EN: Check the real image name first with ./scripts/find-rocky-image.sh southeastasia
 # ตรวจชื่อ image จริงก่อนด้วย ./scripts/find-rocky-image.sh southeastasia
 image = {
   source        = "marketplace"
@@ -19,6 +22,7 @@ image = {
   plan_required = true
 }
 
+# EN: When using the Community Gallery or an image you imported yourself
 # กรณีใช้ Community Gallery หรือ image ที่ import เอง
 # image = {
 #   source   = "image_id"
@@ -27,9 +31,11 @@ image = {
 
 accept_marketplace_terms = false
 
+# EN: Phase 2: after installing FreeIPA in Lab 11, change this to true and apply again
 # Phase 2: หลังติดตั้ง FreeIPA ใน Lab 11 แล้วเปลี่ยนเป็น true แล้ว apply อีกครั้ง
 use_ipa_dns = false
 
+# EN: Machine sizes can be changed, e.g. if Graylog is slow because the B-series ran out of CPU credits
 # ปรับขนาดเครื่องได้ เช่น ถ้า Graylog ช้าเพราะ B-series หมด CPU credit
 # vm_sizes = {
 #   graylog-01 = "Standard_D4as_v5"

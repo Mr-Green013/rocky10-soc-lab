@@ -1,3 +1,4 @@
+# EN: 81-connect-audit.yaml : from chapter 19 (test with tetra tracingpolicy add before placing it in this directory)
 # 81-connect-audit.yaml : จากบทที่ 19 (ทดสอบด้วย tetra tracingpolicy add ก่อนวางในไดเรกทอรีนี้)
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy

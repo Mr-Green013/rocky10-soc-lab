@@ -1,14 +1,16 @@
-# บทที่ 9 CrowdSec: Ban Brute-force และบล็อก Tor/Proxy
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 14, 15
+# Chapter 9 CrowdSec: Banning Brute-force and Blocking Tor/Proxies
 
-ติดตั้ง CrowdSec, acquisition และ scenario ของ sshd, firewall bouncer, ทดสอบ brute-force จำลองจาก lab-linux-02 และบล็อก Tor exit node และ anonymous proxy ด้วย blocklist
+Course labs: 14, 15
 
-สิ่งที่ได้เมื่อจบบท:
+Install CrowdSec, the sshd acquisition and scenario and the firewall bouncer, test a simulated brute-force from lab-linux-02, and block Tor exit nodes and anonymous proxies with a blocklist.
 
-- IP ที่ brute-force ถูก ban อัตโนมัติ
-- จัดการ decision และ allowlist ได้
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch09-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- IPs that brute-force are banned automatically
+- You can manage decisions and the allowlist
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch09-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

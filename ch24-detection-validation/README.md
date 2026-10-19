@@ -1,21 +1,23 @@
-# บทที่ 24 ทดสอบการโจมตีในห้องแลปเพื่อศึกษาการป้องกัน (detection validation)
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: บทสรุป (ใช้ตัวตรวจจับจากบทที่ 8, 9, 15–19, 22)
+# Chapter 24 Attack Simulation in the Lab to Study Defense (Detection Validation)
 
-แมป CVE จริง 6 ตัว (Log4Shell, Struts2, Shellshock, regreSSHion, PwnKit, xz/liblzma) เข้ากับตัวตรวจจับ 3 ชั้นของเล่ม แล้วจำลอง "เฉพาะสัญญาณ" ที่ตัวตรวจจับมองหา ด้วยขั้นตอน benign ที่อ้างอิง lab เดิม เพื่อวัด detection coverage
+Course labs: wrap-up (uses the detectors from chapters 8, 9, 15–19 and 22)
 
-สิ่งที่ได้เมื่อจบบท:
+Map 6 real CVEs (Log4Shell, Struts2, Shellshock, regreSSHion, PwnKit, xz/liblzma) onto the book's 3 detection layers, then simulate **only the signal** each detector looks for, using benign steps that reuse the existing lab, to measure detection coverage.
 
-- จำลองสัญญาณของ CVE ทั้ง 6 ตัวโดยไม่ใช้ exploit จริง และเกิด alert
-- ตาราง detection coverage พร้อมช่องว่างที่ต้องปิด
+What you get at the end of the chapter:
 
-ไฟล์ในบท:
+- The signals of all 6 CVEs simulated without any real exploit, each raising an alert
+- A detection coverage table with the gaps that still need closing
 
-- `guest/ch24-check.sh` — ตรวจความพร้อมของตัวตรวจจับ 3 ชั้น (ไม่รันการโจมตี) รันบน wazuh-01, node-01, lab-linux-01
-- `coverage-template.md` — แม่แบบตาราง detection coverage
+Files in this chapter:
 
-แนวทางด้านความปลอดภัย: ทำในห้องแลปที่แยกขาดเท่านั้น ใช้บัญชี/container ทดสอบและ cleanup ทุกครั้ง ไม่มี exploit หรือ payload จริง ใช้ IP สำหรับเอกสาร (RFC 5737) เมื่ออ้างปลายทางภายนอก
+- `guest/ch24-check.sh` — checks that the 3 detection layers are ready (runs no attacks). Run it on wazuh-01, node-01 and lab-linux-01
+- `coverage-template.md` — template for the detection coverage table
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch24-check.sh` และ `coverage-template.md` (ยังต้องยืนยันบนเครื่องจริง)
+Safety guidance: work only in an isolated lab. Use test accounts/containers and clean up every time. There are no real exploits or payloads; when an external destination is needed, use documentation IPs (RFC 5737).
 
-เริ่มบทนี้จาก snapshot `ch23-final` ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch24-check.sh` and `coverage-template.md` (still to be confirmed on real machines)
+
+Start this chapter from the `ch23-final` snapshot. See the [book outline](../docs/book-outline.md)

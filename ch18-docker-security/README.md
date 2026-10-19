@@ -1,13 +1,15 @@
-# บทที่ 18 Docker Runtime Security
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 24
+# Chapter 18 Docker Runtime Security
 
-จำลองการโจมตี container: terminal hijacking, DoS, data exfiltration ตรวจจับด้วย Falco และ eBPF และป้องกันด้วยการตั้งค่า runtime
+Course lab: 24
 
-สิ่งที่ได้เมื่อจบบท:
+Simulate container attacks — terminal hijacking, DoS, data exfiltration — detect them with Falco and eBPF, and prevent them with runtime settings.
 
-- ตรวจจับพฤติกรรมผิดปกติใน container ได้ real-time
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch18-check.sh` และ config ใน `files/` (ยังต้องยืนยันบนเครื่องจริง)
+- Detect abnormal behavior inside containers in real time
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab files: `guest/ch18-check.sh` and config in `files/` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)

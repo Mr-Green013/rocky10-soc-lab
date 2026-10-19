@@ -1,29 +1,38 @@
-# บทที่ 2 Network, SSH และ Hostname
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 2, 3, 5
+# Chapter 2 Network, SSH and Hostname
 
-ตั้ง IP, DNS และ search domain ด้วย nmcli อ่าน NetworkManager profile ตั้ง hostname แบบ FQDN และ /etc/hosts ให้ตรงกับที่ FreeIPA ต้องการ ติดตั้งและตรวจ sshd รวมถึงลำดับของไฟล์ใน sshd_config.d
+Course labs: 2, 3, 5
 
-สิ่งที่ได้เมื่อจบบท:
+Set the IP, DNS and search domain with nmcli, read NetworkManager profiles, set an FQDN hostname and /etc/hosts the way FreeIPA expects, then install and check sshd, including the order in which files in sshd_config.d are read.
 
-- ทุกเครื่องมี FQDN ที่ resolve เป็น IP จริง
-- เข้าใจว่า sshd อ่านค่าจากไฟล์ใดก่อนหลัง (sshd -T)
+What you get at the end of the chapter:
 
-สถานะ: ต้นฉบับเขียนแล้ว รอทดสอบบนเครื่องจริง
+- Every machine has an FQDN that resolves to its real IP
+- You understand which file sshd reads a value from first (sshd -T)
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: draft written, waiting to be tested on real machines
 
-## ไฟล์
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)
 
-| ไฟล์ | รันที่ | หน้าที่ |
+## Files
+
+| File | Runs on | Purpose |
 | --- | --- | --- |
-| `guest/set-identity.sh` | ทุก VM | ตั้ง FQDN, /etc/hosts ของ lab, profile ชื่อ lab |
-| `guest/ch02-check.sh` | ทุก VM | ตรวจ network, hostname, SSH |
-| `../tools/windows/Set-SocLabHosts.ps1` | Windows (Admin) | hosts file และ ~/.ssh/config ของ Windows |
+| `guest/set-identity.sh` | every VM | Sets the FQDN, the lab /etc/hosts and the profile named lab |
+| `guest/ch02-check.sh` | every VM | Checks network, hostname and SSH |
+| `../tools/windows/Set-SocLabHosts.ps1` | Windows (Admin) | The Windows hosts file and ~/.ssh/config |
 
-รัน script ฝั่ง guest กับทุกเครื่องจาก Windows:
+Run the guest-side script on every machine from Windows:
 
 ```powershell
 cd tools\windows
-.\Invoke-SocLabScript.ps1 -Script ..\..\ch02-network-ssh-hostname\..\tools\windows\Set-SocLabHosts.ps1
+.\Invoke-SocLabScript.ps1 -Script ..\..\ch02-network-ssh-hostname\guest\set-identity.sh -Files ..\..\lab-hosts.csv
+```
+
+`Set-SocLabHosts.ps1` runs directly on Windows, in PowerShell as Admin:
+
+```powershell
+cd tools\windows
+.\Set-SocLabHosts.ps1
 ```

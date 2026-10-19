@@ -1,18 +1,24 @@
 ﻿#Requires -RunAsAdministrator
 <#
 .SYNOPSIS
+  EN: Creates the VM for installing Proxmox VE on Hyper-V (nested virtualization) for the SOC lab
   สร้าง VM สำหรับติดตั้ง Proxmox VE บน Hyper-V (nested virtualization) สำหรับ SOC lab
 
 .DESCRIPTION
+  EN: - Switch "PVE-Uplink" (Internal + NAT 172.31.255.0/24): lets Proxmox reach the internet
   - Switch "PVE-Uplink" (Internal + NAT 172.31.255.0/24): ให้ Proxmox ออก internet
       Windows = 172.31.255.1, Proxmox vmbr0 = 172.31.255.2
+  EN: - Switch "SOC-Lab" (Internal, no NAT): the lab network 192.168.10.0/24
   - Switch "SOC-Lab" (Internal, ไม่มี NAT): network ของ lab 192.168.10.0/24
+      EN: Windows = 192.168.10.100 (the admin workstation in the docs), Proxmox vmbr1 = 192.168.10.1 (the lab gateway)
       Windows = 192.168.10.100 (admin workstation ตามเอกสาร), Proxmox vmbr1 = 192.168.10.1 (gateway ของ lab)
+  EN: - Gen 2 VM, static memory, nested virtualization on, Secure Boot off, MAC spoofing on
   - VM Gen 2, static memory, เปิด nested virtualization, ปิด Secure Boot, เปิด MAC spoofing
 
 .EXAMPLE
   .\New-ProxmoxLabHost.ps1 -IsoPath D:\ISO\proxmox-ve_9.2-1.iso -VMPath D:\Hyper-V
 
+  EN: Part of the book "SOC Lab on Rocky Linux 10", chapter 1
   ส่วนหนึ่งของหนังสือ "SOC Lab บน Rocky Linux 10" บทที่ 1
 #>
 [CmdletBinding()]
@@ -28,6 +34,7 @@ $ErrorActionPreference = 'Stop'
 
 function Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 
+# EN: --- 0. Pre-flight checks ---
 # --- 0. ตรวจความพร้อม -------------------------------------------------------
 Step 'ตรวจ Hyper-V และไฟล์ ISO'
 if (-not (Test-Path $IsoPath)) { throw "ไม่พบ ISO: $IsoPath" }
@@ -41,6 +48,7 @@ if ($hv.State -ne 'Enabled') {
 
 if (Get-VM -Name $VMName -ErrorAction SilentlyContinue) { throw "มี VM ชื่อ $VMName อยู่แล้ว" }
 
+# EN: The lab subnet must not overlap an existing network (home LAN, VPN, WSL, Docker Desktop)
 # subnet ของ lab ต้องไม่ชนกับ network ที่มีอยู่แล้ว (LAN บ้าน, VPN, WSL, Docker Desktop)
 function ConvertTo-UInt32([string]$ip) {
     $b = ([System.Net.IPAddress]::Parse($ip)).GetAddressBytes(); [Array]::Reverse($b); [BitConverter]::ToUInt32($b, 0)
@@ -80,6 +88,7 @@ if (-not (Get-NetNat -Name 'PVE-Uplink-NAT' -ErrorAction SilentlyContinue)) {
     New-NetNat -Name 'PVE-Uplink-NAT' -InternalIPInterfaceAddressPrefix '172.31.255.0/24' | Out-Null
 }
 
+# EN: --- 2. Lab switch (pure L2, Windows is 192.168.10.100) ---
 # --- 2. Lab switch (L2 ล้วน, Windows เป็น 192.168.10.100) ------------------------
 Step 'สร้าง switch SOC-Lab และตั้ง Windows เป็น 192.168.10.100'
 if (-not (Get-VMSwitch -Name 'SOC-Lab' -ErrorAction SilentlyContinue)) {
@@ -87,6 +96,7 @@ if (-not (Get-VMSwitch -Name 'SOC-Lab' -ErrorAction SilentlyContinue)) {
 }
 $lab = Get-NetAdapter -Name 'vEthernet (SOC-Lab)'
 if (-not (Get-NetIPAddress -InterfaceIndex $lab.ifIndex -IPAddress 192.168.10.100 -ErrorAction SilentlyContinue)) {
+    # EN: No default gateway: Windows keeps reaching the internet through its real NIC
     # ไม่ใส่ default gateway: internet ของ Windows ยังออกทาง NIC จริงเหมือนเดิม
     New-NetIPAddress -InterfaceIndex $lab.ifIndex -IPAddress 192.168.10.100 -PrefixLength 24 | Out-Null
 }
@@ -97,26 +107,32 @@ $vhd = Join-Path $VMPath "$VMName\$VMName.vhdx"
 New-VM -Name $VMName -Generation 2 -Path $VMPath -MemoryStartupBytes $MemoryBytes `
        -NewVHDPath $vhd -NewVHDSizeBytes $DiskBytes -SwitchName 'PVE-Uplink' | Out-Null
 
+# EN: nested virtualization requires static memory
 # nested virtualization ต้องใช้ static memory
 Set-VM -Name $VMName -ProcessorCount $CpuCount -StaticMemory `
        -AutomaticCheckpointsEnabled $false -AutomaticStopAction ShutDown -AutomaticStartAction Nothing
 Set-VMProcessor -VMName $VMName -ExposeVirtualizationExtensions $true
 
+# EN: The 2nd NIC connects to SOC-Lab; MAC spoofing lets the VMs inside Proxmox use their own MACs
 # NIC ตัวที่ 2 ต่อ SOC-Lab, MAC spoofing ให้ VM ข้างใน Proxmox ใช้ MAC ของตัวเองได้
 Add-VMNetworkAdapter -VMName $VMName -SwitchName 'SOC-Lab' -Name 'soc-lab'
 Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
 
+# EN: The Proxmox installer boots without setting a Secure Boot template
 # Proxmox installer บูตได้โดยไม่ต้องตั้ง Secure Boot template
 Set-VMFirmware -VMName $VMName -EnableSecureBoot Off
 Add-VMDvdDrive -VMName $VMName -Path $IsoPath
 Set-VMFirmware -VMName $VMName -FirstBootDevice (Get-VMDvdDrive -VMName $VMName)
 
+# EN: Defender does not need to scan the VHDX every time the VM writes to disk
 # Defender ไม่ต้องสแกน VHDX ทุกครั้งที่ VM เขียน disk
 Add-MpPreference -ExclusionPath (Join-Path $VMPath $VMName) -ErrorAction SilentlyContinue
 
+# EN: --- 4. Summary ---
 # --- 4. สรุป -------------------------------------------------------------------
 Step 'เสร็จ: ตรวจค่า'
 Get-VMProcessor -VMName $VMName | Select-Object VMName, Count, ExposeVirtualizationExtensions | Format-Table
+# EN: Note the MACs: use them to pick the right NIC in the Proxmox installer (PVE-Uplink = management)
 # จด MAC ไว้: ใช้เลือก NIC ที่ถูกต้องในตัวติดตั้ง Proxmox (PVE-Uplink = management)
 Get-VMNetworkAdapter -VMName $VMName | Select-Object Name, SwitchName, MacAddressSpoofing, MacAddress | Format-Table
 

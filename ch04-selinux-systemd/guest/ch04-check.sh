@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# EN: Chapter 4 verification: SELinux, systemd and the mini-lab cleanup (sudo bash ch04-check.sh)
 # บทที่ 4 วิธีตรวจสอบ: SELinux, systemd และการ cleanup ของ mini-lab  (sudo bash ch04-check.sh)
 set -uo pipefail
 F=0

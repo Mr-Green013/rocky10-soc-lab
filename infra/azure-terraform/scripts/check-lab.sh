@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+# EN: Check the cloud-init result on every machine through the ssh config from `terraform output -raw ssh_config`
 # ตรวจผลของ cloud-init ทุกเครื่องผ่าน ssh config ที่ได้จาก `terraform output -raw ssh_config`
+# EN: Usage: ./scripts/check-lab.sh
 # ใช้: ./scripts/check-lab.sh
 set -uo pipefail
 HOSTS=(admin-01 ipa-01 graylog-01 wazuh-01 lab-linux-01 lab-linux-02 node-01)

@@ -1,13 +1,15 @@
-# บทที่ 20 SOC Analyst Access และ Sudo Violation Dashboard
+**English** · [ภาษาไทย](README.th.md)
 
-Lab ในหลักสูตร: 25, 26
+# Chapter 20 SOC Analyst Access and a Sudo Violation Dashboard
 
-ให้ analyst login Graylog ด้วยบัญชี FreeIPA ผ่าน LDAP กำหนด role และสร้าง dashboard การใช้ sudo ที่ผิดนโยบาย
+Course labs: 25, 26
 
-สิ่งที่ได้เมื่อจบบท:
+Let analysts log in to Graylog with their FreeIPA account over LDAP, assign roles, and build a dashboard of sudo use that breaks policy.
 
-- สิทธิ์ของทีม SOC จัดการจากที่เดียว
+What you get at the end of the chapter:
 
-สถานะ: เนื้อหาบทเขียนเต็มแล้ว ไฟล์ Lab: `guest/ch20-check.sh` (ยังต้องยืนยันบนเครื่องจริง)
+- SOC team permissions managed from one place
 
-เริ่มบทนี้จาก snapshot ของบทก่อนหน้า ดู [โครงเล่ม](../docs/book-outline.md)
+Status: chapter fully written. Lab file: `guest/ch20-check.sh` (still to be confirmed on real machines)
+
+Start this chapter from the previous chapter's snapshot. See the [book outline](../docs/book-outline.md)
